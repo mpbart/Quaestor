@@ -55,4 +55,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'twitter', '~> 7.0.0'
 
-gem 'ruby-hackernews', '~> 1.4.0'
+gem 'hackernews_ruby', '~> 0.0.5'
