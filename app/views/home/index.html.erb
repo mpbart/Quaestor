@@ -13,16 +13,31 @@
         <div class="col">
             <div class='card'>
                 <div class='card-body'>
-                    <h5 class='card-title text-center'>Twitter</h5>
-                    <p class='card-text'>Some tweets here</p>
+                    <h5 class='card-title text-center'>Hacker News</h5>
+                    <table class='table'>
+                      <thead>
+                        <tr>
+                          <th scope='col'>Title</th>
+                          <th scope='col'>Source</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% @links.each do |link| %>
+                          <tr> 
+                            <td><%= link.title %></td>
+                            <td><%= link.url %></td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
                 </div>
             </div>
         </div>
         <div class="col">
             <div class='card'>
                 <div class='card-body'>
-                    <h5 class='card-title text-center'>HackerNews</h5>
-                    <p class='card-text'>Some links here</p>
+                    <h5 class='card-title text-center'>Twitter</h5>
+                    <p class='card-text'>Some tweets here</p>
                 </div>
             </div>
         </div>
