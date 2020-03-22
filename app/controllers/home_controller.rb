@@ -1,14 +1,15 @@
-require 'twitter/client'
+require 'my_twitter/client'
 require 'hackernews/client'
 
 class HomeController < ActionController::Base
   def index
     @links = load_hackernews_links
+    @tweets = load_tweets
   end
 
   def load_tweets
-    client = Twitter::Client.initialize_from_config
-    client.load_tweets(number: 5)
+    client = MyTwitter::Client.initialize_from_config
+    client.get_tweets(number: 5)
   end
 
   def load_hackernews_links

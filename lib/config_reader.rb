@@ -9,7 +9,7 @@ class ConfigReader
 
   def self.config_file
     File.open(Rails.root.join('config.json'), 'r') do |file|
-      JSON.parse(file)
+      JSON.load(file)
     end
   end
 end
