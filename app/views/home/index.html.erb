@@ -37,7 +37,21 @@
             <div class='card'>
                 <div class='card-body'>
                     <h5 class='card-title text-center'>Twitter</h5>
-                    <p class='card-text'>Some tweets here</p>
+                    <table class='table'>
+                    <thead class='table'>
+                      <tr>
+                        <th scope='col'>User</th>
+                        <th scope='col'>Tweet</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% @tweets.each do |tweet| %>
+                        <tr>
+                          <td><%= tweet.user.screen_name %></td>
+                          <td><%= tweet.full_text %></td>
+                        </tr>
+                      <% end %>
+                    </tbody>
                 </div>
             </div>
         </div>
