@@ -29,3 +29,6 @@
 
 log/
 tmp/
+
+# Ignore config with secrets
+config.json
