@@ -60,3 +60,7 @@ gem 'hackernews_ruby', '~> 0.0.5'
 gem 'devise', '>= 4.7.1'
 
 gem 'plaid', '>= 8.7.0'
+
+gem 'pg'
+
+gem 'awesome_print'
