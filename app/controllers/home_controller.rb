@@ -1,7 +1,9 @@
 require 'my_twitter/client'
 require 'hackernews/client'
 
-class HomeController < ActionController::Base
+class HomeController < ApplicationController
+  before_action :authenticate_user!
+
   def index
     @links = load_hackernews_links
     @tweets = load_tweets
