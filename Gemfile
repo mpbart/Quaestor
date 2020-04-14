@@ -64,3 +64,5 @@ gem 'plaid', '>= 8.7.0'
 gem 'pg'
 
 gem 'awesome_print'
+
+gem 'pry'
