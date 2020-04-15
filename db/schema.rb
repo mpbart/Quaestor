@@ -39,8 +39,8 @@ ActiveRecord::Schema.define(version: 2020_04_11_171556) do
 
   create_table "plaid_credentials", force: :cascade do |t|
     t.bigint "user_id"
-    t.string "plaid_item"
-    t.jsonb "parameters"
+    t.string "plaid_item_id"
+    t.string "access_token"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_plaid_credentials_on_user_id"
