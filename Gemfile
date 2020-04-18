@@ -66,3 +66,5 @@ gem 'pg'
 gem 'awesome_print'
 
 gem 'pry'
+
+gem 'attr_encrypted'
