@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_11_171556) do
+ActiveRecord::Schema.define(version: 2020_04_18_164014) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,9 +40,11 @@ ActiveRecord::Schema.define(version: 2020_04_11_171556) do
   create_table "plaid_credentials", force: :cascade do |t|
     t.bigint "user_id"
     t.string "plaid_item_id"
-    t.string "access_token"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "encrypted_access_token"
+    t.string "encrypted_access_token_iv"
+    t.index ["encrypted_access_token_iv"], name: "index_plaid_credentials_on_encrypted_access_token_iv", unique: true
     t.index ["user_id"], name: "index_plaid_credentials_on_user_id"
   end
 
