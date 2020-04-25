@@ -12,4 +12,5 @@ class ConfigReader
       JSON.load(file)
     end
   end
+
 end

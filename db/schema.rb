@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_18_164014) do
+ActiveRecord::Schema.define(version: 2020_04_25_164809) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,6 +48,17 @@ ActiveRecord::Schema.define(version: 2020_04_18_164014) do
     t.index ["user_id"], name: "index_plaid_credentials_on_user_id"
   end
 
+  create_table "plaid_responses", force: :cascade do |t|
+    t.string "encrypted_response"
+    t.string "encrypted_response_iv"
+    t.string "endpoint"
+    t.bigint "plaid_credential_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["encrypted_response_iv"], name: "index_plaid_responses_on_encrypted_response_iv"
+    t.index ["plaid_credential_id"], name: "index_plaid_responses_on_plaid_credential_id"
+  end
+
   create_table "transactions", force: :cascade do |t|
     t.bigint "account_id"
     t.string "category"
@@ -83,4 +94,5 @@ ActiveRecord::Schema.define(version: 2020_04_18_164014) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "plaid_responses", "plaid_credentials"
 end
