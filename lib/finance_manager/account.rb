@@ -11,8 +11,16 @@ module FinanceManager
       end
     end
 
-    # TODO
     def self.update(account, account_hash)
+      account.name             = account_hash['name']
+      account.official_name    = account_hash['official_name']
+      account.account_type     = account_hash['type']
+      account.account_sub_type = account_hash['subtype']
+      account.mask             = account_hash['mask']
+
+      account.save! if account.changed?
+
+      create_balance(account, account_hash['balances'])
     end
 
     def self.create(account_hash, user)
@@ -26,7 +34,10 @@ module FinanceManager
         mask:             account_hash['mask'],
       )
 
-      balance = account_hash['balances']
+      create_balance(account, account_hash['balances'])
+    end
+
+    def self.create_balance(account, balance)
       Balance.create!(
         account:   account,
         amount:    balance['current'],
@@ -34,6 +45,7 @@ module FinanceManager
         limit:     balance['limit'],
       )
     end
+    private_class_method :create_balance
 
   end
 end
