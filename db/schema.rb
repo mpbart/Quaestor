@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_25_164809) do
+ActiveRecord::Schema.define(version: 2020_04_26_165641) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -59,9 +59,9 @@ ActiveRecord::Schema.define(version: 2020_04_25_164809) do
     t.index ["plaid_credential_id"], name: "index_plaid_responses_on_plaid_credential_id"
   end
 
-  create_table "transactions", force: :cascade do |t|
+  create_table "transactions", id: :serial, force: :cascade do |t|
     t.bigint "account_id"
-    t.string "category"
+    t.string "category", array: true
     t.string "category_id"
     t.string "transaction_type"
     t.string "description"
