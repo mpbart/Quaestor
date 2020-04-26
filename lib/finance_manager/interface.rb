@@ -4,6 +4,7 @@ require_relative 'account'
 
 module FinanceManager
   class Interface
+    DATE_FORMAT = '%Y-%m-%d'.freeze
     
     attr_reader :user
 
@@ -36,6 +37,29 @@ module FinanceManager
     end
 
     def update_transactions(transactions)
+      user.plaid_credentials.each do |credential|
+        response = plaid_client.transactions.get(credential.token,
+                                                 transactions_refresh_start_date(credential),
+                                                 transactions_refresh_end_date)
+        PlaidResponse.record_transactions_response!(response, credential)
+
+        return unless transactions = response[:accounts]&.any?
+        transactions.each do |transaction|
+          FinanceManager::Transaction.handle(transaction)
+        end
+      end
+    end
+
+    private
+
+    # Using a lookback window of 5 days since the last refresh so that
+    # pending transactions will (hopefully) post by then
+    def transactions_refresh_start_date(plaid_cred)
+      (plaid_cred.user.accounts.transactions.order(:created_at).first.created_at - 5.days).strftime(DATE_FORMAT)
+    end
+
+    def transactions_refresh_end_date(plaid_cred)
+      Date.today.strftime(DATE_FORMAT)
     end
 
   end
