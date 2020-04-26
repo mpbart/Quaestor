@@ -3,7 +3,7 @@ class CreateTransactions < ActiveRecord::Migration[6.0]
     create_table :transactions do |t|
       t.references :account
 
-      t.string     :category
+      t.string     :category, array: true
       t.string     :category_id
       t.string     :transaction_type
       t.string     :description
