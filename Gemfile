@@ -68,3 +68,5 @@ gem 'awesome_print'
 gem 'pry'
 
 gem 'attr_encrypted'
+
+gem 'rspec'
