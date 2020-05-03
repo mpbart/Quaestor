@@ -1,6 +1,7 @@
 module FinanceManager
   class Transaction
     class UnknownAccountError < StandardError; end
+    class UnfoundPendingTransactionError < StandardError; end
 
     def self.handle(transaction)
       account = Account.find_by(plaid_identifier: transaction[:account_id])
