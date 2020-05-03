@@ -1,6 +1,7 @@
 require 'plaid'
 require 'config_reader'
 require_relative 'account'
+require_relative 'transaction'
 
 module FinanceManager
   class Interface
@@ -28,23 +29,24 @@ module FinanceManager
         response = plaid_client.accounts.get(credential.token)
         PlaidResponse.record_accounts_response!(response, credential)
 
-        return unless accounts = response[:accounts]&.any?
+        next unless response[:accounts]&.any?
 
-        accounts.each do |account_hash| 
+        response[:accounts].each do |account_hash|
           FinanceManager::Account.handle(account_hash, credential)
         end
       end
     end
 
-    def update_transactions(transactions)
+    def update_transactions
       user.plaid_credentials.each do |credential|
         response = plaid_client.transactions.get(credential.token,
                                                  transactions_refresh_start_date(credential),
                                                  transactions_refresh_end_date)
         PlaidResponse.record_transactions_response!(response, credential)
 
-        return unless transactions = response[:accounts]&.any?
-        transactions.each do |transaction|
+        next unless response[:transactions]&.any?
+
+        response[:transactions].each do |transaction|
           FinanceManager::Transaction.handle(transaction)
         end
       end
