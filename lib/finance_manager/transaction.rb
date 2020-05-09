@@ -9,7 +9,8 @@ module FinanceManager
 
       if transaction[:pending_transaction_id]
         update_pending(transaction)
-      elsif record = ::Transaction.find(transaction[:transaction_id])
+      # Use find_by here so that ActiveRecord does not raise if no record is found
+      elsif record = ::Transaction.find_by(id: transaction[:transaction_id])
         update(transaction, record)
       else
         create(account, transaction)
@@ -35,7 +36,7 @@ module FinanceManager
     end
 
     def self.update_pending(transaction)
-      pending = ::Transaction.find(transaction[:pending_transaction_id])
+      pending = ::Transaction.find_by(id: transaction[:pending_transaction_id])
       unfound_pending_transaction_error(transaction) unless pending
 
       update(transaction, pending)
