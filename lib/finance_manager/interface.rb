@@ -57,7 +57,7 @@ module FinanceManager
     # Using a lookback window of 5 days since the last refresh so that
     # pending transactions will (hopefully) post by then
     def transactions_refresh_start_date(plaid_cred)
-      (plaid_cred.user.accounts.transactions.order(:created_at).first.created_at - 5.days).strftime(DATE_FORMAT)
+      (plaid_cred.user.accounts.order(:updated_at).last.created_at - 10.days).strftime(DATE_FORMAT)
     end
 
     def transactions_refresh_end_date(plaid_cred)
