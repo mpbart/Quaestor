@@ -24,7 +24,7 @@ module FinanceManager
     end
 
     def self.create(account_hash, user)
-      account = Account.create!(
+      account = ::Account.create!(
         user:             user,
         plaid_identifier: account_hash['account_id'],
         name:             account_hash['name'],
