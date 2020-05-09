@@ -4,7 +4,7 @@ module FinanceManager
     class UnfoundPendingTransactionError < StandardError; end
 
     def self.handle(transaction)
-      account = Account.find_by(plaid_identifier: transaction[:account_id])
+      account = ::Account.find_by(plaid_identifier: transaction[:account_id])
       raise_unknown_account_error(transaction) unless account
 
       if transaction[:pending_transaction_id]
@@ -15,7 +15,7 @@ module FinanceManager
     end
 
     def self.create(account, transaction)
-      Transaction.create!(
+      ::Transaction.create!(
         account:                account,
         id:                     transaction[:transaction_id],
         category:               transaction[:category],
@@ -33,7 +33,7 @@ module FinanceManager
     end
 
     def self.update(transaction)
-      pending = Transaction.find(transaction[:pending_transaction_id])
+      pending = ::Transaction.find(transaction[:pending_transaction_id])
       unfound_pending_transaction_error(transaction) unless pending
 
       pending.category               = transaction[:category]
