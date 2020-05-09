@@ -8,7 +8,9 @@ module FinanceManager
       raise_unknown_account_error(transaction) unless account
 
       if transaction[:pending_transaction_id]
-        update(transaction)
+        update_pending(transaction)
+      elsif record = ::Transaction.find(transaction[:transaction_id])
+        update(transaction, record)
       else
         create(account, transaction)
       end
@@ -23,7 +25,7 @@ module FinanceManager
         transaction_type:       transaction[:transaction_type],
         description:            transaction[:description],
         amount:                 transaction[:amount],
-        date:                   transaction[:date], # TODO: Formatting?
+        date:                   transaction[:date],
         pending:                transaction[:pending],
         payment_metadata:       transaction[:payment_metadata],
         location_metadata:      transaction[:location_metadata],
@@ -32,22 +34,26 @@ module FinanceManager
       )
     end
 
-    def self.update(transaction)
+    def self.update_pending(transaction)
       pending = ::Transaction.find(transaction[:pending_transaction_id])
       unfound_pending_transaction_error(transaction) unless pending
 
-      pending.category               = transaction[:category]
-      pending.category_id            = transaction[:category_id]
-      pending.transaction_type       = transaction[:transaction_type]
-      pending.description            = transaction[:description]
-      pending.amount                 = transaction[:amount]
-      pending.date                   = transaction[:date] # TODO: Formatting?
-      pending.pending                = false
-      pending.payment_metadata       = transaction[:payment_metadata]
-      pending.location_metadata      = transaction[:location_metadata]
-      pending.pending_transaction_id = transaction[:pending_transaction_id]
-      pending.account_owner          = transaction[:account_owner]
-      pending.save!
+      update(transaction, pending)
+    end
+
+    def self.update(transaction_hash, record)
+      record.category               = transaction_hash[:category]
+      record.category_id            = transaction_hash[:category_id]
+      record.transaction_type       = transaction_hash[:transaction_type]
+      record.description            = transaction_hash[:description]
+      record.amount                 = transaction_hash[:amount]
+      record.date                   = transaction_hash[:date]
+      record.pending                = false
+      record.payment_metadata       = transaction_hash[:payment_metadata]
+      record.location_metadata      = transaction_hash[:location_metadata]
+      record.pending_transaction_id = transaction_hash[:pending_transaction_id]
+      record.account_owner          = transaction_hash[:account_owner]
+      record.save! if record.changed?
     end
 
     def self.unknown_account_error(transaction)
