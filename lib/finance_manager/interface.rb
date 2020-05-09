@@ -60,7 +60,7 @@ module FinanceManager
       (plaid_cred.user.accounts.order(:updated_at).last.created_at - 10.days).strftime(DATE_FORMAT)
     end
 
-    def transactions_refresh_end_date(plaid_cred)
+    def transactions_refresh_end_date
       Date.today.strftime(DATE_FORMAT)
     end
 
