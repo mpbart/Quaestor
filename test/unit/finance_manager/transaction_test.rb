@@ -41,10 +41,14 @@ RSpec.describe FinanceManager::Transaction do
   end
 
   describe '.handle' do
+    let(:previous_transaction) { nil }
+
     before do
       allow(account_double).to receive(:find_by).and_return(account)
+      allow(transaction_double).to receive(:find_by).and_return(previous_transaction)
       allow(described_class).to receive(:create)
       allow(described_class).to receive(:update)
+      allow(described_class).to receive(:update_pending)
     end
 
     subject(:handle) { described_class.handle(transaction_hash) }
@@ -64,8 +68,20 @@ RSpec.describe FinanceManager::Transaction do
     end
 
     context 'when the transaction is an update from a previously received pending transaction' do
+      let(:previous_transaction) { double('transaction') }
+
+      it 'calls .update_pending' do
+        expect(described_class).to receive(:update_pending).with(transaction_hash)
+        handle
+      end
+    end
+
+    context 'when the transaction has already been seen but was not previously pending' do
+      let(:pending_transaction_id) { nil }
+      let(:previous_transaction)   { double('transaction') }
+
       it 'calls .update' do
-        expect(described_class).to receive(:update).with(transaction_hash)
+        expect(described_class).to receive(:update).with(transaction_hash, previous_transaction)
         handle
       end
     end
@@ -105,7 +121,7 @@ RSpec.describe FinanceManager::Transaction do
     end
   end
 
-  describe '.update' do
+  describe '.update_pending' do
     let(:previous_transaction) { double('previous transaction') }
 
     before do
@@ -122,14 +138,15 @@ RSpec.describe FinanceManager::Transaction do
       allow(previous_transaction).to receive(:pending_transaction_id=).with(pending_transaction_id)
       allow(previous_transaction).to receive(:account_owner=).with(account_owner)
       allow(previous_transaction).to receive(:save!)
-      allow(transaction_double).to receive(:find).with(pending_transaction_id).and_return(previous_transaction)
+      allow(transaction_double).to receive(:find_by).with(id: pending_transaction_id).and_return(previous_transaction)
+      allow(described_class).to receive(:update)
     end
 
-    subject(:update) { described_class.update(transaction_hash) }
+    subject(:update_pending) { described_class.update_pending(transaction_hash) }
 
     it 'looks up the previous transaction by id' do
-      expect(transaction_double).to receive(:find).with(pending_transaction_id)
-      update
+      expect(transaction_double).to receive(:find_by).with(id: pending_transaction_id)
+      update_pending
     end
 
     context 'when the previous transaction is not found' do
@@ -137,13 +154,13 @@ RSpec.describe FinanceManager::Transaction do
 
       it 'calls .unfound_pending_transaction_error' do
         expect(described_class).to receive(:unfound_pending_transaction_error).with(transaction_hash)
-        update
+        update_pending
       end
     end
 
-    it 'saves the updated transaction' do
-      expect(previous_transaction).to receive(:save!)
-      update
+    it 'calls .update' do
+      expect(described_class).to receive(:update).with(transaction_hash, previous_transaction)
+      update_pending
     end
   end
 

@@ -6,8 +6,8 @@ RSpec.describe FinanceManager::Interface do
   let(:instance)             { described_class.new(user) }
   let(:plaid_response_class) { double('plaid response') }
   let(:credentials)          { [credential1, credential2] }
-  let(:credential1)          { double('plaid credential 1', token: token) }
-  let(:credential2)          { double('plaid credential 2', token: token) }
+  let(:credential1)          { double('plaid credential 1', access_token: token) }
+  let(:credential2)          { double('plaid credential 2', access_token: token) }
   let(:token)                { double('token') }
 
   before do
