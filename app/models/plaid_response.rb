@@ -12,4 +12,12 @@ class PlaidResponse < ApplicationRecord
       plaid_credential: credential,
     )
   end
+
+  def self.record_transactions_response!(response, credential)
+    PlaidResponse.create!(
+      endpoint:         '/transactions/get',
+      response:         response,
+      plaid_credential: credential,
+    )
+  end
 end
