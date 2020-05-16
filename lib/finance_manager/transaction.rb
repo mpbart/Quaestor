@@ -20,6 +20,7 @@ module FinanceManager
     def self.create(account, transaction)
       ::Transaction.create!(
         account:                account,
+        user:                   account.user,
         id:                     transaction[:transaction_id],
         category:               transaction[:category],
         category_id:            transaction[:category_id],
