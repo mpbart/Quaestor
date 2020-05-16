@@ -7,7 +7,7 @@ module FinanceManager
       if account
         update(account, account_hash)
       else
-        create(account_hash, credential.user)
+        create(account_hash, credential)
       end
     end
 
@@ -23,9 +23,10 @@ module FinanceManager
       create_balance(account, account_hash['balances'])
     end
 
-    def self.create(account_hash, user)
+    def self.create(account_hash, credential)
       account = ::Account.create!(
-        user:             user,
+        user:             credential.user,
+        institution_name: credential.institution_name,
         plaid_identifier: account_hash['account_id'],
         name:             account_hash['name'],
         official_name:    account_hash['official_name'],
