@@ -27,6 +27,7 @@ module FinanceManager
       account = ::Account.create!(
         user:             credential.user,
         institution_name: credential.institution_name,
+        institution_id:   credential.institution_id,
         plaid_identifier: account_hash['account_id'],
         name:             account_hash['name'],
         official_name:    account_hash['official_name'],
