@@ -13,8 +13,8 @@ class PlaidController < ActionController::Base
     response = finance_manager.plaid_client.item.public_token.exchange(public_token)
     PlaidCredential.create!(plaid_item_id:    response['item_id'],
                             access_token:     response['access_token'],
-                            institution_name: params['metadata']['name'],
-                            institution_id:   params['metadata']['institution_id'],
+                            institution_name: params.dig('metadata', 'institution', 'name'),
+                            institution_id:   params.dig('metadata', 'institution', 'institution_id'),
                             user:             current_user)
     render json: {success: true}
   end
