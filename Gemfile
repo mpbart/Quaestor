@@ -70,3 +70,5 @@ gem 'pry'
 gem 'attr_encrypted'
 
 gem 'rspec'
+
+gem 'will_paginate', '>= 3.3.0'
