@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_26_165641) do
+ActiveRecord::Schema.define(version: 2020_05_16_204051) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -44,6 +44,8 @@ ActiveRecord::Schema.define(version: 2020_04_26_165641) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "encrypted_access_token"
     t.string "encrypted_access_token_iv"
+    t.string "institution_name"
+    t.string "institution_id"
     t.index ["encrypted_access_token_iv"], name: "index_plaid_credentials_on_encrypted_access_token_iv", unique: true
     t.index ["user_id"], name: "index_plaid_credentials_on_user_id"
   end
