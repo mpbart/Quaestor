@@ -27,8 +27,9 @@
       // Select Account view is enabled.
       $.post('/get_access_token', {
         public_token: public_token,
+        metadata:     metadata,
       },
-      function(data, _st, _xhr) { console.log(data) }); // TODO: do something more interesting like show success message here });
+      function(data, _st, _xhr) { console.log(data); $.post('/refresh_accounts', {}, function(_, __, ___) {}); }); // TODO: do something more interesting like show success message here });
     },
     onExit: function(err, metadata) {
       // The user exited the Link flow.
