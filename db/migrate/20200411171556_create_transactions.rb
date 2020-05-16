@@ -2,6 +2,7 @@ class CreateTransactions < ActiveRecord::Migration[6.0]
   def change
     create_table :transactions do |t|
       t.references :account
+      t.references :user
 
       t.string     :category, array: true
       t.string     :category_id

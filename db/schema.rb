@@ -61,6 +61,7 @@ ActiveRecord::Schema.define(version: 2020_04_26_165641) do
 
   create_table "transactions", id: :serial, force: :cascade do |t|
     t.bigint "account_id"
+    t.bigint "user_id"
     t.string "category", array: true
     t.string "category_id"
     t.string "transaction_type"
@@ -75,6 +76,7 @@ ActiveRecord::Schema.define(version: 2020_04_26_165641) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["account_id"], name: "index_transactions_on_account_id"
+    t.index ["user_id"], name: "index_transactions_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
