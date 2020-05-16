@@ -16,6 +16,7 @@
         <th>Name</th>
         <th>Account Type</th>
         <th>Number</th>
+        <th>Institution</th>
       </thead>
       <tbody>
         <% @accounts.each do |account| %>
@@ -23,6 +24,7 @@
             <td><%= account.name %></td>
             <td><%= account.account_type %></td>
             <td><%= account.mask %></td>
+            <td><%= account.institution_name %></td>
           </tr>
         <% end %>
       </tbody>
