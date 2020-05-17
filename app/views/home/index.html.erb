@@ -8,27 +8,37 @@
 </head>
 
 <%= stylesheet_link_tag "application", media: "all" %>
+
 <body>
-  <button id="link-button">Link Account</button>
-  <div id="accounts">
-    <table>
-      <thead>
-        <th>Name</th>
-        <th>Account Type</th>
-        <th>Number</th>
-        <th>Institution</th>
-      </thead>
-      <tbody>
-        <% @accounts.each do |account| %>
-          <tr>
-            <td><%= account.name %></td>
-            <td><%= account.account_type %></td>
-            <td><%= account.mask %></td>
-            <td><%= account.institution_name %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+  <div class="ui divided padded grid">
+    <div class="five wide column">
+    <h3 class="ui center aligned header">Accounts Overview</h3>
+      <div id="accounts">
+        <table class="ui selectable very basic table">
+          <thead>
+            <th>Name</th>
+            <th>Account Type</th>
+            <th>Number</th>
+            <th>Institution</th>
+          </thead>
+          <tbody>
+            <% @accounts.each do |account| %>
+              <tr>
+                <td><%= account.name %></td>
+                <td><%= account.account_type %></td>
+                <td><%= account.mask %></td>
+                <td><%= account.institution_name %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="six wide column">
+      <h3 class="ui center aligned header">Recent Transactions Overview</h3>
+    </div>
+    <div class="five wide column">
+    </div>
   </div>
 </body>
 
