@@ -7,4 +7,8 @@ Rails.application.routes.draw do
 
   post '/get_access_token', to: 'plaid#get_access_token'
   post '/refresh_accounts', to: 'plaid#refresh_accounts'
+
+  get 'transactions', to: 'transactions#index'
+  get 'analytics',    to: 'analytics#index'
+  get 'budgets',      to: 'budgets#index'
 end
