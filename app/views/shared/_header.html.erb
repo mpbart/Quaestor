@@ -1,4 +1,3 @@
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
 <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
@@ -18,7 +17,14 @@
   <a class="item" href="/budgets">
     Budgets
   </a>
-  <div class="right item">
-    <button class="ui button" id="link-button">Link Account</button>
+  <div id="uniqueid" class="ui pointing dropdown link right item">
+    <span class="text">Account Options</span>
+    <i class="dropdown icon"></i>
+    <div class="menu">
+      <div class="item" id="link-button">Link New Account</div>
+      <div class="item" id="refresh-button">Refresh Accounts</div>
+    </div>
   </div>
 </div>
+
+<%= javascript_include_tag "application" %>
