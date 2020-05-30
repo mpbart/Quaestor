@@ -20,6 +20,7 @@
             <th>Account Type</th>
             <th>Number</th>
             <th>Institution</th>
+            <th>Balance</th>
           </thead>
           <tbody>
             <% @accounts.each do |account| %>
@@ -28,6 +29,7 @@
                 <td><%= account.account_type %></td>
                 <td><%= account.mask %></td>
                 <td><%= account.institution_name %></td>
+                <td><%= account.balances.last.amount %></td>
               </tr>
             <% end %>
           </tbody>
@@ -36,6 +38,26 @@
     </div>
     <div class="six wide column">
       <h3 class="ui center aligned header">Recent Transactions Overview</h3>
+        <div id="recent_transactions">
+          <table class="ui selectable basic table">
+            <thead>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Amount</th>
+            </thead>
+            <tbody>
+              <% @transactions.each do |transaction| %>
+                <tr>
+                  <td><%= transaction.date %></td>
+                  <td><%= transaction.description %></td>
+                  <td><%= transaction.category.last %></td>
+                  <td><%= transaction.amount %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
     </div>
     <div class="five wide column">
     </div>
