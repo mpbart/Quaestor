@@ -3,7 +3,7 @@ class HomeController < ApplicationController
 
   def index
     @accounts ||= current_user.accounts
-    @transactions ||= current_user.paginated_transactions(page_num: 1)
+    @transactions ||= current_user.paginated_transactions(page_num: 1).by_date
   end
 
 end
