@@ -20,8 +20,8 @@ class PlaidController < ActionController::Base
   end
 
   def refresh_accounts
-    finance_manager.update_accounts
-    finance_manager.update_transactions
+    finance_manager.refresh_accounts
+    finance_manager.refresh_transactions
   end
 
   private
