@@ -2,7 +2,13 @@ $(function() {
   /**
    * Semantic init
    */
-   console.log('before');
-   $('#uniqueid').dropdown();
-   console.log('after');
+   $('#account-options').dropdown({action: 'hide'});
+
+  /**
+   * Set up event handlers
+   */
+  $('#refresh-button').click(function() {
+    $.post('/refresh_accounts',
+           function() { console.log('refreshed accounts'); });
+  });
 });
