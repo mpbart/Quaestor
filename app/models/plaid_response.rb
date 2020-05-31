@@ -1,3 +1,4 @@
+require 'plaid'
 require 'attr_encrypted'
 
 class PlaidResponse < ApplicationRecord

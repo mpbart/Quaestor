@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_16_204750) do
+ActiveRecord::Schema.define(version: 2020_05_31_165314) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,6 +37,14 @@ ActiveRecord::Schema.define(version: 2020_05_16_204750) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["account_id"], name: "index_balances_on_account_id"
+  end
+
+  create_table "plaid_categories", force: :cascade do |t|
+    t.jsonb "hierarchy"
+    t.string "category_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["category_id"], name: "index_plaid_categories_on_category_id"
   end
 
   create_table "plaid_credentials", force: :cascade do |t|
