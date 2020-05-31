@@ -24,7 +24,7 @@ module FinanceManager
       end
     end
 
-    def update_accounts
+    def refresh_accounts
       user.plaid_credentials.each do |credential|
         response = plaid_client.accounts.get(credential.access_token)
         PlaidResponse.record_accounts_response!(response, credential)
@@ -37,7 +37,7 @@ module FinanceManager
       end
     end
 
-    def update_transactions
+    def refresh_transactions
       user.plaid_credentials.each do |credential|
         response = plaid_client.transactions.get(credential.access_token,
                                                  transactions_refresh_start_date(credential),
