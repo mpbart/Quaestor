@@ -22,6 +22,8 @@ class PlaidController < ActionController::Base
   def refresh_accounts
     finance_manager.refresh_accounts
     finance_manager.refresh_transactions
+
+    render json: {status: 'complete'}
   end
 
   private

@@ -1,4 +1,6 @@
 class TransactionsController < ApplicationController
+  include ActionView::Helpers::NumberHelper
+
   before_action :authenticate_user!
 
   def index
