@@ -37,5 +37,5 @@ getUrl = function() {
 }
 
 getHeaderTabs = function() {
-  return $('.tabular.menu .item').not('#link-button').not('#refresh-button');
+  return $('.tabular.menu .item').not('#link-button').not('#refresh-button').not('#account-options');
 }
