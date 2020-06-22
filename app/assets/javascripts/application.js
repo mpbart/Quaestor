@@ -20,6 +20,9 @@ $(function() {
     activateTab($(event.currentTarget), $('.active'));
   });
 
+  // Initialize modals
+  $('.ui.modal').modal();
+  $('tr').click(function() { $('#transactions-modal').modal('show'); } );
 
   // Activate the tab for the current url
   activateTab($(`#${getUrl()}-tab`), $('.active'));
