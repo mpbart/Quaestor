@@ -52,6 +52,19 @@ module FinanceManager
       end
     end
 
+    def split_transaction(transaction_id, new_transaction_details)
+      begin
+        return unless transaction = ::Transaction.find(transaction_id)
+        FinanceManager::Transaction.split(
+          transaction,
+          new_transaction_details.map(&:with_indifferent_access)
+        )
+      rescue => e
+        Rails.logger.error("Error splitting transaction: #{e}")
+        false
+      end
+    end
+
     private
 
     # Using a lookback window of 10 days since the last refresh so that

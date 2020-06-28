@@ -3,12 +3,21 @@ Rails.application.routes.draw do
                       sessions:      'users/sessions',
                       registrations: 'users/registrations'}
 
+  # Home Page
   root 'home#index'
 
+  # Plaid
   post '/get_access_token', to: 'plaid#get_access_token'
   post '/refresh_accounts', to: 'plaid#refresh_accounts'
 
+  # Transactions
   get 'transactions', to: 'transactions#index'
+  post '/update_transaction', to: 'transactions#update_transaction'
+  post '/split_transaction', to: 'transactions#split_transaction'
+
+  # Analytics
   get 'analytics',    to: 'analytics#index'
+
+  # Budgets
   get 'budgets',      to: 'budgets#index'
 end
