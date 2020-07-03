@@ -25,7 +25,7 @@
             </thead>
             <tbody>
               <% @transactions.each do |transaction| %>
-                <tr>
+                <tr id=<%= "#{transaction.id}" %>>
                   <td><%= short_format_date(transaction.date) %></td>
                   <td><%= transaction.description %></td>
                   <td><%= transaction.category.last %></td>
@@ -44,7 +44,18 @@
 <div id="transactions-modal" class="ui tiny modal">
   <div class="header">Transaction Details</div>
   <div class="content">
-    <p>something</p>
+    <p>
+    <table class="ui table">
+      <tbody>
+        <tr>
+          <td id="details-date"></td>
+          <td id="details-description"></td>
+          <td id="details-category"></td>
+          <td id="details-amount"></td>
+          <td><i class="cogs icon"></i></td>
+        </tr>
+      </tbody>
+    </p>
   </div>
 </div>
 

@@ -22,7 +22,17 @@ $(function() {
 
   // Initialize modals
   $('.ui.modal').modal();
-  $('tr').click(function() { $('#transactions-modal').modal('show'); } );
+  $('tr').click(function(obj) {
+    $.get('/transactions/' + obj.currentTarget.id,
+          function(response) {
+            $('#details-date')[0].innerText = formatDate(response.date);
+            $('#details-description')[0].innerText = response.description;
+            $('#details-category')[0].innerText = response.category[response.category.length -1];
+            $('#details-amount')[0].innerText = response.amount;
+          }
+    );
+    $('#transactions-modal').modal('show');
+  });
 
   // Activate the tab for the current url
   activateTab($(`#${getUrl()}-tab`), $('.active'));
@@ -41,4 +51,9 @@ getUrl = function() {
 
 getHeaderTabs = function() {
   return $('.tabular.menu .item').not('#link-button').not('#refresh-button').not('#account-options');
+}
+
+formatDate = function(date) {
+  var d = new Date(date);
+  return d.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
 }

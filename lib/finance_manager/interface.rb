@@ -52,15 +52,27 @@ module FinanceManager
       end
     end
 
-    def split_transaction(transaction_id, new_transaction_details)
+    def split_transaction!(transaction_id, new_transaction_details)
       begin
         return unless transaction = ::Transaction.find(transaction_id)
-        FinanceManager::Transaction.split(
+        FinanceManager::Transaction.split!(
           transaction,
           new_transaction_details.map(&:with_indifferent_access)
         )
+        true
       rescue => e
         Rails.logger.error("Error splitting transaction: #{e}")
+        false
+      end
+    end
+
+    def edit_transaction!(transaction_id, new_transaction_details)
+      begin
+        return unless transaction = ::Transaction.find(transaction_id)
+        Financemanager::Transaction.edit!(transaction, new_transaction_details)
+        true
+      rescue => e
+        Rails.logger.error("Error editing transaction: #{e}")
         false
       end
     end
