@@ -58,7 +58,7 @@ module FinanceManager
       record.save! if record.changed?
     end
 
-    def self.split(original_transaction, new_transaction_details)
+    def self.split!(original_transaction, new_transaction_details)
       ActiveRecord::Base.transaction do
         new_transaction_details.each do |transaction_hash|
           t             = original_transaction.deep_dup
@@ -76,6 +76,10 @@ module FinanceManager
       end
 
       true
+    end
+
+    def self.edit!(transaction_record, new_transaction_details)
+      transaction_record.update!(**new_transaction_details)
     end
 
     def self.unknown_account_error(transaction)
