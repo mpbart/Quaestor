@@ -25,7 +25,7 @@
             </thead>
             <tbody>
               <% @transactions.each do |transaction| %>
-                <tr id=<%= "#{transaction.id}" %>>
+                <tr data-url="<%= transaction_path(transaction) %>" >
                   <td><%= short_format_date(transaction.date) %></td>
                   <td><%= transaction.description %></td>
                   <td><%= transaction.category.last %></td>

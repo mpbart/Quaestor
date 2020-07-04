@@ -9,8 +9,16 @@ class TransactionsController < ApplicationController
   end
 
   def show
-    transaction = @transactions&.detect{ |t| t.id == params[:id] } || Transaction.find(params[:id])
-    render json: transaction.to_json
+    # TODO: fix this so that it doesn't need a db lookup every time
+    @transaction = @transactions&.detect{ |t| t.id == params[:id] } || Transaction.find(params[:id])
+  end
+
+  def update
+    permitted = params.require(:transaction).permit(:date, :amount)
+    transaction = Transaction.find(params[:id])
+    success = transaction.update(permitted)
+
+    render json: {success: success}
   end
 
   # Split a single transaction into multiple
