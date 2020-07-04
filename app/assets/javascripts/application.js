@@ -1,3 +1,5 @@
+HEADER_TABS = ["home-tab", "transactions-tab", "analytics-tab", "budgets-tab"]
+
 $(function() {
  /**
   * Semantic init
@@ -15,32 +17,28 @@ $(function() {
 
   // Ensure that tabs are activated/deactivated on click
   getHeaderTabs().click(function(event) {
-    // $('.active').removeClass('active');
-    // $(event.currentTarget).addClass('active');
+
     activateTab($(event.currentTarget), $('.active'));
   });
 
-  // Initialize modals
-  $('.ui.modal').modal();
+  // Initialize ability to edit transactions by clicking a row
+  // in the table
   $('tr').click(function(obj) {
-    $.get('/transactions/' + obj.currentTarget.id,
-          function(response) {
-            $('#details-date')[0].innerText = formatDate(response.date);
-            $('#details-description')[0].innerText = response.description;
-            $('#details-category')[0].innerText = response.category[response.category.length -1];
-            $('#details-amount')[0].innerText = response.amount;
-          }
-    );
-    $('#transactions-modal').modal('show');
+    window.location = $(this).data('url');
   });
 
   // Activate the tab for the current url
-  activateTab($(`#${getUrl()}-tab`), $('.active'));
+  if (HEADER_TABS.includes(`${getUrl()}-tab`)) {
+    activateTab($(`#${getUrl()}-tab`), $('.active'));
+  }
 });
 
 
 // helper methods
 activateTab = function(tabToActivate, tabToDeactivate) {
+  if (!HEADER_TABS.includes(tabToActivate[0].id)) {
+    return;
+  }
   tabToDeactivate.removeClass('active');
   tabToActivate.addClass('active');
 }
