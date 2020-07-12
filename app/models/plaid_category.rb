@@ -14,4 +14,9 @@ class PlaidCategory < ActiveRecord::Base
 
     categories.select{ |c| c.hierarchy.include?(key.last) }
   end
+
+  def most_specific_category
+    hierarchy.last
+  end
+
 end
