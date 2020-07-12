@@ -14,7 +14,7 @@ class TransactionsController < ApplicationController
   end
 
   def update
-    permitted = params.require(:transaction).permit(:date, :amount)
+    permitted = params.require(:transaction).permit(:date, :amount, :description, :category_id)
     transaction = Transaction.find(params[:id])
     success = transaction.update(permitted)
 

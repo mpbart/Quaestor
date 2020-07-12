@@ -11,19 +11,22 @@
 
 <body>
   <div class="ui divided padded grid">
-    <div class="five wide column">
+    <div class="three wide column">
     </div>
-    <div class="six wide column">
-      <h3 class="ui center aligned header">Transactions Details</h3>
+    <div class="ten wide column">
+      <h3 class="ui center aligned header">Transaction Details</h3>
         <div>
           <%= form_for @transaction do |f| %>
+
             Date: <%= f.text_field :date %>
             Amount: <%= f.text_field :amount %>
+            Description: <%= f.text_field :description %>
+            Category: <%= collection_select(:transaction, :category_id, PlaidCategory.all, :category_id, :most_specific_category) %>
             <%= f.submit %>
           <% end %>
         </div>
     </div>
-    <div class="five wide column">
+    <div class="three wide column">
     </div>
   </div>
 </body>
