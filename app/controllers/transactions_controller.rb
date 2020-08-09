@@ -29,14 +29,6 @@ class TransactionsController < ApplicationController
     render json: {success: result}
   end
 
-  # Updating any part of a single transaction
-  def update_transaction
-    transaction_id = params['transaction_id']
-    new_transactino_details = params['new_transaction_details']
-    result = finance_manager.transactions.edit_transaction(transaction_id, new_transaction_details)
-    render json: {success: result}
-  end
-
   private
 
   def finance_manager
