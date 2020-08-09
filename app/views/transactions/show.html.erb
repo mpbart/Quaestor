@@ -21,7 +21,14 @@
             Date: <%= f.text_field :date %>
             Amount: <%= f.text_field :amount %>
             Description: <%= f.text_field :description %>
-            Category: <%= collection_select(:transaction, :category_id, PlaidCategory.all, :category_id, :most_specific_category) %>
+            Category: <%= grouped_collection_select(:transaction,
+                                                    :category_id,
+                                                    PlaidCategory.top_level_records,
+                                                    :children,
+                                                    :most_specific_category,
+                                                    :category_id,
+                                                    :most_specific_category,
+                                                    { :selected => [@transaction.category_id] }) %>
             <%= f.submit %>
           <% end %>
         </div>
