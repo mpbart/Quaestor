@@ -16,8 +16,8 @@
     <div class="ten wide column">
       <h3 class="ui center aligned header">Transaction Details</h3>
         <div>
-          <%= form_for @transaction do |f| %>
-
+          <%= form_for @transaction, html: { :id => 'edit-transaction-form' }, remote: true do |f| %>
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
             Date: <%= f.text_field :date %>
             Amount: <%= f.text_field :amount %>
             Description: <%= f.text_field :description %>
