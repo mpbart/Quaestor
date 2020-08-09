@@ -12,7 +12,6 @@ Rails.application.routes.draw do
 
   # Transactions
   resources :transactions, only: [:index, :show, :update]
-  post '/update_transaction', to: 'transactions#update_transaction'
   post '/split_transaction', to: 'transactions#split_transaction'
 
   # Analytics

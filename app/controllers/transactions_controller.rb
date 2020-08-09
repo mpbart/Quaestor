@@ -18,7 +18,7 @@ class TransactionsController < ApplicationController
     transaction = Transaction.find(params[:id])
     success = transaction.update(permitted)
 
-    render json: {success: success}
+    redirect_to action: :index
   end
 
   # Split a single transaction into multiple
