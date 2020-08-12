@@ -2,10 +2,11 @@
   "name": "personal_crm",
   "private": true,
   "dependencies": {
-    "@rails/ujs": "^6.0.0-alpha",
-    "turbolinks": "^5.2.0",
+    "@rails/actioncable": "^6.0.0-alpha",
     "@rails/activestorage": "^6.0.0-alpha",
-    "@rails/actioncable": "^6.0.0-alpha"
+    "@rails/ujs": "^6.0.0-alpha",
+    "rails-ujs": "^5.2.4-3",
+    "turbolinks": "^5.2.0"
   },
   "version": "0.1.0"
 }
