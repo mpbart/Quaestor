@@ -32,8 +32,12 @@ $(function() {
     activateTab($(`#${getUrl()}-tab`), $('.active'));
   }
 
-  $('.edit_transaction').on('ajax:success', showTransactionUpdateSuccessIcon );
-  $('.edit_transaction').on('ajax:failure', showTransactionUpdateFailureIcon );
+  $('#successIcon').hide();
+  $('#failureIcon').hide();
+  $('#edit-transaction-form').on('ajax:success', showTransactionUpdateSuccessIcon );
+  $('#edit-transaction-form').on('ajax:failure', showTransactionUpdateFailureIcon );
+  $('#split-transaction-form').click(function() {
+  });
 });
 
 
@@ -59,12 +63,10 @@ formatDate = function(date) {
   return d.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
 }
 
-// TODO: Placeholder - fill out with real details
 showTransactionUpdateSuccessIcon = function(data, status, xhr) {
-  console.log("Success");
+  $('#successIcon').show();
 }
 
-// TODO: Placeholder - fill out with real details
 showTransactionUpdateFailureIcon = function(xhr, status, error) {
-  console.log("Failure");
+  $('#failureIcon').show();
 }

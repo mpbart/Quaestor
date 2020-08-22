@@ -11,29 +11,38 @@
 
 <body>
   <div class="ui divided padded grid">
-    <div class="three wide column">
+    <div class="one wide column">
     </div>
-    <div class="ten wide column">
+    <div class="fourteen wide column">
       <h3 class="ui center aligned header">Transaction Details</h3>
         <div>
-          <%= form_for @transaction, html: { :id => 'edit-transaction-form' }, remote: true do |f| %>
+          <%= form_for @transaction, html: { :class => 'ui form', :id => 'edit-transaction-form' }, remote: true do |f| %>
             <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
-            Date: <%= f.text_field :date %>
-            Amount: <%= f.text_field :amount %>
-            Description: <%= f.text_field :description %>
-            Category: <%= grouped_collection_select(:transaction,
-                                                    :category_id,
-                                                    PlaidCategory.top_level_records,
-                                                    :children,
-                                                    :most_specific_category,
-                                                    :category_id,
-                                                    :most_specific_category,
-                                                    { :selected => [@transaction.category_id] }) %>
-            <%= f.submit :id => 'edit-transaction-button' %>
+            <div class="fields">
+              <div class="field">Date: <%= f.text_field :date %></div>
+              <div class="field">Amount: <%= f.text_field :amount %></div>
+              <div class="field">Description: <%= f.text_field :description %></div>
+              <div class="field">
+                Category: <%= grouped_collection_select(:transaction,
+                                                        :category_id,
+                                                        PlaidCategory.top_level_records,
+                                                        :children,
+                                                        :most_specific_category,
+                                                        :category_id,
+                                                        :most_specific_category,
+                                                        { :selected => [@transaction.category_id] }) %>
+              </div>
+              <div class="field">
+                <%= f.submit :id => 'edit-transaction-button', :class => 'ui fluid basic primary bottom button' %>
+              </div>
+              <div class="field"><i id="successIcon" class="green check icon"></i></div>
+              <div class="field"><i id="failureIcon" class="red times icon"></i></div>
+            </div>
           <% end %>
+          <button class="ui basic button" id="split-transaction-button">Split</button>
         </div>
     </div>
-    <div class="three wide column">
+    <div class="one wide column">
     </div>
   </div>
 </body>
