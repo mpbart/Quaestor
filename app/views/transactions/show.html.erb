@@ -38,6 +38,11 @@
               <div class="field"><i id="successIcon" class="green check icon"></i></div>
               <div class="field"><i id="failureIcon" class="red times icon"></i></div>
             </div>
+            <div id='split'>
+              <div class='links'>
+                <%= link_to_add_association 'add', f, :split_transactions, partial: 'split_transaction', form_name: 'f' %>
+              </div>
+            </div>
           <% end %>
           <button class="ui basic button" id="split-transaction-button">Split</button>
         </div>

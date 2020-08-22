@@ -1,6 +1,8 @@
 class Transaction < ApplicationRecord
   belongs_to :account
   belongs_to :user
+  has_many :split_transactions
+
   before_update :normalize_category
 
   scope :by_date, -> { order('date DESC') }
