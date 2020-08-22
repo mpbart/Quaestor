@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_28_192518) do
+ActiveRecord::Schema.define(version: 2020_08_22_173139) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,6 +69,18 @@ ActiveRecord::Schema.define(version: 2020_06_28_192518) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["encrypted_response_iv"], name: "index_plaid_responses_on_encrypted_response_iv"
     t.index ["plaid_credential_id"], name: "index_plaid_responses_on_plaid_credential_id"
+  end
+
+  create_table "split_transactions", force: :cascade do |t|
+    t.string "transaction_id"
+    t.float "amount"
+    t.datetime "date"
+    t.string "description"
+    t.string "category", array: true
+    t.integer "category_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["transaction_id"], name: "index_split_transactions_on_transaction_id"
   end
 
   create_table "transactions", id: :serial, force: :cascade do |t|
