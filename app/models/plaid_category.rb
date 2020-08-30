@@ -1,4 +1,3 @@
-require 'pry'
 class PlaidCategory < ActiveRecord::Base
   
   def self.grouped_by_top_level
