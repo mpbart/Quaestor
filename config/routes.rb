@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   # Plaid
   post '/get_access_token', to: 'plaid#get_access_token'
   post '/refresh_accounts', to: 'plaid#refresh_accounts'
+  post '/create_link_token', to: 'plaid#create_link_token'
 
   # Transactions
   resources :transactions, only: [:index, :show, :update]

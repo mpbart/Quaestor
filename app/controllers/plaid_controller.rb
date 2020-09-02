@@ -26,6 +26,20 @@ class PlaidController < ActionController::Base
     render json: {status: 'complete'}
   end
 
+  def create_link_token
+    token = finance_manager.plaid_client.link_token.create(
+      user: {
+        client_user_id: current_user.id.to_s
+      },
+      client_name: 'personal-dash',
+      language: 'en',
+      country_codes: ['US'],
+      products: ['transactions']
+    )
+
+    render json: {link_token: token[:link_token]}
+  end
+
   private
 
   def finance_manager
