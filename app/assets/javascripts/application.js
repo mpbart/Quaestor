@@ -53,7 +53,7 @@ activateTab = function(tabToActivate, tabToDeactivate) {
 }
 
 getUrl = function() {
-  return window.location.pathname.substr(1) || "home";
+  return window.location.pathname.substr(1).split("/")[0] || "home";
 }
 
 getHeaderTabs = function() {
