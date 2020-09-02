@@ -23,9 +23,11 @@ $(function() {
 
   // Initialize ability to edit transactions by clicking a row
   // in the table
-  $('tr').click(function(obj) {
-    window.location = $(this).data('url');
-  });
+  if(getUrl() == "transactions") {
+    $('tr').click(function(obj) {
+        window.location = $(this).data('url');
+    })
+  }
 
   // Activate the tab for the current url
   if (HEADER_TABS.includes(`${getUrl()}-tab`)) {
