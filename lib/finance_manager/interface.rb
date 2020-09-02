@@ -19,8 +19,7 @@ module FinanceManager
         env = config['environment'].fetch(ENV['RAILS_ENV']) { raise StandardError, "No mapping found for environment #{ENV['RAILS_ENV']}" }
         Plaid::Client.new(env:        env,
                           client_id:  config['client_id'],
-                          secret:     config['secret'],
-                          public_key: config['public_key'])
+                          secret:     config['secret'])
       end
     end
 
