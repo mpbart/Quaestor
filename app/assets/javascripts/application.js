@@ -38,9 +38,6 @@ $(function() {
   $('#failureIcon').hide();
   $('#edit-transaction-form').on('ajax:success', showTransactionUpdateSuccessIcon );
   $('#edit-transaction-form').on('ajax:failure', showTransactionUpdateFailureIcon );
-  $('#split-transaction-button').click(function() {
-    console.log("clicked..");
-  });
   $('#edit-transaction-button').click(function(data, _h) {
     console.log(data.currentTarget.form);
   });
