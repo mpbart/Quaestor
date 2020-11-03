@@ -14,9 +14,19 @@ class TransactionsController < ApplicationController
   end
 
   def update
-    permitted = params.require(:transaction).permit(:date, :amount, :description, :category_id)
+    puts params
+    permitted = params.require(:transaction).permit(:date,
+                                                    :amount,
+                                                    :description,
+                                                    :category_id,
+                                                    split_transactions: [:date, :amount, :description, :category_id, :_destroy])
     transaction = Transaction.find(params[:id])
-    success = transaction.update(permitted)
+    succes = if params[:split_transactions].nil?
+      transaction.update(permitted)
+    else
+      puts params[:split_transactions]
+      finance_manager.transactions.split_transaction(params[:id], params[:split_transactions])
+    end
 
     render json: {success: success}
   end

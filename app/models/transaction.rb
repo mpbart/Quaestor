@@ -1,7 +1,7 @@
 class Transaction < ApplicationRecord
   belongs_to :account
   belongs_to :user
-  has_many :split_transactions
+  has_many :split_transactions, inverse_of: :parent_transaction
 
   before_update :normalize_category
 
