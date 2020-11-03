@@ -61,12 +61,11 @@ module FinanceManager
     def self.split!(original_transaction, new_transaction_details)
       ActiveRecord::Base.transaction do
         new_transaction_details.each do |transaction_hash|
-          t             = original_transaction.deep_dup
-          t.id          = SecureRandom.alphanumeric(37)
-          t.amount      = transaction_hash[:amount]
-          t.category    = transaction_hash[:category]
-          t.category_id = transaction_hash[:category_id]
-          t.split       = true
+          t                = ::SplitTransaction.initialize_from_original_transaction(original_transaction)
+          t.transaction_id = SecureRandom.alphanumeric(37)
+          t.amount         = transaction_hash[:amount]
+          t.category       = transaction_hash[:category]
+          t.category_id    = transaction_hash[:category_id]
           t.save!
         end
 
