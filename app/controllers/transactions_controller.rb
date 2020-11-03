@@ -11,10 +11,10 @@ class TransactionsController < ApplicationController
   def show
     # TODO: fix this so that it doesn't need a db lookup every time
     @transaction = @transactions&.detect{ |t| t.id == params[:id] } || Transaction.find(params[:id])
+    @split_transaction = @transaction.split_transactions.build
   end
 
   def update
-    puts params
     permitted = params.require(:transaction).permit(:date,
                                                     :amount,
                                                     :description,
