@@ -19,6 +19,9 @@
     // Select Account view is enabled.
     await fetch('/get_access_token', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({ public_token: public_token }),
     });
    },
