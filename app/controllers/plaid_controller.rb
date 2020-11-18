@@ -7,7 +7,8 @@ class PlaidController < ActionController::Base
 
   # Add accounts from new financial institution for user
   def get_access_token
-    public_token = params['public_token']
+    params.permit(:public_token)
+    public_token = params[:public_token]
     return unless valid_public_token?(public_token)
 
     response = finance_manager.plaid_client.item.public_token.exchange(public_token)
