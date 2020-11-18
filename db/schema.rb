@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_22_173139) do
+ActiveRecord::Schema.define(version: 2020_11_18_005852) do
 
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "accounts", force: :cascade do |t|
@@ -71,7 +72,7 @@ ActiveRecord::Schema.define(version: 2020_08_22_173139) do
     t.index ["plaid_credential_id"], name: "index_plaid_responses_on_plaid_credential_id"
   end
 
-  create_table "split_transactions", force: :cascade do |t|
+  create_table "split_transactions", primary_key: "uuid", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "transaction_id"
     t.float "amount"
     t.datetime "date"
