@@ -7,7 +7,7 @@ class TransactionsController < ApplicationController
 
   def index
     @categories ||= PlaidCategory.grouped_by_top_level
-    @transactions = current_user.paginated_transactions(page_num: 1).by_date
+    @transactions = current_user.paginated_transactions(page_num: 1)
   end
 
   def show
@@ -26,7 +26,6 @@ class TransactionsController < ApplicationController
     succes = if params[:split_transactions].nil?
       transaction.update(permitted)
     else
-      puts params[:split_transactions]
       finance_manager.transactions.split_transaction(params[:id], params[:split_transactions])
     end
 
