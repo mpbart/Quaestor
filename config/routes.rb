@@ -13,8 +13,8 @@ Rails.application.routes.draw do
 
   # Transactions
   resources :transactions, only: [:index, :show, :update]
-  resources :split_transactions, only: [:index]
-  post '/split_transaction', to: 'transactions#split_transaction'
+  resources :split_transactions, only: [:index, :show]
+  post '/split_transactions', to: 'transactions#split_transactions'
 
   # Analytics
   get 'analytics',    to: 'analytics#index'

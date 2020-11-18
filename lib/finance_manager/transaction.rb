@@ -2,6 +2,7 @@ module FinanceManager
   class Transaction
     class UnknownAccountError < StandardError; end
     class UnfoundPendingTransactionError < StandardError; end
+    class BadParametersError < StandardError; end
 
     def self.handle(transaction)
       account = ::Account.find_by(plaid_identifier: transaction[:account_id])
@@ -59,17 +60,18 @@ module FinanceManager
     end
 
     def self.split!(original_transaction, new_transaction_details)
-      ActiveRecord::Base.transaction do
-        new_transaction_details.each do |transaction_hash|
-          t                = ::SplitTransaction.initialize_from_original_transaction(original_transaction)
-          t.transaction_id = SecureRandom.alphanumeric(37)
-          t.amount         = transaction_hash[:amount]
-          t.category       = transaction_hash[:category]
-          t.category_id    = transaction_hash[:category_id]
-          t.save!
-        end
+      if new_transaction_details[:amount].nil?
+        raise BadParametersError.new("Amount must be filled when splitting a transaction")
+      end
 
-        original_transaction.amount -= new_transaction_details.sum{ |t| t[:amount] }
+      ActiveRecord::Base.transaction do
+        t                = ::SplitTransaction.initialize_from_original_transaction(original_transaction)
+        t.amount         = new_transaction_details[:amount].to_f
+        t.category       = new_transaction_details[:category] || t.category
+        t.category_id    = new_transaction_details[:category_id] || t.category_id
+        t.save!
+
+        original_transaction.amount -= new_transaction_details[:amount].to_f
         original_transaction.split = true
         original_transaction.save!
       end

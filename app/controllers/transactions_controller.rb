@@ -1,3 +1,5 @@
+require 'finance_manager/interface'
+
 class TransactionsController < ApplicationController
   include ActionView::Helpers::NumberHelper
 
@@ -32,10 +34,10 @@ class TransactionsController < ApplicationController
   end
 
   # Split a single transaction into multiple
-  def split_transaction
-    transaction_id = params['transaction_id']
-    new_transaction_details = params['new_transaction_details']
-    result = finance_manager.transactions.split_transaction(transaction_id, new_transaction_details)
+  def split_transactions
+    new_transaction_details = params.require(:split_transaction).permit(:date, :amount, :description, :parent_transaction_id).to_h
+    parent_transaction_id = new_transaction_details.delete(:parent_transaction_id)
+    result = finance_manager.split_transaction!(parent_transaction_id, new_transaction_details)
     render json: {success: result}
   end
 

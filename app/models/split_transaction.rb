@@ -3,8 +3,11 @@ class SplitTransaction < ApplicationRecord
 
   def self.initialize_from_original_transaction(transaction)
     split = new
-    split.date = transaction.date
-    split.description = transaction.description
+    split.transaction_id = transaction.id
+    split.date           = transaction.date
+    split.description    = transaction.description
+    split.category       = transaction.category
+    split.category_id    = transaction.category_id
     split
   end
 end

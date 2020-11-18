@@ -56,7 +56,7 @@ module FinanceManager
         return unless transaction = ::Transaction.find(transaction_id)
         FinanceManager::Transaction.split!(
           transaction,
-          new_transaction_details.map(&:with_indifferent_access)
+          new_transaction_details
         )
         true
       rescue => e
