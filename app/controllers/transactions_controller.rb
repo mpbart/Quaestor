@@ -23,7 +23,7 @@ class TransactionsController < ApplicationController
                                                     :category_id,
                                                     split_transactions: [:date, :amount, :description, :category_id, :_destroy])
     transaction = Transaction.find(params[:id])
-    succes = if params[:split_transactions].nil?
+    success = if params[:split_transactions].nil?
       transaction.update(permitted)
     else
       finance_manager.transactions.split_transaction(params[:id], params[:split_transactions])
