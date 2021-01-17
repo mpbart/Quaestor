@@ -13,7 +13,8 @@ class TransactionsController < ApplicationController
   def show
     # TODO: fix this so that it doesn't need a db lookup every time
     @transaction = @transactions&.detect{ |t| t.id == params[:id] } || Transaction.find(params[:id])
-    @split_transaction = @transaction.split_transactions.build
+    @grouped_transactions = @transaction.grouped_transactions
+    @split_transaction = @grouped_transactions.empty? ? ::Transaction.new : @grouped_transactions.build
   end
 
   def update
@@ -34,7 +35,7 @@ class TransactionsController < ApplicationController
 
   # Split a single transaction into multiple
   def split_transactions
-    new_transaction_details = params.require(:split_transaction).permit(:date, :amount, :description, :parent_transaction_id).to_h
+    new_transaction_details = params.require(:transaction).permit(:date, :amount, :description, :parent_transaction_id).to_h
     parent_transaction_id = new_transaction_details.delete(:parent_transaction_id)
     result = finance_manager.split_transaction!(parent_transaction_id, new_transaction_details)
     render json: {success: result}

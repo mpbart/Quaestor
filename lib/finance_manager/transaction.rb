@@ -65,18 +65,32 @@ module FinanceManager
       end
 
       ActiveRecord::Base.transaction do
-        t                = ::SplitTransaction.initialize_from_original_transaction(original_transaction)
+        t                = original_transaction.dup
         t.amount         = new_transaction_details[:amount].to_f
         t.category       = new_transaction_details[:category] || t.category
         t.category_id    = new_transaction_details[:category_id] || t.category_id
+        t.split          = true
         t.save!
 
         original_transaction.amount -= new_transaction_details[:amount].to_f
         original_transaction.split = true
         original_transaction.save!
+
+        add_to_transaction_group!(original_transaction, t)
       end
 
       true
+    end
+
+    def self.add_to_transaction_group!(original_transaction, new_transaction)
+      if original_transaction.transaction_group.present?
+        group = original_transaction.transaction_group
+        group.transactions << new_transaction
+      else
+        group = ::TransactionGroup.create!
+        group.transactions << original_transaction
+        group.transactions << new_transaction
+      end
     end
 
     def self.edit!(transaction_record, new_transaction_details)

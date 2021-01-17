@@ -1,11 +1,15 @@
 class Transaction < ApplicationRecord
   belongs_to :account
   belongs_to :user
-  has_many :split_transactions, inverse_of: :parent_transaction
+  belongs_to :transaction_group, primary_key: :uuid, foreign_key: :transaction_group_uuid, optional: true
 
   before_update :normalize_category
 
   scope :by_date, -> { order('date DESC') }
+
+  def grouped_transactions
+    transaction_group&.transactions&.where&.not(id: self.id) || []
+  end
 
   private
 
