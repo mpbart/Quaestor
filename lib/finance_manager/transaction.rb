@@ -64,6 +64,8 @@ module FinanceManager
         raise BadParametersError.new("Amount must be filled when splitting a transaction")
       end
 
+      return false unless new_transaction_details[:amount].to_f > 0.0
+
       ActiveRecord::Base.transaction do
         t                = original_transaction.dup
         t.amount         = new_transaction_details[:amount].to_f
