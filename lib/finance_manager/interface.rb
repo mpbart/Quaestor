@@ -58,7 +58,6 @@ module FinanceManager
           transaction,
           new_transaction_details
         )
-        true
       rescue => e
         Rails.logger.error("Error splitting transaction: #{e}")
         false
