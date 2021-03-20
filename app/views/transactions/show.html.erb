@@ -69,7 +69,7 @@
       </div>
 
       <div id='grouped-transaction-div'>
-        <%= form_for @split_transaction, html: { :class => 'ui form', :id => 'edit-transactions-form'}, url: '/split_transactions', remote: true do |f| %>
+        <%= form_for @split_transaction, html: { :class => 'ui form', :id => 'split-transactions-form'}, url: '/split_transactions', remote: true do |f| %>
           <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
           <%= f.hidden_field(:parent_transaction_id, value: @transaction.id) %>
           <div class="fields">
@@ -79,6 +79,8 @@
             <div class="field">
               <%= f.submit :id => 'split-transaction-button', :class => 'ui fluid basic primary bottom button' %>
             </div>
+            <div class="field"><i id="successIconSplit" class="green check icon"></i></div>
+            <div class="field"><i id="failureIconSplit" class="red times icon"></i></div>
           </div>
         <% end %>
       </div>
