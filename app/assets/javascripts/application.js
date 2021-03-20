@@ -36,8 +36,12 @@ $(function() {
 
   $('#successIcon').hide();
   $('#failureIcon').hide();
+  $('#successIconSplit').hide();
+  $('#failureIconSplit').hide();
   $('#edit-transaction-form').on('ajax:success', showTransactionUpdateSuccessIcon );
   $('#edit-transaction-form').on('ajax:failure', showTransactionUpdateFailureIcon );
+  $('#split-transactions-form').on('ajax:success', showTransactionSplitUpdateSuccessIcon );
+  $('#split-transactions-form').on('ajax:failure', showTransactionSplitUpdateFailureIcon );
   $('#edit-transaction-button').click(function(data, _h) {
     console.log(data.currentTarget.form);
   });
@@ -67,9 +71,25 @@ formatDate = function(date) {
 }
 
 showTransactionUpdateSuccessIcon = function(data, status, xhr) {
-  $('#successIcon').show();
+  if (data.detail[0]['success']) {
+    $('#successIcon').show();
+  } else {
+    $('#failureIcon').show();
+  }
 }
 
 showTransactionUpdateFailureIcon = function(xhr, status, error) {
   $('#failureIcon').show();
+}
+
+showTransactionSplitUpdateSuccessIcon = function(data, status, xhr) {
+  if (data.detail[0]['success']) {
+    $('#successIconSplit').show();
+  } else {
+    $('#failureIconSplit').show();
+  }
+}
+
+showTransactionSplitUpdateFailureIcon = function(xhr, status, error) {
+  $('#failureIconSplit').show();
 }
