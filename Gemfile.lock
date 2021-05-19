@@ -138,7 +138,9 @@ GEM
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
     method_source (1.0.0)
-    mimemagic (0.3.4)
+    mimemagic (0.3.10)
+      nokogiri (~> 1)
+      rake
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.14.0)
@@ -159,7 +161,8 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (4.0.3)
-    puma (3.12.4)
+    puma (4.3.8)
+      nio4r (~> 2.0)
     rack (2.2.2)
     rack-proxy (0.6.5)
       rack
@@ -303,7 +306,7 @@ DEPENDENCIES
   pg
   plaid (~> 11.0.0)
   pry
-  puma (~> 3.12.4)
+  puma (~> 4.3.8)
   rails (~> 6.0.0)
   rspec
   sass-rails (~> 5)
