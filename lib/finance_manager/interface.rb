@@ -1,5 +1,6 @@
 require 'plaid'
 require 'config_reader'
+require 'csv_import/importer'
 require_relative 'account'
 require_relative 'transaction'
 
@@ -73,6 +74,10 @@ module FinanceManager
         Rails.logger.error("Error editing transaction: #{e}")
         false
       end
+    end
+
+    def import_transactions_csv(csv_file)
+      CsvImport::Importer.new.process_csv(csv_file)
     end
 
     private

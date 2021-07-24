@@ -41,6 +41,12 @@ class TransactionsController < ApplicationController
     render json: {success: result}
   end
 
+  # Upload a CSV of transactions
+  def upload_csv
+    current_user.transaction_csvs.attach(params[:user][:transaction_csv])
+    finance_manager.import_transactions_csv(current_user.transaction_csvs.last)
+  end
+
   private
 
   def finance_manager
