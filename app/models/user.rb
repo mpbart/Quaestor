@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :accounts
   has_many :transactions, through: :accounts
   has_many :plaid_credentials
+  has_many_attached :transaction_csvs
 
   # Only show 50 transactions at a time
   def paginated_transactions(page_num:)

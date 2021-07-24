@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   resources :transactions, only: [:index, :show, :update]
   resources :split_transactions, only: [:index, :show]
   post '/split_transactions', to: 'transactions#split_transactions'
+  post '/upload_csv', to: 'transactions#upload_csv'
 
   # Analytics
   get 'analytics',    to: 'analytics#index'
