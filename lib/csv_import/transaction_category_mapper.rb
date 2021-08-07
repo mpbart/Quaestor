@@ -8,8 +8,8 @@ module CsvImport
       @source_mappings = load_source_mappings(source.to_s)
     end
 
-    def [](key)
-      category = @source_mappings.dig(key)
+    def [](transaction)
+      category = @source_mappings.map_category(transaction.dig('Category'), transaction.dig('Description'))
 
       raise MappingNotFoundError.new("Could not find mapping for category #{key}") unless category
 
@@ -21,7 +21,7 @@ module CsvImport
     def load_source_mappings(source)
       require 'csv_import/constants/' + source
       klass = "CsvImport::Constants::#{source.camelize}".constantize
-      klass.mappings
+      klass.new
     end
 
   end
