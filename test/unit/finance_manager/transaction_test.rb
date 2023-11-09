@@ -31,7 +31,8 @@ RSpec.describe FinanceManager::Transaction do
   let(:location_metadata)      { {} }
   let(:pending_transaction_id) { 3 }
   let(:account_owner)          { 'owner' }
-  let(:account)                { double('account') }
+  let(:user)                   { double('user') }
+  let(:account)                { double('account', user: user) }
   let(:transaction_double)     { double('transaction') }
   let(:account_double)         { double('account double') }
 
@@ -104,6 +105,7 @@ RSpec.describe FinanceManager::Transaction do
     it 'creates a new transaction with the correct arguments' do
       expect(transaction_double).to receive(:create!).with(
         account:                account,
+        user:                   user,
         id:                     transaction_id,
         category:               category,
         category_id:            category_id,
