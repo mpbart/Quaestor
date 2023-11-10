@@ -8,47 +8,71 @@ module FinanceManager
   class Interface
     DATE_FORMAT = '%Y-%m-%d'.freeze
     
-    attr_reader :user
+    attr_reader :user, :plaid_client
 
     def initialize(user)
       @user = user
+      @plaid_client = create_plaid_client
     end
 
-    def plaid_client
-      @plaid_client ||= begin
-        config = ConfigReader.for('plaid')
-        env = config['environment'].fetch(ENV['RAILS_ENV']) { raise StandardError, "No mapping found for environment #{ENV['RAILS_ENV']}" }
-        Plaid::Client.new(env:        env,
-                          client_id:  config['client_id'],
-                          secret:     config['secret'])
-      end
+    # TODO: Refactor into a separate plaid object to handle all plaid-related things
+    def create_plaid_client
+      config = ConfigReader.for('plaid')
+      # TODO: Fix this by just using ENV vars :shrug:
+      #env = config['environment'].fetch(ENV['RAILS_ENV']) { raise StandardError, "No mapping found for environment #{ENV['RAILS_ENV']}" }
+      plaid_config = Plaid::Configuration.new
+      plaid_config.server_index = Plaid::Configuration::Environment["sandbox"]
+      plaid_config.api_key["PLAID-CLIENT-ID"] = config['client_id']
+      plaid_config.api_key["PLAID-SECRET"] = config['secret']
+
+      api_client = Plaid::ApiClient.new(plaid_config)
+
+      Plaid::PlaidApi.new(api_client)
     end
 
     def refresh_accounts
       user.plaid_credentials.each do |credential|
-        response = plaid_client.accounts.get(credential.access_token)
-        PlaidResponse.record_accounts_response!(response, credential)
+        request = Plaid::AccountsGetRequest.new({ access_token: credential.access_token })
+        response = plaid_client.accounts_get(request)
+        accounts = response.accounts
+        PlaidResponse.record_accounts_response!(response.to_hash, credential)
 
-        next unless response[:accounts]&.any?
+        next unless response.accounts&.any?
 
-        response[:accounts].each do |account_hash|
-          FinanceManager::Account.handle(account_hash, credential)
+        response.accounts.each do |account|
+          FinanceManager::Account.handle(account, credential)
         end
       end
     end
 
+    # TODO: add a mechanism for setting the last refreshed date/time when importing via CSV
+    # so that we can use that in the call here to sync
     def refresh_transactions
       user.plaid_credentials.each do |credential|
-        response = plaid_client.transactions.get(credential.access_token,
-                                                 transactions_refresh_start_date(credential),
-                                                 transactions_refresh_end_date)
-        PlaidResponse.record_transactions_response!(response, credential)
+        transactions_remaining = true
+        cursor = transactions_cursor(credential)
+        added, modified, removed = [], [], []
 
-        next unless response[:transactions]&.any?
+        while transactions_remaining
+          request = Plaid::TransactionsSyncRequest.new(
+            access_token: credential.access_token,
+            cursor:       cursor,       
+          )
+          response = plaid_client.transactions_sync(request)
+          PlaidResponse.record_transactions_response!(response.to_hash, credential)
 
-        response[:transactions].each do |transaction|
-          FinanceManager::Transaction.handle(transaction)
+          added.concat(response.added)
+          modified.concat(response.modified)
+          removed.concat(response.removed)
+
+          transactions_remaining = response.has_more
+          cursor = response.next_cursor
         end
+
+        added.each { |transaction| FinanceManager::Transaction.create(transaction) }
+        modified.each { |transaction| FinanceManager::Transaction.update(transaction) }
+        removed.each { |transaction| FinanceManager::Transaction.delete(transaction) }
+        credential.update_columns(cursor: cursor)
       end
     end
 
@@ -80,16 +104,28 @@ module FinanceManager
       CsvImport::Importer.new.process_csv(csv_file)
     end
 
-    private
+    def add_institution_information(plaid_credential)
+      request = Plaid::ItemGetRequest.new({ access_token: plaid_credential.access_token })
+      response = plaid_client.item_get(request)
 
-    # Using a lookback window of 10 days since the last refresh so that
-    # pending transactions will (hopefully) post by then
-    def transactions_refresh_start_date(plaid_cred)
-      ((plaid_cred.user.transactions.order(:updated_at).last&.created_at || Date.current) - 10.days).strftime(DATE_FORMAT)
+      request = Plaid::InstitutionsGetByIdRequest.new(
+        {
+          institution_id: response.item.institution_id,
+          country_codes: ["US"]
+        }
+      )
+      response = plaid_client.institutions_get_by_id(request)
+
+      plaid_credential.update_columns(
+        institution_id: response.institution.institution_id,
+        institution_name: response.institution.name
+      )
     end
 
-    def transactions_refresh_end_date
-      Date.today.strftime(DATE_FORMAT)
+    private
+
+    def transactions_cursor(plaid_cred)
+      plaid_cred.cursor #|| "now"
     end
 
   end

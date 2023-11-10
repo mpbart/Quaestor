@@ -1,50 +1,50 @@
 module FinanceManager
   class Account
     
-    def self.handle(account_hash, credential)
+    def self.handle(account, credential)
       user = credential.user
-      account = user.accounts.find_by(plaid_identifier: account_hash['account_id'])
-      if account
-        update(account, account_hash)
+      record = user.accounts.find_by(plaid_identifier: account.account_id)
+      if record
+        update(record, account)
       else
-        create(account_hash, credential)
+        create(account, credential)
       end
     end
 
-    def self.update(account, account_hash)
-      account.name             = account_hash['name']
-      account.official_name    = account_hash['official_name']
-      account.account_type     = account_hash['type']
-      account.account_sub_type = account_hash['subtype']
-      account.mask             = account_hash['mask']
+    def self.update(record, account)
+      record.name             = account.name
+      record.official_name    = account.official_name
+      record.account_type     = account.type
+      record.account_sub_type = account.subtype
+      record.mask             = account.mask
 
-      account.save! if account.changed?
+      record.save! if record.changed?
 
-      create_balance(account, account_hash['balances'])
+      create_balance(record, account.balances)
     end
 
-    def self.create(account_hash, credential)
-      account = ::Account.create!(
+    def self.create(account, credential)
+      record = ::Account.create!(
         user:             credential.user,
         institution_name: credential.institution_name,
         institution_id:   credential.institution_id,
-        plaid_identifier: account_hash['account_id'],
-        name:             account_hash['name'],
-        official_name:    account_hash['official_name'],
-        account_type:     account_hash['type'],
-        account_sub_type: account_hash['subtype'],
-        mask:             account_hash['mask'],
+        plaid_identifier: account.account_id,
+        name:             account.name,
+        official_name:    account.official_name,
+        account_type:     account.type,
+        account_sub_type: account.subtype,
+        mask:             account.mask,
       )
 
-      create_balance(account, account_hash['balances'])
+      create_balance(record, account.balances)
     end
 
     def self.create_balance(account, balance)
       Balance.create!(
         account:   account,
-        amount:    balance['current'],
-        available: balance['available'],
-        limit:     balance['limit'],
+        amount:    balance.current,
+        available: balance.available,
+        limit:     balance.limit,
       )
     end
     private_class_method :create_balance

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2021_07_24_130612) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_10_163511) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -34,7 +34,7 @@ ActiveRecord::Schema[7.1].define(version: 2021_07_24_130612) do
     t.string "record_type", null: false
     t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
-    t.datetime "created_at", null: false
+    t.datetime "created_at", precision: nil, null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
@@ -46,7 +46,7 @@ ActiveRecord::Schema[7.1].define(version: 2021_07_24_130612) do
     t.text "metadata"
     t.bigint "byte_size", null: false
     t.string "checksum", null: false
-    t.datetime "created_at", null: false
+    t.datetime "created_at", precision: nil, null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -77,6 +77,7 @@ ActiveRecord::Schema[7.1].define(version: 2021_07_24_130612) do
     t.string "encrypted_access_token_iv"
     t.string "institution_name"
     t.string "institution_id"
+    t.string "cursor"
     t.index ["encrypted_access_token_iv"], name: "index_plaid_credentials_on_encrypted_access_token_iv", unique: true
     t.index ["user_id"], name: "index_plaid_credentials_on_user_id"
   end
@@ -97,15 +98,13 @@ ActiveRecord::Schema[7.1].define(version: 2021_07_24_130612) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "transactions", id: :serial, force: :cascade do |t|
+  create_table "transactions", id: :string, force: :cascade do |t|
     t.bigint "account_id"
     t.bigint "user_id"
-    t.string "category", array: true
-    t.string "category_id"
-    t.string "transaction_type"
+    t.string "payment_channel"
     t.string "description"
     t.float "amount"
-    t.datetime "date"
+    t.datetime "date", precision: nil
     t.boolean "pending"
     t.jsonb "payment_metadata"
     t.jsonb "location_metadata"
@@ -115,7 +114,13 @@ ActiveRecord::Schema[7.1].define(version: 2021_07_24_130612) do
     t.datetime "updated_at", null: false
     t.boolean "split", default: false
     t.uuid "transaction_group_uuid"
+    t.string "primary_category"
+    t.string "detailed_category"
+    t.string "category_confidence"
+    t.string "merchant_name"
+    t.datetime "deleted_at"
     t.index ["account_id"], name: "index_transactions_on_account_id"
+    t.index ["deleted_at"], name: "index_transactions_on_deleted_at"
     t.index ["transaction_group_uuid"], name: "index_transactions_on_transaction_group_uuid"
     t.index ["user_id"], name: "index_transactions_on_user_id"
   end
@@ -124,11 +129,11 @@ ActiveRecord::Schema[7.1].define(version: 2021_07_24_130612) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at", precision: nil
+    t.datetime "remember_created_at", precision: nil
     t.integer "sign_in_count", default: 0, null: false
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
+    t.datetime "current_sign_in_at", precision: nil
+    t.datetime "last_sign_in_at", precision: nil
     t.inet "current_sign_in_ip"
     t.inet "last_sign_in_ip"
     t.datetime "created_at", null: false
