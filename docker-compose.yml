@@ -1,0 +1,32 @@
+version: '3.4'
+services:
+  db:
+    image: postgres:14.2-alpine
+    volumes:
+      - postgres_14_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=password
+
+  web:
+    build: .
+    command: 'run_app'
+    stdin_open: true
+    tty: true
+    depends_on:
+      - db
+    ports:
+      - target: 3000
+        published: 2424
+        protocol: tcp
+        mode: host
+    environment:
+      - DEVISE_SECRET_KEY=
+      - DB_HOST=db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=password
+      - ENCRYPTION_KEY=
+    volumes:
+      - .:/code:cached
+
+volumes:
+  postgres_14_data:

@@ -11,7 +11,7 @@ RSpec.describe FinanceManager::Account do
       }
     end
     let(:account_id) { 1 }
-    let(:credential) { double('credential') }
+    let(:credential) { double('credential', user: user) }
     let(:accounts)   { double('accounts') }
 
     subject(:handle) { described_class.handle(hash, credential) }
@@ -45,7 +45,7 @@ RSpec.describe FinanceManager::Account do
       let(:account)    { nil }
 
       it 'calls create' do
-        expect(described_class).to receive(:create).with(hash, user)
+        expect(described_class).to receive(:create).with(hash, credential)
         handle
       end
     end
@@ -71,8 +71,16 @@ RSpec.describe FinanceManager::Account do
     let(:mask)          { '1234' }
     let(:balances)      { {'key' => 'value'} }
     let(:account_double) { double('account double') }
+    let(:user)          { double('user') }
+    let(:credential) do
+      double('credential',
+        user:             user,
+        institution_name: 'name',
+        institution_id:   1
+      )
+    end
 
-    subject(:create) { described_class.create(hash, user) }
+    subject(:create) { described_class.create(hash, credential) }
 
     before do
       stub_const('Account', account_double)
@@ -83,6 +91,8 @@ RSpec.describe FinanceManager::Account do
     it 'creates a new account with the correct arguments' do
       expect(account_double).to receive(:create!).with(
         user:             user,
+        institution_name: 'name',
+        institution_id:   1,
         plaid_identifier: account_id,
         name:             name,
         official_name:    official_name,
