@@ -1,62 +1,60 @@
 module FinanceManager
   class Transaction
     class UnknownAccountError < StandardError; end
-    class UnfoundPendingTransactionError < StandardError; end
+    class UnknownTransactionError < StandardError; end
     class BadParametersError < StandardError; end
 
-    def self.handle(transaction)
-      account = ::Account.find_by(plaid_identifier: transaction[:account_id])
+    def self.create(transaction)
+      account = ::Account.find_by(plaid_identifier: transaction.account_id)
       raise_unknown_account_error(transaction) unless account
 
-      if transaction[:pending_transaction_id]
-        update_pending(transaction)
-      # Use find_by here so that ActiveRecord does not raise if no record is found
-      elsif record = ::Transaction.find_by(id: transaction[:transaction_id])
-        update(transaction, record)
-      else
-        create(account, transaction)
-      end
-    end
-
-    def self.create(account, transaction)
       ::Transaction.create!(
         account:                account,
         user:                   account.user,
-        id:                     transaction[:transaction_id],
-        category:               transaction[:category],
-        category_id:            transaction[:category_id],
-        transaction_type:       transaction[:transaction_type],
-        description:            transaction[:description],
-        amount:                 transaction[:amount],
-        date:                   transaction[:date],
-        pending:                transaction[:pending],
-        payment_metadata:       transaction[:payment_metadata],
-        location_metadata:      transaction[:location_metadata],
-        pending_transaction_id: transaction[:pending_transaction_id],
-        account_owner:          transaction[:account_owner],
+        id:                     transaction.transaction_id,
+        primary_category:       transaction.personal_finance_category.primary,
+        detailed_category:      transaction.personal_finance_category.detailed,
+        category_confidence:    transaction.personal_finance_category.confidence_level,
+        merchant_name:          transaction.merchant_name,
+        payment_channel:        transaction.payment_channel,
+        description:            transaction.name,
+        amount:                 transaction.amount,
+        date:                   transaction.date,
+        pending:                transaction.pending,
+        payment_metadata:       transaction.payment_meta,
+        location_metadata:      transaction.location,
+        pending_transaction_id: transaction.pending_transaction_id,
+        account_owner:          transaction.account_owner,
       )
     end
 
-    def self.update_pending(transaction)
-      pending = ::Transaction.find_by(id: transaction[:pending_transaction_id])
-      unfound_pending_transaction_error(transaction) unless pending
+    def self.update(transaction)
+      pending = ::Transaction.find_by(id: transaction.pending_transaction_id)
+      create(transaction) unless pending
 
-      update(transaction, pending)
+      pending.id                     = transaction.id
+      pending.primary_category       = transaction.primary_category
+      pending.detailed_category      = transaction.detailed_category
+      pending.category_confidence    = transaction.category_confidence
+      pending.merchant_name          = transaction.merchant_name
+      pending.payment_channel        = transaction.payment_channel
+      pending.description            = transaction.name
+      pending.amount                 = transaction.amount
+      pending.date                   = transaction.date
+      pending.pending                = transaction.pending
+      pending.payment_metadata       = transaction.payment_meta
+      pending.location_metadata      = transaction.location
+      pending.pending_transaction_id = transaction.pending_transaction_id
+      pending.account_owner          = transaction.account_owner
+
+      pending.save! if pending.changed?
     end
 
-    def self.update(transaction_hash, record)
-      record.category               = transaction_hash[:category]
-      record.category_id            = transaction_hash[:category_id]
-      record.transaction_type       = transaction_hash[:transaction_type]
-      record.description            = transaction_hash[:description]
-      record.amount                 = transaction_hash[:amount]
-      record.date                   = transaction_hash[:date]
-      record.pending                = false
-      record.payment_metadata       = transaction_hash[:payment_metadata]
-      record.location_metadata      = transaction_hash[:location_metadata]
-      record.pending_transaction_id = transaction_hash[:pending_transaction_id]
-      record.account_owner          = transaction_hash[:account_owner]
-      record.save! if record.changed?
+    def self.remove(transaction)
+      transaction = ::Transaction.find_by(id: transaction.id)
+      Rails.logger.warn("Could not find transaction to remove with id #{transaction.id}") unless transaction
+
+      transaction.destroy
     end
 
     def self.split!(original_transaction, new_transaction_details)
@@ -100,11 +98,11 @@ module FinanceManager
     end
 
     def self.unknown_account_error(transaction)
-      raise UnknownAccountError, "Could not find account matching #{transaction[:account_id]} for transaction #{transaction[:transaction_id]}"
+      raise UnknownAccountError, "Could not find account matching #{transaction.account_id} for transaction #{transaction[:transaction_id]}"
     end
 
-    def self.unfound_pending_transaction_error(transaction)
-      raise UnfoundPendingTransactionError, "Could not find pending transaction with id #{transaction[:pending_transaction_id]}"
+    def self.unknown_transaction_error(transaction)
+      raise UnknownTransactionError, "Could not find transaction with id #{transaction.id}"
     end
 
   end

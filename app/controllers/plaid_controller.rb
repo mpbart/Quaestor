@@ -11,12 +11,15 @@ class PlaidController < ActionController::Base
     public_token = params[:public_token]
     return unless valid_public_token?(public_token)
 
-    response = finance_manager.plaid_client.item.public_token.exchange(public_token)
-    PlaidCredential.create!(plaid_item_id:    response['item_id'],
-                            access_token:     response['access_token'],
-                            institution_name: params.dig('metadata', 'institution', 'name'),
-                            institution_id:   params.dig('metadata', 'institution', 'institution_id'),
-                            user:             current_user)
+    request = Plaid::ItemPublicTokenExchangeRequest.new
+    request.public_token = public_token
+
+    response = finance_manager.plaid_client.item_public_token_exchange(request)
+    credential = PlaidCredential.create!(plaid_item_id:    response.item_id,
+                                         access_token:     response.access_token,
+                                         user:             current_user)
+    finance_manager.add_institution_information(credential)
+
     render json: {success: true}
   end
 
@@ -28,17 +31,21 @@ class PlaidController < ActionController::Base
   end
 
   def create_link_token
-    token = finance_manager.plaid_client.link_token.create(
-      user: {
-        client_user_id: current_user.id.to_s
-      },
-      client_name: 'personal-dash',
-      language: 'en',
-      country_codes: ['US'],
-      products: ['transactions']
+    link_token_create_request = Plaid::LinkTokenCreateRequest.new({
+      :user => { :client_user_id => current_user.id.to_s },
+      :client_name => 'personal-dash',
+      # Might need to only have transactions since it expects the linked institution to
+      # have accounts with all types listed below
+      :products => %w[transactions liabilities],
+      :country_codes => ['US'],
+      :language => 'en'
+    })
+
+    link_token_response = finance_manager.plaid_client.link_token_create(
+      link_token_create_request
     )
 
-    render json: {link_token: token[:link_token]}
+    render json: {link_token: link_token_response.link_token}
   end
 
   private

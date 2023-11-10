@@ -29,7 +29,7 @@
                 <td><%= account.account_type %></td>
                 <td><%= account.mask %></td>
                 <td><%= account.institution_name %></td>
-                <td><%= account.balances.last.amount %></td>
+                <td><%= account.balances.last&.amount || 0 %></td>
               </tr>
             <% end %>
           </tbody>
@@ -51,7 +51,7 @@
                 <tr>
                   <td><%= short_format_date(transaction.date) %></td>
                   <td><%= transaction.description %></td>
-                  <td><%= transaction.category.last %></td>
+                  <td><%= transaction.detailed_category %></td>
                   <td><%= transaction.amount %></td>
                 </tr>
               <% end %>

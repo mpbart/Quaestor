@@ -26,7 +26,7 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'devise', '>= 4.7.1'
 
-gem 'plaid', '~> 11.0.0'
+gem 'plaid', '~> 23'
 
 gem 'pg'
 
@@ -37,6 +37,8 @@ gem 'will_paginate', '~> 3.3'
 gem 'cocoon'
 
 gem 'sprockets-rails'
+
+gem 'acts_as_paranoid', '~> 0.9'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

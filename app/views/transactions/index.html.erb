@@ -16,9 +16,9 @@
   <% end %>
 
   <div class="ui divided padded grid">
-    <div class="five wide column">
+    <div class="three wide column">
     </div>
-    <div class="six wide column">
+    <div class="ten wide column">
       <h3 class="ui center aligned header">Transactions</h3>
         <div id="recent_transactions">
           <table class="ui selectable basic table">
@@ -33,7 +33,7 @@
                 <tr data-url="<%= transaction_path(transaction) %>" >
                   <td><%= short_format_date(transaction.date) %></td>
                   <td><%= transaction.description %></td>
-                  <td><%= transaction.category.last %></td>
+                  <td><%= transaction.detailed_category %></td>
                   <td><%= number_to_currency(transaction.amount) %></td>
                 </tr>
               <% end %>
@@ -41,7 +41,7 @@
           </table>
         </div>
     </div>
-    <div class="five wide column">
+    <div class="three wide column">
     </div>
   </div>
 </body>

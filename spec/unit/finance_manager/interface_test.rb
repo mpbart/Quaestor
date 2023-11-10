@@ -15,7 +15,7 @@ RSpec.describe FinanceManager::Interface do
     allow(user).to receive(:plaid_credentials).and_return(credentials)
   end
 
-  describe '#plaid_client' do
+  describe '#create_plaid_client' do
     let(:config) do
       {
         'environment'=> environment,
@@ -23,46 +23,56 @@ RSpec.describe FinanceManager::Interface do
         'secret'=>      secret,
       }
     end
-    let(:secret)      { 'secret' }
-    let(:client_id)   { 'client_id' }
-    let(:environment) { {'test'=> 'sandbox'} }
-    let(:client)      { double('client') }
-    let(:plaid)       { class_double(Plaid::Client) }
+    let(:secret)             { 'secret' }
+    let(:client_id)          { 'client_id' }
+    let(:environment)        { {'test'=> 'sandbox'} }
+    let(:plaid_client)       { instance_double(Plaid::PlaidApi) }
+    let(:plaid_class)        { class_double(Plaid::PlaidApi) }
+    let(:plaid_api_class)    { class_double(Plaid::ApiClient) }
+    let(:plaid_api_instance) { instance_double(Plaid::ApiClient) }
+    let(:plaid_config_class) { class_double(Plaid::Configuration) }
+    let(:plaid_config)       { instance_double(Plaid::Configuration) }
 
     before do
       allow(ConfigReader).to receive(:for).and_return(config)
-      allow(plaid).to receive(:new).and_return(client)
-      stub_const('Plaid::Client', plaid)
+      allow(plaid_class).to receive(:new).and_return(plaid_client)
+      allow(plaid_api_class).to receive(:new).and_return(plaid_api_instance)
+      allow(plaid_config_class).to receive(:new).and_return(plaid_config)
+      stub_const('Plaid::PlaidConfiguration', plaid_config_class)
+      stub_const('Plaid::ApiClient', plaid_api_class)
+      stub_const('Plaid::Api', plaid_class)
       stub_const('ENV', {'RAILS_ENV' => 'test'})
     end
 
-    subject(:plaid_client) { instance.plaid_client }
+    subject(:create_plaid_client) { instance.create_plaid_client }
 
     context 'when the config does not contain a mapping for the current environment' do
       let(:environment) { {} }
 
       it 'raises an error' do
-        expect{ plaid_client }.to raise_error{ StandardError }
+        expect{ create_plaid_client }.to raise_error{ StandardError }
       end
     end
 
     context 'when there is an environment mapping' do
       it 'calls .for on ConfigReader' do
         expect(ConfigReader).to receive(:for).with('plaid')
-        plaid_client
+        create_plaid_client
       end
 
       it 'creates a new plaid client with the correct parameters' do
-        expect(plaid).to receive(:new).with(
-          env:        'sandbox',
-          client_id:  client_id,
-          secret:     secret,
-        )
-        plaid_client
+        expect(plaid_config).to receive(:server_index=)
+        expect(plaid_config).to receive(:api_key)
+        expect(plaid_config).to receive(:api_key)
+
+        expect(plaid_api_class).to receive(:new).with(plaid_config)
+        expect(plaid_class).to receive(:new).with(plaid_api_instance)
+
+        create_plaid_client
       end
 
       it 'returns the plaid client' do
-        expect(plaid_client).to eq(client)
+        expect(create_plaid_client).to eq(client)
       end
     end
   end
@@ -80,7 +90,7 @@ RSpec.describe FinanceManager::Interface do
       allow(FinanceManager::Account).to receive(:handle)
       allow(client).to receive(:accounts).and_return(accounts_double)
       allow(accounts_double).to receive(:get).with(token).and_return(api_response)
-      allow(instance).to receive(:plaid_client).and_return(client)
+      allow(instance).to receive(:create_plaid_client).and_return(client)
     end
     subject(:refresh_accounts) { instance.refresh_accounts }
 
@@ -131,7 +141,7 @@ RSpec.describe FinanceManager::Interface do
       allow(transactions_double).to receive(:get).with(token, start_date, end_date).and_return(api_response)
       allow(instance).to receive(:transactions_refresh_start_date).and_return(start_date)
       allow(instance).to receive(:transactions_refresh_end_date).and_return(end_date)
-      allow(instance).to receive(:plaid_client).and_return(client)
+      allow(instance).to receive(:create_plaid_client).and_return(client)
     end
     subject(:refresh_transactions) { instance.refresh_transactions }
 
