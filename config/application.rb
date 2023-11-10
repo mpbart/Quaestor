@@ -2,6 +2,9 @@ $:.unshift File.expand_path('../../lib', __FILE__)
 require_relative 'boot'
 
 require 'rails/all'
+require 'devise'
+require 'will_paginate'
+require 'cocoon'
 require 'sprockets/railtie'
 
 # Require the gems listed in Gemfile, including any gems
