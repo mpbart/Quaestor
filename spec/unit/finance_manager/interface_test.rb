@@ -21,15 +21,13 @@ RSpec.describe FinanceManager::Interface do
         'environment'=> environment,
         'client_id'=>   client_id,
         'secret'=>      secret,
-        'public_key'=>  public_key,
       }
     end
-    let(:public_key)  { 'public_key' }
     let(:secret)      { 'secret' }
     let(:client_id)   { 'client_id' }
     let(:environment) { {'test'=> 'sandbox'} }
     let(:client)      { double('client') }
-    let(:plaid) { class_double(Plaid::Client) }
+    let(:plaid)       { class_double(Plaid::Client) }
 
     before do
       allow(ConfigReader).to receive(:for).and_return(config)
@@ -59,7 +57,6 @@ RSpec.describe FinanceManager::Interface do
           env:        'sandbox',
           client_id:  client_id,
           secret:     secret,
-          public_key: public_key,
         )
         plaid_client
       end
@@ -70,7 +67,7 @@ RSpec.describe FinanceManager::Interface do
     end
   end
 
-  describe '#update_accounts' do
+  describe '#refresh_accounts' do
     let(:client)          { double('client') }
     let(:accounts_double) { double('accounts') }
     let(:accounts)        { [account1, account2] }
@@ -85,21 +82,21 @@ RSpec.describe FinanceManager::Interface do
       allow(accounts_double).to receive(:get).with(token).and_return(api_response)
       allow(instance).to receive(:plaid_client).and_return(client)
     end
-    subject(:update_accounts) { instance.update_accounts }
+    subject(:refresh_accounts) { instance.refresh_accounts }
 
     it 'passes the correct token to #get' do
       expect(accounts_double).to receive(:get).with(token)
-      update_accounts
+      refresh_accounts
     end
 
     it 'calls #get for all accounts associated with the user' do
       expect(accounts_double).to receive(:get).with(token).twice
-      update_accounts
+      refresh_accounts
     end
 
     it 'records the plaid response' do
       expect(plaid_response_class).to receive(:record_accounts_response!).twice
-      update_accounts
+      refresh_accounts
     end
 
     context 'when no accounts are returned' do
@@ -107,17 +104,17 @@ RSpec.describe FinanceManager::Interface do
 
       it 'does not attempt to update' do
         expect(FinanceManager::Account).not_to receive(:handle)
-        update_accounts
+        refresh_accounts
       end
     end
 
     it 'handles the response for each account' do
       expect(FinanceManager::Account).to receive(:handle).exactly(4).times
-      update_accounts
+      refresh_accounts
     end
   end
 
-  describe '#update_transactions' do
+  describe '#refresh_transactions' do
     let(:client)              { double('client') }
     let(:transactions_double) { double('transactions') }
     let(:start_date)          { '2020-05-01' }
@@ -136,21 +133,21 @@ RSpec.describe FinanceManager::Interface do
       allow(instance).to receive(:transactions_refresh_end_date).and_return(end_date)
       allow(instance).to receive(:plaid_client).and_return(client)
     end
-    subject(:update_transactions) { instance.update_transactions }
+    subject(:refresh_transactions) { instance.refresh_transactions }
 
     it 'passes the correct arguments to #get' do
       expect(transactions_double).to receive(:get).with(token, start_date, end_date)
-      update_transactions
+      refresh_transactions
     end
 
     it 'gets transactions for all credentials associted with the user' do
       expect(transactions_double).to receive(:get).twice
-      update_transactions
+      refresh_transactions
     end
 
     it 'records the plaid response' do
       expect(plaid_response_class).to receive(:record_transactions_response!).twice
-      update_transactions
+      refresh_transactions
     end
 
     context 'when there are no transactions' do
@@ -158,13 +155,13 @@ RSpec.describe FinanceManager::Interface do
 
       it 'does not attempt to update' do
         expect(FinanceManager::Transaction).not_to receive(:handle)
-        update_transactions
+        refresh_transactions
       end
     end
 
     it 'handles each transaction in the response' do
         expect(FinanceManager::Transaction).to receive(:handle).exactly(4).times
-      update_transactions
+        refresh_transactions
     end
   end
 end

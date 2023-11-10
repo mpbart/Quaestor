@@ -2,6 +2,7 @@ default: &default
   adapter: postgresql
   host: <%= ENV.fetch('DB_HOST', 'localhost') %>
   username: <%= ENV.fetch('DB_USERNAME', `whoami`.chomp) %>
+  password: <%= ENV.fetch('DB_PASSWORD', 'password') %>
   min_messages: ERROR
 
 development:
