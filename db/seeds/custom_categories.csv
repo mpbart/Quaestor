@@ -1,0 +1,11 @@
+PRIMARY,DETAILED,DESCRIPTION
+FOOD_AND_DRINK,FOOD_AND_DRINK_LUNCH,Money spent on lunch while working
+FOOD_AND_DRINK,FOOD_AND_DRINK_FOOD_DELIVERY,Purchases made for food delivery
+GENERAL_MERCHANDISE,GENERAL_MERCHANDISE_ENGAGEMENT_RING,Engagement ring
+PERSONAL_CARE,PERSONAL_CARE_SPORTS,"Sports leagues,and recreational sports"
+LOAN_PAYMENTS,LOAN_PAYMENTS_DOWN_PAYMENT,Down payment for a mortgage
+GENERAL_SERVICES,GENERAL_SERVICES_MOVING,"Move in fees, movers, and other miscellaneous moving expenses"
+INCOME,INCOME_BONUS,Income earned as a bonus
+GENERAL_SERVICES,GENERAL_SERVICES_WEDDING,"Wedding venue, vendors, and associated expenses"
+TRAVEL,TRAVEL_VACATION,General expenses incurred while on vacation
+EXCLUDED,EXCLUDED_EXCLUDED,Transactions excluded or otherwise ignored for personal finance purposes
