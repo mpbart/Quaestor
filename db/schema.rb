@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_10_163511) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_12_194101) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -61,11 +61,11 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_10_163511) do
   end
 
   create_table "plaid_categories", force: :cascade do |t|
-    t.jsonb "hierarchy"
-    t.string "category_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["category_id"], name: "index_plaid_categories_on_category_id"
+    t.string "primary_category"
+    t.string "detailed_category"
+    t.string "description"
   end
 
   create_table "plaid_credentials", force: :cascade do |t|
