@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_12_194101) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_12_201809) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -114,13 +114,14 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_12_194101) do
     t.datetime "updated_at", null: false
     t.boolean "split", default: false
     t.uuid "transaction_group_uuid"
-    t.string "primary_category"
-    t.string "detailed_category"
     t.string "category_confidence"
     t.string "merchant_name"
     t.datetime "deleted_at"
+    t.bigint "plaid_category_id"
     t.index ["account_id"], name: "index_transactions_on_account_id"
     t.index ["deleted_at"], name: "index_transactions_on_deleted_at"
+    t.index ["id"], name: "index_transactions_on_id"
+    t.index ["plaid_category_id"], name: "index_transactions_on_plaid_category_id"
     t.index ["transaction_group_uuid"], name: "index_transactions_on_transaction_group_uuid"
     t.index ["user_id"], name: "index_transactions_on_user_id"
   end

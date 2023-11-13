@@ -5,7 +5,7 @@ response = Faraday.new(url: 'https://plaid.com/documents/transactions-personal-f
 puts "Failure response retrieving plaid transaction categories - status: #{response.status}" unless response.success?
 
 records_inserted = 0
-p "Seeding categories from plaid"
+puts "Seeding categories from plaid"
 CSV.parse(response.body, headers: true).each do |row|
   PlaidCategory.find_or_create_by(primary_category: row['PRIMARY'], detailed_category: row['DETAILED']) do |record|
     record.description = row['DESCRIPTION']
@@ -13,7 +13,7 @@ CSV.parse(response.body, headers: true).each do |row|
   end
 end
 
-p "Seeding custom categories from custom_categories.csv"
+puts "Seeding custom categories from custom_categories.csv"
 CSV.open(Rails.root.join('db', 'seeds', 'custom_categories.csv'), headers: true).each do |row|
   PlaidCategory.find_or_create_by(primary_category: row['PRIMARY'], detailed_category: row['DETAILED']) do |record|
     record.description = row['DESCRIPTION']
@@ -21,4 +21,4 @@ CSV.open(Rails.root.join('db', 'seeds', 'custom_categories.csv'), headers: true)
   end
 end
 
-p "Successfully seeded #{records_inserted} categories"
+puts "Successfully seeded #{records_inserted} categories"
