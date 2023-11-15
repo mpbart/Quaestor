@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_12_201809) do
+ActiveRecord::Schema[7.1].define(version: 2023_11_15_000550) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -58,6 +58,18 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_12_201809) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_balances_on_account_id"
+  end
+
+  create_table "labels", force: :cascade do |t|
+    t.string "name"
+  end
+
+  create_table "labels_transactions", id: false, force: :cascade do |t|
+    t.string "transaction_id", null: false
+    t.bigint "label_id", null: false
+    t.index ["label_id", "transaction_id"], name: "index_labels_transactions_on_label_id_and_transaction_id", unique: true
+    t.index ["label_id"], name: "index_labels_transactions_on_label_id"
+    t.index ["transaction_id"], name: "index_labels_transactions_on_transaction_id"
   end
 
   create_table "plaid_categories", force: :cascade do |t|
