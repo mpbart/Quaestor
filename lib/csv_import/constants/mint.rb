@@ -1,6 +1,10 @@
 module CsvImport
   module Constants
     class Mint
+      class TransactionType
+        CREDIT = 'credit'.freeze
+        DEBIT = 'debit'.freeze
+      end
 
       def map_category(category, description)
         self.class.mappings.dig(category).call(description)
@@ -28,7 +32,7 @@ module CsvImport
             'Books & Supplies' => ['GENERAL_MERCHANDISE', 'GENERAL_MERCHANDISE_BOOKSTORES_AND_NEWSSTANDS'],
             'Student Loan' => ['LOAN_PAYMENTS', 'LOAN_PAYMENTS_STUDENT_LOAN_PAYMENT'],
             'Tuition' => ['GENERAL_SERVICES', 'GENERAL_SERVICES_EDUCATION'],
-            'Amusement' => 'Entertainment',
+            'Amusement' => ['ENTERTAINMENT', 'ENTERTAINMENT_OTHER_ENTERTAINMENT'],
             'Arts' => ['GENERAL_MERCHANDISE', 'GENERAL_MERCHANDISE_OTHER_GENERAL_MERCHANDISE'],
             'Movies & DVDs' => ['ENTERTAINMENT', 'ENTERTAINMENT_TV_AND_MOVIES'],
             'Music' => ['ENTERTAINMENT', 'ENTERTAINMENT_MUSIC_AND_AUDIO'],
@@ -85,7 +89,7 @@ module CsvImport
             'Loan Payment' => ['LOAN_PAYMENTS', 'LOAN_PAYMENTS_MORTGAGE_PAYMENT'],
             'Loan Principal' => ['LOAN_PAYMENTS', 'LOAN_PAYMENTS_MORTGAGE_PAYMENT'],
             'Loans' => ['EXCLUDED', 'EXCLUDED_EXCLUDED'],
-            'Wedding' => ['GENERAL_MERCHANDISE', 'GENERAL_MERCHANDISE_WEDDING'],
+            'Wedding' => ['GENERAL_SERVICES', 'GENERAL_SERVICES_WEDDING'],
             'Hair' => ['PERSONAL_CARE', 'PERSONAL_CARE_HAIR_AND_BEAUTY'],
             'Laundry' => ['PERSONAL_CARE', 'PERSONAL_CARE_LAUNDRY_AND_DRY_CLEANING'],
             'Spa & Massage' => ['PERSONAL_CARE', 'PERSONAL_CARE_HAIR_AND_BEAUTY'],
