@@ -7,6 +7,8 @@ require_relative 'constants/mint'
 module CsvImport
   class Importer
     class << self
+      DATETIME_FORMAT = '%m/%d/%Y'
+
       def process_csv(filename, user_id)
         ActiveRecord::Base.transaction do
           CSV.open(filename, headers: true).each do |row|
@@ -15,7 +17,7 @@ module CsvImport
               user_id:           user_id,
               description:       row['Description'],
               amount:            normalize_amount(row),
-              date:              row['Date'],
+              date:              DateTime.strptime(row['Date'], DATETIME_FORMAT).in_time_zone,
               plaid_category_id: map_category(row),
               labels:            extract_labels(row),
             )
