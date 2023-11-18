@@ -51,7 +51,7 @@
                 <tr>
                   <td><%= short_format_date(transaction.date) %></td>
                   <td><%= transaction.description %></td>
-                  <td><%= transaction.detailed_category %></td>
+                  <td><%= transaction.plaid_category.detailed_category %></td>
                   <td><%= transaction.amount %></td>
                 </tr>
               <% end %>

@@ -24,13 +24,13 @@
               <div class="field">Description: <%= f.text_field :description %></div>
               <div class="field">
                 Category: <%= grouped_collection_select(:transaction,
-                                                        :category_id,
+                                                        :plaid_category_id,
                                                         PlaidCategory.top_level_records,
                                                         :children,
-                                                        :most_specific_category,
-                                                        :category_id,
-                                                        :most_specific_category,
-                                                        { :selected => [@transaction.category_id] }) %>
+                                                        :primary_category,
+                                                        :id,
+                                                        :detailed_category,
+                                                        { :selected => [@transaction.plaid_category_id] }) %>
               </div>
               <div class="field">
                 <%= f.submit :id => 'edit-transaction-button', :class => 'ui fluid basic primary bottom button' %>
@@ -52,13 +52,13 @@
               <div class="field">Description: <%= f.text_field :description %></div>
               <div class="field">
                 Category: <%= grouped_collection_select(:transaction,
-                                                        :category_id,
+                                                        :plaid_category_id,
                                                         PlaidCategory.top_level_records,
                                                         :children,
-                                                        :most_specific_category,
-                                                        :category_id,
-                                                        :most_specific_category,
-                                                        { :selected => [@transaction.category_id] }) %>
+                                                        :primary_category,
+                                                        :id,
+                                                        :detailed_category,
+                                                        { :selected => [grouped_transaction.plaid_category_id] }) %>
               </div>
               <div class="field">
                 <%= f.submit :id => 'grouped-transaction-button', :class => 'ui fluid basic primary bottom button' %>

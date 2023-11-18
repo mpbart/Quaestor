@@ -11,7 +11,6 @@ class TransactionsController < ApplicationController
   end
 
   def show
-    # TODO: fix this so that it doesn't need a db lookup every time
     @transaction = @transactions&.detect{ |t| t.id == params[:id] } || Transaction.find(params[:id])
     @grouped_transactions = @transaction.grouped_transactions
     @split_transaction = @grouped_transactions.empty? ? ::Transaction.new : @grouped_transactions.build
@@ -21,8 +20,8 @@ class TransactionsController < ApplicationController
     permitted = params.require(:transaction).permit(:date,
                                                     :amount,
                                                     :description,
-                                                    :category_id,
-                                                    split_transactions: [:date, :amount, :description, :category_id, :_destroy])
+                                                    :plaid_category_id,
+                                                    split_transactions: [:date, :amount, :description, :plaid_category_id, :_destroy])
     transaction = Transaction.find(params[:id])
     success = if params[:split_transactions].nil?
       transaction.update(permitted)
