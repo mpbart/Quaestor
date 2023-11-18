@@ -1,11 +1,11 @@
 class PlaidCategory < ActiveRecord::Base
   
   def self.grouped_by_top_level
-    @@top_level ||= PlaidCategory.all.group_by{ |category| category.hierarchy[0] }
+    @@top_level ||= PlaidCategory.all.group_by{ |category| category.primary_category }
   end
 
   def self.top_level_records
-    @@top_level_records ||= where("jsonb_array_length(hierarchy) = 1").to_a
+    @@top_level_records ||= select(:primary_category).distinct.to_a
   end
 
   def self.category_children(top_level_key)
@@ -13,7 +13,7 @@ class PlaidCategory < ActiveRecord::Base
   end
 
   def children
-    PlaidCategory.grouped_by_top_level.dig(hierarchy.first)
+    PlaidCategory.grouped_by_top_level.dig(primary_category)
   end
 
   # Get all categories that match the given key
@@ -25,9 +25,4 @@ class PlaidCategory < ActiveRecord::Base
 
     categories.select{ |c| c.hierarchy.include?(key.last) }
   end
-
-  def most_specific_category
-    hierarchy.last
-  end
-
 end
