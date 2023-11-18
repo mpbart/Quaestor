@@ -1,3 +1,7 @@
+require 'base64'
+require 'securerandom'
+require 'bigdecimal'
+
 module FinanceManager
   class Transaction
     class UnknownAccountError < StandardError; end
@@ -6,15 +10,17 @@ module FinanceManager
 
     def self.create(transaction)
       account = ::Account.find_by(plaid_identifier: transaction.account_id)
-      raise_unknown_account_error(transaction) unless account
+      category = ::PlaidCategory.find_by(detailed_category: transaction.personal_finance_category.detailed)
+
+      unknown_account_error(transaction) unless account
+      unknown_category_error(transaction) unless category
 
       ::Transaction.create!(
         account:                account,
         user:                   account.user,
         id:                     transaction.transaction_id,
-        primary_category:       transaction.personal_finance_category.primary,
-        detailed_category:      transaction.personal_finance_category.detailed,
         category_confidence:    transaction.personal_finance_category.confidence_level,
+        plaid_category_id:      category.id,
         merchant_name:          transaction.merchant_name,
         payment_channel:        transaction.payment_channel,
         description:            transaction.name,
@@ -105,5 +111,8 @@ module FinanceManager
       raise UnknownTransactionError, "Could not find transaction with id #{transaction.id}"
     end
 
+    def self.unknown_category_error(transaction)
+      raise UnknownCategoryError, "Could not find category for #{transaction.personal_finance_category.detailed_category}"
+    end
   end
 end
