@@ -8,5 +8,6 @@ fi
 
 DB_NAME=$1
 DATETIME=$(date +"%Y-%m-%d:%T")
+FILENAME="$DB_NAME-backup-$DATETIME.db"
 
-pg_dump -h /tmp/postgres/ -d $DB_NAME > db_backups/"$DB_NAME-backup-$DATETIME.db"
+pg_dump "postgresql://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$DB_NAME" > db_backups/$FILENAME && echo "Successfully backed up database $DB_NAME to $FILENAME"

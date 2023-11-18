@@ -12,4 +12,4 @@ fi
 
 DB_NAME=$1
 BACKUP_FILE=$2
-psql -h /tmp/postgres/ $DB_NAME < "$BACKUP_FILE"
+psql postgresql://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$DB_NAME < db_backups/"$BACKUP_FILE" && echo "Successfully restored $DB_NAME from $BACKUP_FILE"
