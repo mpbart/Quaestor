@@ -38,10 +38,12 @@ module FinanceManager
       pending = ::Transaction.find_by(id: transaction.pending_transaction_id)
       create(transaction) unless pending
 
+      category = ::PlaidCategory.find_by(detailed_category: transaction.personal_finance_category.detailed)
+      unknown_category_error(transaction) unless category
+
       pending.id                     = transaction.id
-      pending.primary_category       = transaction.primary_category
-      pending.detailed_category      = transaction.detailed_category
       pending.category_confidence    = transaction.category_confidence
+      pending.plaid_category_id      = category.id
       pending.merchant_name          = transaction.merchant_name
       pending.payment_channel        = transaction.payment_channel
       pending.description            = transaction.name
@@ -71,18 +73,18 @@ module FinanceManager
       return false unless new_transaction_details[:amount].to_f > 0.0
 
       ActiveRecord::Base.transaction do
-        t                = original_transaction.dup
-        t.amount         = new_transaction_details[:amount].to_f
-        t.category       = new_transaction_details[:category] || t.category
-        t.category_id    = new_transaction_details[:category_id] || t.category_id
-        t.split          = true
-        t.save!
+        new_transaction_record = ::Transaction.create!(original_transaction.attributes.except('id')
+          .merge(new_transaction_details.reject{ |k,v| v.blank? })
+          .merge({id: generate_transaction_id, split: true})
+        )
+        new_transaction_record.split = true
+        new_transaction_record.save!
 
-        original_transaction.amount -= new_transaction_details[:amount].to_f
+        original_transaction.amount -= BigDecimal(new_transaction_details[:amount].to_s)
         original_transaction.split = true
         original_transaction.save!
 
-        add_to_transaction_group!(original_transaction, t)
+        add_to_transaction_group!(original_transaction, new_transaction_record)
       end
 
       true
@@ -101,6 +103,10 @@ module FinanceManager
 
     def self.edit!(transaction_record, new_transaction_details)
       transaction_record.update!(**new_transaction_details)
+    end
+
+    def self.generate_transaction_id
+      Base64.encode64(SecureRandom.random_bytes(36))[..-2]
     end
 
     def self.unknown_account_error(transaction)
