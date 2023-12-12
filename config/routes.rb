@@ -12,7 +12,9 @@ Rails.application.routes.draw do
   post '/create_link_token', to: 'plaid#create_link_token'
 
   # Transactions
-  resources :transactions, only: [:index, :show, :update]
+  resources :transactions, only: [:index, :show, :update] do
+    post '/hard_delete', to: 'transactions#hard_delete'
+  end
   resources :split_transactions, only: [:index, :show]
   post '/split_transactions', to: 'transactions#split_transactions'
   post '/upload_csv', to: 'transactions#upload_csv'

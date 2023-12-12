@@ -125,7 +125,7 @@ module FinanceManager
     private
 
     def transactions_cursor(plaid_cred)
-      plaid_cred.cursor #|| "now"
+      plaid_cred.cursor || "now"
     end
 
   end

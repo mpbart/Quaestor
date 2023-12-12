@@ -46,6 +46,12 @@ class TransactionsController < ApplicationController
     finance_manager.import_transactions_csv(current_user.transaction_csvs.last)
   end
 
+  def hard_delete
+    Transaction.find(params[:transaction_id]).destroy_fully!
+
+    redirect_to action: 'index'
+  end
+
   private
 
   def finance_manager

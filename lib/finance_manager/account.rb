@@ -12,7 +12,6 @@ module FinanceManager
     end
 
     def self.update(record, account)
-      record.name             = account.name
       record.official_name    = account.official_name
       record.account_type     = account.type
       record.account_sub_type = account.subtype

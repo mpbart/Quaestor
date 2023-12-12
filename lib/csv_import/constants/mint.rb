@@ -8,6 +8,8 @@ module CsvImport
 
       def map_category(category, description)
         self.class.mappings.dig(category).call(description)
+      rescue => e
+        puts "Error mapping category: #{category} with description: #{description}"
       end
 
       def self.mappings
@@ -122,6 +124,7 @@ module CsvImport
             'Shopping' => ->(description) { classify_shopping_category(description) },
             'Fees & Charges' => ['BANK_FEES', 'BANK_FEES_OTHER_BANK_FEES'],
             'Transfer' => ->(description) { classify_transfer_category(description) },
+            'Transfer for Cash Spending' => ['TRANSFER_OUT', 'TRANSFER_OUT_WITHDRAWAL'],
             'Travel' => ->(description) { classify_travel_category(description) },
             'Business Services' => ['GENERAL_SERVICES', 'GENERAL_SERVICES_OTHER_GENERAL_SERVICES'],
             'Health & Fitness' => ['PERSONAL_CARE', 'PERSONAL_CARE_GYMS_AND_FITNESS_CENTERS'],

@@ -3,4 +3,5 @@
 bundle exec rake db:drop \
                  db:create \
                  db:schema:load \
-                 db:migrate
+                 db:migrate \
+                 db:seed
