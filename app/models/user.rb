@@ -6,7 +6,7 @@ class User < ApplicationRecord
          :trackable
 
   has_many :accounts
-  has_many :transactions, through: :accounts
+  has_many :transactions
   has_many :plaid_credentials
   has_many_attached :transaction_csvs
 

@@ -12,7 +12,6 @@ module FinanceManager
     end
 
     def self.update(record, account)
-      record.name             = account.name
       record.official_name    = account.official_name
       record.account_type     = account.type
       record.account_sub_type = account.subtype
@@ -40,6 +39,13 @@ module FinanceManager
     end
 
     def self.create_balance(account, balance)
+      # De-dupe balances so that multiple refreshes per day does not result in duplicate balance records
+      # being created
+      newest_balance = account.balances.order(created_at: :desc).first
+      if  newest_balance.created_at.to_date == Date.today && balance.current == newest_balance.amount
+        return
+      end
+
       Balance.create!(
         account:   account,
         amount:    balance.current,

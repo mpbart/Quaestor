@@ -15,6 +15,11 @@ module FinanceManager
       unknown_account_error(transaction) unless account
       unknown_category_error(transaction) unless category
 
+      if ::Transaction.exists?(transaction.transaction_id)
+        Rails.logger.warn("Duplicate transaction with ID #{transaction.transaction_id} recorded. Ignoring and continuing")
+        return
+      end
+
       ::Transaction.create!(
         account:                account,
         user:                   account.user,
@@ -35,32 +40,32 @@ module FinanceManager
     end
 
     def self.update(transaction)
-      pending = ::Transaction.find_by(id: transaction.pending_transaction_id)
-      create(transaction) unless pending
+      existing = ::Transaction.find_by(id: transaction.transaction_id)
+      Rails.logger.warn("Could not find transaction to update with id #{transaction.transaction_id}") unless existing
 
       category = ::PlaidCategory.find_by(detailed_category: transaction.personal_finance_category.detailed)
       unknown_category_error(transaction) unless category
 
-      pending.id                     = transaction.id
-      pending.category_confidence    = transaction.category_confidence
-      pending.plaid_category_id      = category.id
-      pending.merchant_name          = transaction.merchant_name
-      pending.payment_channel        = transaction.payment_channel
-      pending.description            = transaction.name
-      pending.amount                 = transaction.amount
-      pending.date                   = transaction.date
-      pending.pending                = transaction.pending
-      pending.payment_metadata       = transaction.payment_meta
-      pending.location_metadata      = transaction.location
-      pending.pending_transaction_id = transaction.pending_transaction_id
-      pending.account_owner          = transaction.account_owner
+      existing.id                     = transaction.transaction_id
+      existing.category_confidence    = transaction.personal_finance_category.confidence_level
+      existing.plaid_category_id      = category.id
+      existing.merchant_name          = transaction.merchant_name
+      existing.payment_channel        = transaction.payment_channel
+      existing.description            = transaction.name
+      existing.amount                 = transaction.amount
+      existing.date                   = transaction.date
+      existing.pending                = transaction.pending
+      existing.payment_metadata       = transaction.payment_meta
+      existing.location_metadata      = transaction.location
+      existing.pending_transaction_id = transaction.pending_transaction_id
+      existing.account_owner          = transaction.account_owner
 
-      pending.save! if pending.changed?
+      existing.save! if existing.changed?
     end
 
     def self.remove(transaction)
-      transaction = ::Transaction.find_by(id: transaction.id)
-      Rails.logger.warn("Could not find transaction to remove with id #{transaction.id}") unless transaction
+      transaction = ::Transaction.find_by(id: transaction.transaction_id)
+      Rails.logger.warn("Could not find transaction to remove with id #{transaction.transaction_id}") unless transaction
 
       transaction.destroy
     end

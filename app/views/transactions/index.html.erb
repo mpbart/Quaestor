@@ -25,16 +25,20 @@
             <thead>
               <th>Date</th>
               <th>Description</th>
+              <th>Account</th>
               <th>Category</th>
               <th>Amount</th>
             </thead>
             <tbody>
               <% @transactions.each do |transaction| %>
-                <tr data-url="<%= transaction_path(transaction) %>" >
+                <% amount_klass = transaction.amount < 0 ? 'green-text' : 'black-text' %>
+                <% row_klass = transaction.pending ? 'pending-transaction-background': '' %>
+                <tr class="<%= row_klass %>" data-url="<%= transaction_path(transaction) %>" >
                   <td><%= short_format_date(transaction.date) %></td>
-                  <td><%= transaction.description %></td>
+                  <td><%= transaction.description[..40] %></td>
+                  <td><%= transaction.account&.name %></td>
                   <td><%= humanized_category(transaction.plaid_category) %></td>
-                  <td><%= number_to_currency(transaction.amount) %></td>
+                  <td class="<%= amount_klass %>"><%= number_to_currency(transaction.amount * -1.0) %></td>
                 </tr>
               <% end %>
             </tbody>
