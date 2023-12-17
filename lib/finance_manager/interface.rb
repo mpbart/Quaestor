@@ -32,47 +32,49 @@ module FinanceManager
 
     def refresh_accounts
       user.plaid_credentials.each do |credential|
-        request = Plaid::AccountsGetRequest.new({ access_token: credential.access_token })
-        response = plaid_client.accounts_get(request)
-        accounts = response.accounts
-        PlaidResponse.record_accounts_response!(response.to_hash, credential)
+        ActiveRecord::Base.transaction do
+          request = Plaid::AccountsGetRequest.new({ access_token: credential.access_token })
+          response = plaid_client.accounts_get(request)
+          accounts = response.accounts
+          PlaidResponse.record_accounts_response!(response.to_hash, credential)
 
-        next unless response.accounts&.any?
+          next unless response.accounts&.any?
 
-        response.accounts.each do |account|
-          FinanceManager::Account.handle(account, credential)
+          response.accounts.each do |account|
+            FinanceManager::Account.handle(account, credential)
+          end
         end
       end
     end
 
-    # TODO: add a mechanism for setting the last refreshed date/time when importing via CSV
-    # so that we can use that in the call here to sync
     def refresh_transactions
       user.plaid_credentials.each do |credential|
-        transactions_remaining = true
-        cursor = transactions_cursor(credential)
-        added, modified, removed = [], [], []
+        ActiveRecord::Base.transaction do
+          transactions_remaining = true
+          cursor = transactions_cursor(credential)
+          added, modified, removed = [], [], []
 
-        while transactions_remaining
-          request = Plaid::TransactionsSyncRequest.new(
-            access_token: credential.access_token,
-            cursor:       cursor,       
-          )
-          response = plaid_client.transactions_sync(request)
-          PlaidResponse.record_transactions_response!(response.to_hash, credential)
+          while transactions_remaining
+            request = Plaid::TransactionsSyncRequest.new(
+              access_token: credential.access_token,
+              cursor:       cursor,
+            )
+            response = plaid_client.transactions_sync(request)
+            PlaidResponse.record_transactions_response!(response.to_hash, credential)
 
-          added.concat(response.added)
-          modified.concat(response.modified)
-          removed.concat(response.removed)
+            added.concat(response.added)
+            modified.concat(response.modified)
+            removed.concat(response.removed)
 
-          transactions_remaining = response.has_more
-          cursor = response.next_cursor
+            transactions_remaining = response.has_more
+            cursor = response.next_cursor
+          end
+
+          added.each { |transaction| FinanceManager::Transaction.create(transaction) }
+          modified.each { |transaction| FinanceManager::Transaction.update(transaction) }
+          removed.each { |transaction| FinanceManager::Transaction.remove(transaction) }
+          credential.update_columns(cursor: cursor)
         end
-
-        added.each { |transaction| FinanceManager::Transaction.create(transaction) }
-        modified.each { |transaction| FinanceManager::Transaction.update(transaction) }
-        removed.each { |transaction| FinanceManager::Transaction.delete(transaction) }
-        credential.update_columns(cursor: cursor)
       end
     end
 
