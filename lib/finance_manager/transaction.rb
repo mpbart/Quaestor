@@ -15,6 +15,11 @@ module FinanceManager
       unknown_account_error(transaction) unless account
       unknown_category_error(transaction) unless category
 
+      if ::Transaction.exists?(transaction.transaction_id)
+        Rails.logger.warn("Duplicate transaction with ID #{transaction.transaction_id} recorded. Ignoring and continuing")
+        return
+      end
+
       ::Transaction.create!(
         account:                account,
         user:                   account.user,
