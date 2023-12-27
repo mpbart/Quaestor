@@ -22,3 +22,6 @@
   background-color: #f4efef;
 }
 
+.ui.form ::placeholder {
+  color: rgb(0, 0, 0);
+}
