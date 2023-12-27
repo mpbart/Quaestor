@@ -24,7 +24,7 @@
               <div class="field">Description: <%= f.text_field :description %></div>
               <div class="field">
                 Category:
-                <input list="plaid_category_id" id="transaction_category_id" name="transaction[plaid_category_id]" placeholder="<%= humanized_category(@transaction.plaid_category) %>" />
+                <input list="plaid_category_id" id="transaction-category-id" name="transaction[plaid_category_id]" placeholder="<%= humanized_category(@transaction.plaid_category) %>" />
                 <datalist id="plaid_category_id">
                   <% PlaidCategory.all.each do |category| %>
                     <% if @transaction.plaid_category_id == category.id %>
@@ -54,16 +54,17 @@
               <div class="field">Amount: <%= f.text_field :amount %></div>
               <div class="field">Description: <%= f.text_field :description %></div>
               <div class="field">
-                <input list="grouped_category_id" id="transaction_category_id" name="transaction[plaid_category_id]" placeholder="<%= humanized_category(@transaction.plaid_category) %>" />
-                Category: <datalist id="grouped_category_id">
-                            <% PlaidCategory.all.each do |category| %>
-                              <% if grouped_transaction.plaid_category_id == category.id %>
-                                <option value="<%= category.id %>" label="<%= humanized_category(category) %>" selected=true></option>
-                              <% else %>
-                                <option value="<%= category.id %>" label="<%= humanized_category(category) %>"></option>
-                              <% end %>
-                            <% end %>
-                          </datalist>
+                Category:
+                <input list="plaid_category_id" id="grouped-transaction-category-id" name="transaction[plaid_category_id]" placeholder="<%= humanized_category(grouped_transaction.plaid_category) %>" />
+                <datalist id="plaid_category_id">
+                  <% PlaidCategory.all.each do |category| %>
+                    <% if grouped_transaction.plaid_category_id == category.id %>
+                      <option value="<%= category.id %>" label="<%= humanized_category(category) %>" selected=true></option>
+                    <% else %>
+                      <option value="<%= category.id %>" label="<%= humanized_category(category) %>"></option>
+                    <% end %>
+                  <% end %>
+                </datalist>
               </div>
               <div class="field">
                 <%= f.submit :id => 'grouped-transaction-button', :class => 'ui fluid basic primary bottom button' %>
