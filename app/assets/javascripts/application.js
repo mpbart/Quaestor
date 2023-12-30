@@ -6,6 +6,13 @@ $(function() {
   */
   $('#account-options').dropdown({action: 'hide'});
   getHeaderTabs().tab();  
+  $('.ui.dropdown').dropdown();
+  $('#plaid-category-id').dropdown('set selected',
+      $('#plaid-category-id > option').filter($("option[selected='true']")).prop('text'));
+  $('#transaction-labels > option').filter($("option[data-selected='true']")).each(function(_idx, el) {
+      $('#transaction-labels').dropdown('set selected', el.text)
+  });
+
 
  /**
   * Set up event handlers
@@ -38,10 +45,10 @@ $(function() {
   $('#failureIcon').hide();
   $('#successIconSplit').hide();
   $('#failureIconSplit').hide();
-  $('#edit-transaction-form').on('ajax:success', showTransactionUpdateSuccessIcon );
-  $('#edit-transaction-form').on('ajax:failure', showTransactionUpdateFailureIcon );
-  $('#split-transactions-form').on('ajax:success', showTransactionSplitUpdateSuccessIcon );
-  $('#split-transactions-form').on('ajax:failure', showTransactionSplitUpdateFailureIcon );
+  $('#edit-transaction-form').on('ajax:success', showTransactionUpdateSuccessIcon);
+  $('#edit-transaction-form').on('ajax:failure', showTransactionUpdateFailureIcon);
+  $('#split-transactions-form').on('ajax:success', showTransactionSplitUpdateSuccessIcon);
+  $('#split-transactions-form').on('ajax:failure', showTransactionSplitUpdateFailureIcon);
   $('#edit-transaction-button').click(function(data, _h) {
     console.log(data.currentTarget.form);
   });

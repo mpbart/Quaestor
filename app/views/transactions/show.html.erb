@@ -19,24 +19,41 @@
           <%= form_for @transaction, html: { :class => 'ui form', :id => 'edit-transaction-form' }, remote: true do |f| %>
             <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
             <div class="fields">
-              <div class="field">Date: <%= f.text_field :date %></div>
-              <div class="field">Amount: <%= f.text_field :amount %></div>
-              <div class="field">Description: <%= f.text_field :description %></div>
-              <div class="field">
-                Category:
-                <input list="plaid_category_id" id="transaction-category-id" name="transaction[plaid_category_id]" placeholder="<%= humanized_category(@transaction.plaid_category) %>" />
-                <datalist id="plaid_category_id">
-                  <% PlaidCategory.all.each do |category| %>
-                    <% if @transaction.plaid_category_id == category.id %>
-                      <option value="<%= category.id %>" label="<%= humanized_category(category) %>" selected=true></option>
+              <div class="field"><label>Date:</label> <%= f.text_field :date %></div>
+              <div class="field one wide"><label>Amount:</label> <%= f.text_field :amount %></div>
+              <div class="field"><label>Description:</label> <%= f.text_field :description %></div>
+              <div class="field four wide">
+                <label>Labels:</label>
+                <input type="hidden" name="transaction[label_ids][]", value="">
+                <select name="transaction[label_ids][]" id="transaction-labels" multiple="" class="ui dropdown">
+                  <option value="">Select Tags</option>
+                  <% Label.all.each do |label| %>
+                    <% if @label_ids.include?(label.id) %>
+                      <option value="<%= label.id %>" data-selected="true"><%= label.name %></option>
                     <% else %>
-                      <option value="<%= category.id %>" label="<%= humanized_category(category) %>"></option>
+                      <option value="<%= label.id %>" ><%= label.name %></option>
                     <% end %>
                   <% end %>
-                </datalist>
+                </select>
               </div>
-              <div class="field">
-                <%= f.submit :id => 'edit-transaction-button', :class => 'ui fluid basic primary bottom button' %>
+              <div class="field five wide">
+                <label>Category:</label>
+                <div class="two fields">
+                  <div class="field">
+                    <select name="transaction[plaid_category_id]" id="plaid-category-id" class="ui search dropdown">
+                      <% PlaidCategory.all.each do |category| %>
+                        <% if @transaction.plaid_category_id == category.id %>
+                          <option value="<%= category.id %>" selected="true"><%= humanized_category(category) %></option>
+                        <% else %>
+                          <option value="<%= category.id %>"><%= humanized_category(category) %></option>
+                        <% end %>
+                      <% end %>
+                    </select>
+                  </div>
+                  <div class="field six wide">
+                    <%= f.submit :id => 'edit-transaction-button', :class => 'ui fluid basic primary bottom button' %>
+                  </div>
+                </div>
               </div>
               <div class="field"><i id="successIcon" class="green check icon"></i></div>
               <div class="field"><i id="failureIcon" class="red times icon"></i></div>
@@ -44,49 +61,73 @@
           <% end %>
         </div>
       <div class="ui hidden divider"></div>
-      <h3 class="ui center aligned header">Split Transactions</h3>
+      <h3 class="ui center aligned header">Existing Split Transactions</h3>
       <div id='grouped-transaction-div'>
         <% @transaction.grouped_transactions.each do |grouped_transaction| %>
           <%= form_for grouped_transaction, html: { :class => 'ui form', :id => 'edit-transactions-form' }, remote: true do |f| %>
             <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
             <div class="fields">
-              <div class="field">Date: <%= f.text_field :date %></div>
-              <div class="field">Amount: <%= f.text_field :amount %></div>
-              <div class="field">Description: <%= f.text_field :description %></div>
-              <div class="field">
-                Category:
-                <input list="plaid_category_id" id="grouped-transaction-category-id" name="transaction[plaid_category_id]" placeholder="<%= humanized_category(grouped_transaction.plaid_category) %>" />
-                <datalist id="plaid_category_id">
-                  <% PlaidCategory.all.each do |category| %>
-                    <% if grouped_transaction.plaid_category_id == category.id %>
-                      <option value="<%= category.id %>" label="<%= humanized_category(category) %>" selected=true></option>
+              <div class="field"><label>Date:</label> <%= f.text_field :date %></div>
+              <div class="field one wide"><label>Amount:</label> <%= f.text_field :amount %></div>
+              <div class="field"><label>Description:</label> <%= f.text_field :description %></div>
+              <div class="field four wide">
+                <label>Labels:</label>
+                <input type="hidden" name="transaction[label_ids][]", value="">
+                <select name="transaction[label_ids][]" id="transaction-labels" multiple="" class="ui dropdown">
+                  <option value="">Select Tags</option>
+                  <% grouped_label_ids = grouped_transaction.labels.pluck(:id).to_set %>
+                  <% Label.all.each do |label| %>
+                    <% if grouped_label_ids.include?(label.id) %>
+                      <option value="<%= label.id %>" data-selected="true"><%= label.name %></option>
                     <% else %>
-                      <option value="<%= category.id %>" label="<%= humanized_category(category) %>"></option>
+                      <option value="<%= label.id %>" ><%= label.name %></option>
                     <% end %>
                   <% end %>
-                </datalist>
+                </select>
               </div>
-              <div class="field">
-                <%= f.submit :id => 'grouped-transaction-button', :class => 'ui fluid basic primary bottom button' %>
+              <div class="field five wide">
+                <label>Category:</label>
+                <div class="two fields">
+                  <div class="field">
+                    <select name="transaction[plaid_category_id]" id="plaid-category-id" class="ui search dropdown">
+                      <% PlaidCategory.all.each do |category| %>
+                        <% if grouped_transaction.plaid_category_id == category.id %>
+                          <option value="<%= category.id %>" selected="true"><%= humanized_category(category) %></option>
+                        <% else %>
+                          <option value="<%= category.id %>"><%= humanized_category(category) %></option>
+                        <% end %>
+                      <% end %>
+                    </select>
+                  </div>
+                  <div class="field six wide">
+                    <%= f.submit :id => 'grouped-transaction-button', :class => 'ui fluid basic primary bottom button' %>
+                  </div>
+                </div>
               </div>
             </div>
           <% end %>
         <% end %>
       </div>
 
-      <div id='grouped-transaction-div'>
+      <h3 class="ui center aligned header">Create New Split Transaction</h3>
+      <div id='split-transaction-div'>
         <%= form_for @split_transaction, html: { :class => 'ui form', :id => 'split-transactions-form'}, url: '/split_transactions', remote: true do |f| %>
           <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
           <%= f.hidden_field(:parent_transaction_id, value: @transaction.id) %>
           <div class="fields">
-            <div class="field">Date: <%= f.text_field :date %></div>
-            <div class="field">Amount: <%= f.text_field :amount %></div>
-            <div class="field">Description: <%= f.text_field :description %></div>
-            <div class="field">
-              <%= f.submit :id => 'split-transaction-button', :class => 'ui fluid basic primary bottom button' %>
+            <div class="field"><label>Date:</label> <%= f.text_field :date %></div>
+            <div class="field one wide"><label>Amount:</label> <%= f.text_field :amount %></div>
+            <div class="field eight wide">
+              <label>Description:</label>
+              <div class="two fields">
+                <div class="field"><%= f.text_field :description %></div>
+                <div class="field six wide">
+                  <%= f.submit :id => 'split-transaction-button', :class => 'ui fluid basic primary bottom button' %>
+                </div>
+                <div class="field"><i id="successIconSplit" class="green check icon"></i></div>
+                <div class="field"><i id="failureIconSplit" class="red times icon"></i></div>
+              </div>
             </div>
-            <div class="field"><i id="successIconSplit" class="green check icon"></i></div>
-            <div class="field"><i id="failureIconSplit" class="red times icon"></i></div>
           </div>
         <% end %>
       </div>

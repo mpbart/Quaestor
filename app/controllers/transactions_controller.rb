@@ -12,6 +12,7 @@ class TransactionsController < ApplicationController
 
   def show
     @transaction = @transactions&.detect{ |t| t.id == params[:id] } || Transaction.find(params[:id])
+    @label_ids = Set.new(@transaction.labels.pluck(:id))
     @grouped_transactions = @transaction.grouped_transactions
     @split_transaction = @grouped_transactions.empty? ? ::Transaction.new : @grouped_transactions.build
   end
@@ -21,6 +22,7 @@ class TransactionsController < ApplicationController
                                                     :amount,
                                                     :description,
                                                     :plaid_category_id,
+                                                    label_ids: [],
                                                     split_transactions: [:date, :amount, :description, :plaid_category_id, :_destroy])
     transaction = Transaction.find(params[:id])
     success = if params[:split_transactions].nil?
