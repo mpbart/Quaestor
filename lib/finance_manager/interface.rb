@@ -1,8 +1,8 @@
 require 'plaid'
 require 'config_reader'
 require 'csv_import/importer'
-require_relative 'account'
-require_relative 'transaction'
+require 'entity/account'
+require 'repository/transaction'
 
 module FinanceManager
   class Interface
@@ -13,21 +13,6 @@ module FinanceManager
     def initialize(user)
       @user = user
       @plaid_client = create_plaid_client
-    end
-
-    # TODO: Refactor into a separate plaid object to handle all plaid-related things
-    def create_plaid_client
-      config = ConfigReader.for('plaid')
-      # TODO: Fix this by just using ENV vars :shrug:
-      #env = config['environment'].fetch(ENV['RAILS_ENV']) { raise StandardError, "No mapping found for environment #{ENV['RAILS_ENV']}" }
-      plaid_config = Plaid::Configuration.new
-      plaid_config.server_index = Plaid::Configuration::Environment["sandbox"]
-      plaid_config.api_key["PLAID-CLIENT-ID"] = config['client_id']
-      plaid_config.api_key["PLAID-SECRET"] = config['secret']
-
-      api_client = Plaid::ApiClient.new(plaid_config)
-
-      Plaid::PlaidApi.new(api_client)
     end
 
     def refresh_accounts
@@ -41,7 +26,7 @@ module FinanceManager
           next unless response.accounts&.any?
 
           response.accounts.each do |account|
-            FinanceManager::Account.handle(account, credential)
+            Entity::Account.create_or_update(account, credential)
           end
         end
       end
@@ -70,35 +55,11 @@ module FinanceManager
             cursor = response.next_cursor
           end
 
-          added.each { |transaction| FinanceManager::Transaction.create(transaction) }
-          modified.each { |transaction| FinanceManager::Transaction.update(transaction) }
-          removed.each { |transaction| FinanceManager::Transaction.remove(transaction) }
+          Repository::Transaction.update(modified)
+          Repository::Transaction.add(added)
+          Repository::Transaction.remove(removed)
           credential.update_columns(cursor: cursor)
         end
-      end
-    end
-
-    def split_transaction!(transaction_id, new_transaction_details)
-      begin
-        return unless transaction = ::Transaction.find(transaction_id)
-        FinanceManager::Transaction.split!(
-          transaction,
-          new_transaction_details
-        )
-      rescue => e
-        Rails.logger.error("Error splitting transaction: #{e}")
-        false
-      end
-    end
-
-    def edit_transaction!(transaction_id, new_transaction_details)
-      begin
-        return unless transaction = ::Transaction.find(transaction_id)
-        Financemanager::Transaction.edit!(transaction, new_transaction_details)
-        true
-      rescue => e
-        Rails.logger.error("Error editing transaction: #{e}")
-        false
       end
     end
 
@@ -125,6 +86,20 @@ module FinanceManager
     end
 
     private
+
+    def create_plaid_client
+      config = ConfigReader.for('plaid')
+      # TODO: Fix this by just using ENV vars :shrug:
+      #env = config['environment'].fetch(ENV['RAILS_ENV']) { raise StandardError, "No mapping found for environment #{ENV['RAILS_ENV']}" }
+      plaid_config = Plaid::Configuration.new
+      plaid_config.server_index = Plaid::Configuration::Environment["sandbox"]
+      plaid_config.api_key["PLAID-CLIENT-ID"] = config['client_id']
+      plaid_config.api_key["PLAID-SECRET"] = config['secret']
+
+      api_client = Plaid::ApiClient.new(plaid_config)
+
+      Plaid::PlaidApi.new(api_client)
+    end
 
     def transactions_cursor(plaid_cred)
       plaid_cred.cursor || "now"

@@ -1,7 +1,7 @@
-module FinanceManager
+module Entity
   class Account
     
-    def self.handle(account, credential)
+    def self.create_or_update(account, credential)
       user = credential.user
       record = user.accounts.find_by(plaid_identifier: account.account_id)
       if record
@@ -46,12 +46,7 @@ module FinanceManager
         return
       end
 
-      Balance.create!(
-        account:   account,
-        amount:    balance.current,
-        available: balance.available,
-        limit:     balance.limit,
-      )
+      Entity::Balance.create(balance, account)
     end
     private_class_method :create_balance
 

@@ -2,11 +2,17 @@ require 'base64'
 require 'securerandom'
 require 'bigdecimal'
 
-module FinanceManager
+module Entity
   class Transaction
     class UnknownAccountError < StandardError; end
     class UnknownTransactionError < StandardError; end
     class BadParametersError < StandardError; end
+
+    attr_accessor :transaction
+
+    def initialize(transaction_id)
+      @transaction = Transaction.find(transaction_id)
+    end
 
     def self.create(transaction)
       account = ::Account.find_by(plaid_identifier: transaction.account_id)
@@ -39,34 +45,28 @@ module FinanceManager
       )
     end
 
-    def self.update(transaction)
-      existing = ::Transaction.find_by(id: transaction.transaction_id)
-      Rails.logger.warn("Could not find transaction to update with id #{transaction.transaction_id}") unless existing
+    def self.update(plaid_transaction)
+      category = ::PlaidCategory.find_by(detailed_category: plaid_transaction.personal_finance_category.detailed)
+      unknown_category_error(plaid_transaction) unless category
 
-      category = ::PlaidCategory.find_by(detailed_category: transaction.personal_finance_category.detailed)
-      unknown_category_error(transaction) unless category
+      transaction.id                     = plaid_transaction.transaction_id
+      transaction.category_confidence    = plaid_transaction.personal_finance_category.confidence_level
+      transaction.plaid_category_id      = category.id
+      transaction.merchant_name          = plaid_transaction.merchant_name
+      transaction.payment_channel        = plaid_transaction.payment_channel
+      transaction.description            = plaid_transaction.name
+      transaction.amount                 = plaid_transaction.amount
+      transaction.date                   = plaid_transaction.date
+      transaction.pending                = plaid_transaction.pending
+      transaction.payment_metadata       = plaid_transaction.payment_meta
+      transaction.location_metadata      = plaid_transaction.location
+      transaction.pending_transaction_id = plaid_transaction.pending_transaction_id
+      transaction.account_owner          = plaid_transaction.account_owner
 
-      existing.id                     = transaction.transaction_id
-      existing.category_confidence    = transaction.personal_finance_category.confidence_level
-      existing.plaid_category_id      = category.id
-      existing.merchant_name          = transaction.merchant_name
-      existing.payment_channel        = transaction.payment_channel
-      existing.description            = transaction.name
-      existing.amount                 = transaction.amount
-      existing.date                   = transaction.date
-      existing.pending                = transaction.pending
-      existing.payment_metadata       = transaction.payment_meta
-      existing.location_metadata      = transaction.location
-      existing.pending_transaction_id = transaction.pending_transaction_id
-      existing.account_owner          = transaction.account_owner
-
-      existing.save! if existing.changed?
+      existing.save! if transaction.changed?
     end
 
-    def self.remove(transaction)
-      transaction = ::Transaction.find_by(id: transaction.transaction_id)
-      Rails.logger.warn("Could not find transaction to remove with id #{transaction.transaction_id}") unless transaction
-
+    def self.remove
       transaction.destroy
     end
 
@@ -108,6 +108,10 @@ module FinanceManager
 
     def self.edit!(transaction_record, new_transaction_details)
       transaction_record.update!(**new_transaction_details)
+    end
+
+    def delete!
+      transaction.destroy_fully!
     end
 
     def self.generate_transaction_id

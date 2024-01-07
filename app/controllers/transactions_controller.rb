@@ -1,4 +1,6 @@
 require 'finance_manager/interface'
+require 'repository/transaction'
+require 'entity/transaction'
 
 class TransactionsController < ApplicationController
   include ActionView::Helpers::NumberHelper
@@ -24,10 +26,12 @@ class TransactionsController < ApplicationController
                                                     :plaid_category_id,
                                                     label_ids: [],
                                                     split_transactions: [:date, :amount, :description, :plaid_category_id, :_destroy])
-    transaction = Transaction.find(params[:id])
+    transaction = Entity::Transaction.new(params[:id])
     success = if params[:split_transactions].nil?
       transaction.update(permitted)
     else
+      Rails.logger.error("We should not be hitting this branch anymore !!!!")
+      render json: {success: false, debug: :check_the_logs}
       finance_manager.transactions.split_transaction(params[:id], params[:split_transactions])
     end
 
@@ -37,8 +41,7 @@ class TransactionsController < ApplicationController
   # Split a single transaction into multiple
   def split_transactions
     new_transaction_details = params.require(:transaction).permit(:date, :amount, :description, :parent_transaction_id).to_h
-    parent_transaction_id = new_transaction_details.delete(:parent_transaction_id)
-    result = finance_manager.split_transaction!(parent_transaction_id, new_transaction_details)
+    result = Repository::Transaction.split!(new_transaction_details)
     render json: {success: result}
   end
 
@@ -49,7 +52,7 @@ class TransactionsController < ApplicationController
   end
 
   def hard_delete
-    Transaction.find(params[:transaction_id]).destroy_fully!
+    Entity::Transaction.new(params[:transaction_id]).delete!
 
     redirect_to action: 'index'
   end
