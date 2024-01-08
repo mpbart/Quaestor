@@ -36,6 +36,10 @@ gem 'acts_as_paranoid', '~> 0.9'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'rspec', '~> 3'
+  gem 'rspec-rails', '~> 6.1'
+  gem 'factory_bot_rails', '~> 6.4'
+  gem 'database_cleaner-active_record'
+  gem 'rails-controller-testing'
 end
 
 group :development do
