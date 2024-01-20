@@ -6,7 +6,7 @@ require 'attr_encrypted'
 class PlaidResponse < ApplicationRecord
   belongs_to :plaid_credential
 
-  attr_encrypted :response, key: ENV['ENCRYPTION_KEY'], marshal: true
+  attr_encrypted :response, key: ENV.fetch('ENCRYPTION_KEY', nil), marshal: true
 
   def self.record_accounts_response!(response, credential)
     PlaidResponse.create!(

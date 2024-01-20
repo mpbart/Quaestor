@@ -4,9 +4,9 @@ require 'csv'
 require 'pry'
 
 # rubocop:disable Layout/LineLength
-account_map = Account.all.map { |a| [a.name, a] }.to_h.merge(Account.all.map do |a|
+account_map = Account.all.to_h { |a| [a.name, a] }.merge(Account.all.to_h do |a|
   [a.official_name, a]
-end.to_h)
+end)
 account_map.delete(nil)
 
 count = 0
