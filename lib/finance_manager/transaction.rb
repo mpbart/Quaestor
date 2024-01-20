@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 require 'securerandom'
 require 'bigdecimal'
@@ -103,12 +105,11 @@ module FinanceManager
     def self.add_to_transaction_group!(original_transaction, new_transaction)
       if original_transaction.transaction_group.present?
         group = original_transaction.transaction_group
-        group.transactions << new_transaction
       else
         group = ::TransactionGroup.create!
         group.transactions << original_transaction
-        group.transactions << new_transaction
       end
+      group.transactions << new_transaction
     end
 
     def self.generate_transaction_id

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'finance_manager/interface'
 
 class PlaidController < ActionController::Base

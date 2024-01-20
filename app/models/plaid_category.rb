@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class PlaidCategory < ActiveRecord::Base
   def self.grouped_by_top_level
-    @@top_level ||= PlaidCategory.all.group_by { |category| category.primary_category }
+    @@top_level ||= PlaidCategory.all.group_by(&:primary_category)
   end
 
   def self.top_level_records
@@ -8,11 +10,11 @@ class PlaidCategory < ActiveRecord::Base
   end
 
   def self.category_children(top_level_key)
-    grouped_by_top_level.dig(top_level_key)
+    grouped_by_top_level[top_level_key]
   end
 
   def children
-    PlaidCategory.grouped_by_top_level.dig(primary_category)
+    PlaidCategory.grouped_by_top_level[primary_category]
   end
 
   # Get all categories that match the given key

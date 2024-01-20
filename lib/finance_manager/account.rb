@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinanceManager
   class Account
     def self.handle(account, credential)

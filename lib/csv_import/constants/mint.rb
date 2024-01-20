@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 module CsvImport
   module Constants
     class Mint
       class TransactionType
-        CREDIT = 'credit'.freeze
-        DEBIT = 'debit'.freeze
+        CREDIT = 'credit'
+        DEBIT = 'debit'
       end
 
       def map_category(category, description)
-        self.class.mappings.dig(category).call(description)
-      rescue StandardError => e
+        self.class.mappings[category].call(description)
+      rescue StandardError
         puts "Error mapping category: #{category} with description: #{description}"
       end
 

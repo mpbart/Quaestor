@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'plaid'
 require 'config_reader'
 require 'csv_import/importer'
@@ -6,7 +8,7 @@ require_relative 'transaction'
 
 module FinanceManager
   class Interface
-    DATE_FORMAT = '%Y-%m-%d'.freeze
+    DATE_FORMAT = '%Y-%m-%d'
 
     attr_reader :user, :plaid_client
 
@@ -81,7 +83,7 @@ module FinanceManager
     end
 
     def split_transaction!(transaction_id, new_transaction_details)
-      return unless transaction = ::Transaction.find(transaction_id)
+      return unless (transaction = ::Transaction.find(transaction_id))
 
       FinanceManager::Transaction.split!(
         transaction,

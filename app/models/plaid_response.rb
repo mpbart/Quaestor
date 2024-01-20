@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'plaid'
 require 'attr_encrypted'
 

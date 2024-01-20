@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'finance_manager/transaction'
 
 RSpec.describe FinanceManager::Transaction do

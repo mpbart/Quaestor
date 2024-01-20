@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SplitTransactionsController < ApplicationController
   include ActionView::Helpers::NumberHelper
 

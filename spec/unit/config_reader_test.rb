@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'config_reader'
 
 RSpec.describe ConfigReader do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::Base
   helper_method :short_format_date, :amount_class
   helper_method :humanized_category
