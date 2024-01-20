@@ -198,10 +198,10 @@ module CsvImport
           }
           # rubocop:enable Layout/LineLength
 
-          conversions.each do |_k, value|
+          conversions.each do |key, value|
             next if value.respond_to?(:call)
 
-            conversions[_k] = ->(_) { value }
+            conversions[key] = ->(_) { value }
           end
 
           conversions
