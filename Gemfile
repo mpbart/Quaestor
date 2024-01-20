@@ -35,19 +35,19 @@ gem 'acts_as_paranoid', '~> 0.9'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'database_cleaner-active_record'
+  gem 'factory_bot_rails', '~> 6.4'
+  gem 'rails-controller-testing'
   gem 'rspec', '~> 3'
   gem 'rspec-rails', '~> 6.1'
-  gem 'factory_bot_rails', '~> 6.4'
-  gem 'database_cleaner-active_record'
-  gem 'rails-controller-testing'
 end
 
 group :development do
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
+  gem 'awesome_print'
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'listen'
   gem 'pry'
-  gem 'awesome_print'
   gem 'spring'
   gem 'spring-watcher-listen'
 end
@@ -57,4 +57,4 @@ group :test do
   # Easy installation and use of web drivers to run system tests with browsers
 end
 
-gem "rubocop", "~> 1.60"
+gem 'rubocop', '~> 1.60'

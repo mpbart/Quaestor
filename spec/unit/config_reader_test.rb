@@ -1,7 +1,7 @@
 require 'config_reader'
 
 RSpec.describe ConfigReader do
-  let(:config_file) { {key: 'value'} }
+  let(:config_file) { { key: 'value' } }
   let(:client_name) { 'client' }
 
   describe '.for' do

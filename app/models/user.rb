@@ -14,5 +14,4 @@ class User < ApplicationRecord
   def paginated_transactions(page_num:)
     transactions.by_date.paginate(page: page_num, per_page: 50)
   end
-
 end

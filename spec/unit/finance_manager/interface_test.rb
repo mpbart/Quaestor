@@ -18,14 +18,14 @@ RSpec.describe FinanceManager::Interface do
   describe '#create_plaid_client' do
     let(:config) do
       {
-        'environment'=> environment,
-        'client_id'=>   client_id,
-        'secret'=>      secret,
+        'environment' => environment,
+        'client_id'   => client_id,
+        'secret'      => secret
       }
     end
     let(:secret)             { 'secret' }
     let(:client_id)          { 'client_id' }
-    let(:environment)        { {'test'=> 'sandbox'} }
+    let(:environment)        { { 'test'=> 'sandbox' } }
     let(:plaid_client)       { instance_double(Plaid::PlaidApi) }
     let(:plaid_class)        { class_double(Plaid::PlaidApi) }
     let(:plaid_api_class)    { class_double(Plaid::ApiClient) }
@@ -41,7 +41,7 @@ RSpec.describe FinanceManager::Interface do
       stub_const('Plaid::PlaidConfiguration', plaid_config_class)
       stub_const('Plaid::ApiClient', plaid_api_class)
       stub_const('Plaid::Api', plaid_class)
-      stub_const('ENV', {'RAILS_ENV' => 'test'})
+      stub_const('ENV', { 'RAILS_ENV' => 'test' })
     end
 
     subject(:create_plaid_client) { instance.create_plaid_client }
@@ -50,7 +50,7 @@ RSpec.describe FinanceManager::Interface do
       let(:environment) { {} }
 
       it 'raises an error' do
-        expect{ create_plaid_client }.to raise_error{ StandardError }
+        expect { create_plaid_client }.to(raise_error { StandardError })
       end
     end
 
@@ -81,9 +81,9 @@ RSpec.describe FinanceManager::Interface do
     let(:client)          { double('client') }
     let(:accounts_double) { double('accounts') }
     let(:accounts)        { [account1, account2] }
-    let(:account1)        { {'key' => 'value'} }
-    let(:account2)        { {'key' => 'value2'} }
-    let(:api_response)    { {accounts: accounts} }
+    let(:account1)        { { 'key' => 'value' } }
+    let(:account2)        { { 'key' => 'value2' } }
+    let(:api_response)    { { accounts: accounts } }
 
     before do
       allow(plaid_response_class).to receive(:record_accounts_response!)
@@ -129,16 +129,17 @@ RSpec.describe FinanceManager::Interface do
     let(:transactions_double) { double('transactions') }
     let(:start_date)          { '2020-05-01' }
     let(:end_date)            { '2020-05-05' }
-    let(:api_response)        { {transactions: transactions} }
+    let(:api_response)        { { transactions: transactions } }
     let(:transactions)        { [transaction1, transaction2] }
-    let(:transaction1)        { {'key' => 'value'} }
-    let(:transaction2)        { {'key' => 'value2'} }
+    let(:transaction1)        { { 'key' => 'value' } }
+    let(:transaction2)        { { 'key' => 'value2' } }
 
     before do
       allow(plaid_response_class).to receive(:record_transactions_response!)
       allow(FinanceManager::Transaction).to receive(:handle)
       allow(client).to receive(:transactions).and_return(transactions_double)
-      allow(transactions_double).to receive(:get).with(token, start_date, end_date).and_return(api_response)
+      allow(transactions_double).to receive(:get).with(token, start_date,
+                                                       end_date).and_return(api_response)
       allow(instance).to receive(:transactions_refresh_start_date).and_return(start_date)
       allow(instance).to receive(:transactions_refresh_end_date).and_return(end_date)
       allow(instance).to receive(:create_plaid_client).and_return(client)
@@ -170,8 +171,8 @@ RSpec.describe FinanceManager::Interface do
     end
 
     it 'handles each transaction in the response' do
-        expect(FinanceManager::Transaction).to receive(:handle).exactly(4).times
-        refresh_transactions
+      expect(FinanceManager::Transaction).to receive(:handle).exactly(4).times
+      refresh_transactions
     end
   end
 end

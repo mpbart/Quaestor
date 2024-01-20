@@ -1,6 +1,5 @@
 module FinanceManager
   class Account
-    
     def self.handle(account, credential)
       user = credential.user
       record = user.accounts.find_by(plaid_identifier: account.account_id)
@@ -33,7 +32,7 @@ module FinanceManager
         official_name:    account.official_name,
         account_type:     account.type,
         account_sub_type: account.subtype,
-        mask:             account.mask,
+        mask:             account.mask
       )
 
       create_balance(record, account.balances)
@@ -43,7 +42,7 @@ module FinanceManager
       # De-dupe balances so that multiple refreshes per day does not result in duplicate balance records
       # being created
       newest_balance = account.balances.order(created_at: :desc).first
-      if  newest_balance&.created_at&.to_date == Date.today && balance.current == newest_balance.amount
+      if newest_balance&.created_at&.to_date == Date.today && balance.current == newest_balance.amount
         return
       end
 
@@ -51,10 +50,9 @@ module FinanceManager
         account:   account,
         amount:    balance.current,
         available: balance.available,
-        limit:     balance.limit,
+        limit:     balance.limit
       )
     end
     private_class_method :create_balance
-
   end
 end

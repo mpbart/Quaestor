@@ -10,7 +10,7 @@ class PlaidResponse < ApplicationRecord
     PlaidResponse.create!(
       endpoint:         '/accounts/get',
       response:         response,
-      plaid_credential: credential,
+      plaid_credential: credential
     )
   end
 
@@ -18,7 +18,7 @@ class PlaidResponse < ApplicationRecord
     PlaidResponse.create!(
       endpoint:         '/transactions/get',
       response:         response,
-      plaid_credential: credential,
+      plaid_credential: credential
     )
   end
 end

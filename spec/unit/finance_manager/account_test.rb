@@ -7,7 +7,7 @@ RSpec.describe FinanceManager::Account do
   describe '.handle' do
     let(:hash) do
       {
-        'account_id' => account_id,
+        'account_id' => account_id
       }
     end
     let(:account_id) { 1 }
@@ -42,7 +42,7 @@ RSpec.describe FinanceManager::Account do
     end
 
     context 'when the account does not exist' do
-      let(:account)    { nil }
+      let(:account) { nil }
 
       it 'calls create' do
         expect(described_class).to receive(:create).with(hash, credential)
@@ -60,7 +60,7 @@ RSpec.describe FinanceManager::Account do
         'type'          => type,
         'subtype'       => sub_type,
         'mask'          => mask,
-        'balances'      => balances,
+        'balances'      => balances
       }
     end
     let(:account_id)    { 1 }
@@ -69,15 +69,14 @@ RSpec.describe FinanceManager::Account do
     let(:type)          { 'checking' }
     let(:sub_type)      { '3' }
     let(:mask)          { '1234' }
-    let(:balances)      { {'key' => 'value'} }
+    let(:balances)      { { 'key' => 'value' } }
     let(:account_double) { double('account double') }
-    let(:user)          { double('user') }
+    let(:user) { double('user') }
     let(:credential) do
       double('credential',
-        user:             user,
-        institution_name: 'name',
-        institution_id:   1
-      )
+             user:             user,
+             institution_name: 'name',
+             institution_id:   1)
     end
 
     subject(:create) { described_class.create(hash, credential) }
@@ -98,7 +97,7 @@ RSpec.describe FinanceManager::Account do
         official_name:    official_name,
         account_type:     type,
         account_sub_type: sub_type,
-        mask:             mask,
+        mask:             mask
       )
       create
     end
@@ -117,7 +116,7 @@ RSpec.describe FinanceManager::Account do
         'type'          => type,
         'subtype'       => sub_type,
         'mask'          => mask,
-        'balances'      => balances,
+        'balances'      => balances
       }
     end
     let(:name)          { 'checking account' }
@@ -125,7 +124,7 @@ RSpec.describe FinanceManager::Account do
     let(:type)          { 'checking' }
     let(:sub_type)      { '3' }
     let(:mask)          { '1234' }
-    let(:balances)      { {'key' => 'value'} }
+    let(:balances)      { { 'key' => 'value' } }
     let(:changed)       { false }
 
     subject(:update) { described_class.update(account, hash) }

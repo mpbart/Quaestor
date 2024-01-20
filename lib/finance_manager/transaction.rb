@@ -35,13 +35,15 @@ module FinanceManager
         payment_metadata:       transaction.payment_meta,
         location_metadata:      transaction.location,
         pending_transaction_id: transaction.pending_transaction_id,
-        account_owner:          transaction.account_owner,
+        account_owner:          transaction.account_owner
       )
     end
 
     def self.update(transaction)
       existing = ::Transaction.find_by(id: transaction.transaction_id)
-      Rails.logger.warn("Could not find transaction to update with id #{transaction.transaction_id}") unless existing
+      unless existing
+        Rails.logger.warn("Could not find transaction to update with id #{transaction.transaction_id}")
+      end
 
       category = ::PlaidCategory.find_by(detailed_category: transaction.personal_finance_category.detailed)
       unknown_category_error(transaction) unless category
@@ -65,23 +67,26 @@ module FinanceManager
 
     def self.remove(transaction)
       transaction = ::Transaction.find_by(id: transaction.transaction_id)
-      Rails.logger.warn("Could not find transaction to remove with id #{transaction.transaction_id}") unless transaction
+      unless transaction
+        Rails.logger.warn("Could not find transaction to remove with id #{transaction.transaction_id}")
+      end
 
       transaction.destroy
     end
 
     def self.split!(original_transaction, new_transaction_details)
       if new_transaction_details[:amount].nil?
-        raise BadParametersError.new("Amount must be filled when splitting a transaction")
+        raise BadParametersError, 'Amount must be filled when splitting a transaction'
       end
 
-      return false unless new_transaction_details[:amount].to_f > 0.0 && new_transaction_details[:amount].to_f < original_transaction.amount
+      unless new_transaction_details[:amount].to_f > 0.0 && new_transaction_details[:amount].to_f < original_transaction.amount
+        return false
+      end
 
       ActiveRecord::Base.transaction do
         new_transaction_record = ::Transaction.create!(original_transaction.attributes.except('id')
-          .merge(new_transaction_details.reject{ |k,v| v.blank? })
-          .merge({id: generate_transaction_id, split: true})
-        )
+          .merge(new_transaction_details.reject { |_k, v| v.blank? })
+          .merge({ id: generate_transaction_id, split: true }))
         new_transaction_record.split = true
         new_transaction_record.save!
 
@@ -111,7 +116,8 @@ module FinanceManager
     end
 
     def self.unknown_account_error(transaction)
-      raise UnknownAccountError, "Could not find account matching #{transaction.account_id} for transaction #{transaction.transaction_id}"
+      raise UnknownAccountError,
+            "Could not find account matching #{transaction.account_id} for transaction #{transaction.transaction_id}"
     end
 
     def self.unknown_transaction_error(transaction)
@@ -119,7 +125,8 @@ module FinanceManager
     end
 
     def self.unknown_category_error(transaction)
-      raise UnknownCategoryError, "Could not find category for #{transaction.personal_finance_category.detailed_category}"
+      raise UnknownCategoryError,
+            "Could not find category for #{transaction.personal_finance_category.detailed_category}"
     end
   end
 end

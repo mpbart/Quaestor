@@ -1,7 +1,6 @@
 class PlaidCategory < ActiveRecord::Base
-  
   def self.grouped_by_top_level
-    @@top_level ||= PlaidCategory.all.group_by{ |category| category.primary_category }
+    @@top_level ||= PlaidCategory.all.group_by { |category| category.primary_category }
   end
 
   def self.top_level_records
@@ -23,6 +22,6 @@ class PlaidCategory < ActiveRecord::Base
 
     return categories unless key
 
-    categories.select{ |c| c.hierarchy.include?(key.last) }
+    categories.select { |c| c.hierarchy.include?(key.last) }
   end
 end

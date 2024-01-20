@@ -7,7 +7,7 @@ require_relative 'transaction'
 module FinanceManager
   class Interface
     DATE_FORMAT = '%Y-%m-%d'.freeze
-    
+
     attr_reader :user, :plaid_client
 
     def initialize(user)
@@ -19,11 +19,11 @@ module FinanceManager
     def create_plaid_client
       config = ConfigReader.for('plaid')
       # TODO: Fix this by just using ENV vars :shrug:
-      #env = config['environment'].fetch(ENV['RAILS_ENV']) { raise StandardError, "No mapping found for environment #{ENV['RAILS_ENV']}" }
+      # env = config['environment'].fetch(ENV['RAILS_ENV']) { raise StandardError, "No mapping found for environment #{ENV['RAILS_ENV']}" }
       plaid_config = Plaid::Configuration.new
-      plaid_config.server_index = Plaid::Configuration::Environment["sandbox"]
-      plaid_config.api_key["PLAID-CLIENT-ID"] = config['client_id']
-      plaid_config.api_key["PLAID-SECRET"] = config['secret']
+      plaid_config.server_index = Plaid::Configuration::Environment['sandbox']
+      plaid_config.api_key['PLAID-CLIENT-ID'] = config['client_id']
+      plaid_config.api_key['PLAID-SECRET'] = config['secret']
 
       api_client = Plaid::ApiClient.new(plaid_config)
 
@@ -52,12 +52,14 @@ module FinanceManager
         ActiveRecord::Base.transaction do
           transactions_remaining = true
           cursor = transactions_cursor(credential)
-          added, modified, removed = [], [], []
+          added = []
+          modified = []
+          removed = []
 
           while transactions_remaining
             request = Plaid::TransactionsSyncRequest.new(
               access_token: credential.access_token,
-              cursor:       cursor,
+              cursor:       cursor
             )
             response = plaid_client.transactions_sync(request)
             PlaidResponse.record_transactions_response!(response.to_hash, credential)
@@ -79,16 +81,15 @@ module FinanceManager
     end
 
     def split_transaction!(transaction_id, new_transaction_details)
-      begin
-        return unless transaction = ::Transaction.find(transaction_id)
-        FinanceManager::Transaction.split!(
-          transaction,
-          new_transaction_details
-        )
-      rescue => e
-        Rails.logger.error("Error splitting transaction: #{e}")
-        false
-      end
+      return unless transaction = ::Transaction.find(transaction_id)
+
+      FinanceManager::Transaction.split!(
+        transaction,
+        new_transaction_details
+      )
+    rescue StandardError => e
+      Rails.logger.error("Error splitting transaction: #{e}")
+      false
     end
 
     def import_transactions_csv(csv_file)
@@ -102,13 +103,13 @@ module FinanceManager
       request = Plaid::InstitutionsGetByIdRequest.new(
         {
           institution_id: response.item.institution_id,
-          country_codes: ["US"]
+          country_codes:  ['US']
         }
       )
       response = plaid_client.institutions_get_by_id(request)
 
       plaid_credential.update_columns(
-        institution_id: response.institution.institution_id,
+        institution_id:   response.institution.institution_id,
         institution_name: response.institution.name
       )
     end
@@ -116,8 +117,7 @@ module FinanceManager
     private
 
     def transactions_cursor(plaid_cred)
-      plaid_cred.cursor || "now"
+      plaid_cred.cursor || 'now'
     end
-
   end
 end

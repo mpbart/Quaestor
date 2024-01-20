@@ -11,7 +11,9 @@ class TransactionsController < ApplicationController
   end
 
   def show
-    @transaction = @transactions&.detect{ |t| t.id == params[:id] } || Transaction.find(params[:id])
+    @transaction = @transactions&.detect do |t|
+      t.id == params[:id]
+    end || Transaction.find(params[:id])
     @label_ids = Set.new(@transaction.labels.pluck(:id))
     @grouped_transactions = @transaction.grouped_transactions
     @split_transaction = @grouped_transactions.empty? ? ::Transaction.new : @grouped_transactions.build
@@ -22,24 +24,27 @@ class TransactionsController < ApplicationController
                                                     :amount,
                                                     :description,
                                                     :plaid_category_id,
-                                                    label_ids: [],
-                                                    split_transactions: [:date, :amount, :description, :plaid_category_id, :_destroy])
+                                                    label_ids:          [],
+                                                    split_transactions: [:date, :amount,
+                                                                         :description, :plaid_category_id, :_destroy])
     transaction = Transaction.find(params[:id])
     success = if params[:split_transactions].nil?
-      transaction.update(permitted)
-    else
-      finance_manager.transactions.split_transaction(params[:id], params[:split_transactions])
-    end
+                transaction.update(permitted)
+              else
+                finance_manager.transactions.split_transaction(params[:id],
+                                                               params[:split_transactions])
+              end
 
-    render json: {success: success}
+    render json: { success: success }
   end
 
   # Split a single transaction into multiple
   def split_transactions
-    new_transaction_details = params.require(:transaction).permit(:date, :amount, :description, :parent_transaction_id).to_h
+    new_transaction_details = params.require(:transaction).permit(:date, :amount, :description,
+                                                                  :parent_transaction_id).to_h
     parent_transaction_id = new_transaction_details.delete(:parent_transaction_id)
     result = finance_manager.split_transaction!(parent_transaction_id, new_transaction_details)
-    render json: {success: result}
+    render json: { success: result }
   end
 
   # Upload a CSV of transactions
@@ -59,5 +64,4 @@ class TransactionsController < ApplicationController
   def finance_manager
     @finance_manager ||= FinanceManager::Interface.new(current_user)
   end
-
 end

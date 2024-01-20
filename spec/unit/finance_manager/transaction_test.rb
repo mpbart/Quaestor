@@ -15,7 +15,7 @@ RSpec.describe FinanceManager::Transaction do
       payment_metadata:       payment_metadata,
       location_metadata:      location_metadata,
       pending_transaction_id: pending_transaction_id,
-      account_owner:          account_owner,
+      account_owner:          account_owner
     }
   end
   let(:transaction_id)         { 1 }
@@ -117,7 +117,7 @@ RSpec.describe FinanceManager::Transaction do
         payment_metadata:       payment_metadata,
         location_metadata:      location_metadata,
         pending_transaction_id: pending_transaction_id,
-        account_owner:          account_owner,
+        account_owner:          account_owner
       )
       create
     end
@@ -165,5 +165,4 @@ RSpec.describe FinanceManager::Transaction do
       update_pending
     end
   end
-
 end

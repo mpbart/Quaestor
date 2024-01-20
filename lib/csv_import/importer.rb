@@ -19,7 +19,7 @@ module CsvImport
               amount:            normalize_amount(row),
               date:              DateTime.strptime(row['Date'], DATETIME_FORMAT).in_time_zone,
               plaid_category_id: map_category(row),
-              labels:            extract_labels(row),
+              labels:            extract_labels(row)
             )
           end
         end
@@ -34,15 +34,15 @@ module CsvImport
       def normalize_amount(row)
         amount = row['Amount'].to_f
         if row['Transaction Type'] == CsvImport::Constants::Mint::TransactionType::CREDIT && amount > 0.0 ||
-            row['Transaction Type'] == CsvImport::Constants::Mint::TransactionType::DEBIT && amount < 0.0
-          amount * -1.0 
+           row['Transaction Type'] == CsvImport::Constants::Mint::TransactionType::DEBIT && amount < 0.0
+          amount * -1.0
         else
           amount
         end
       end
 
       def extract_labels(row)
-        row['Labels'].split(',').map{ |l| Label.find_or_create_by(name: l) }
+        row['Labels'].split(',').map { |l| Label.find_or_create_by(name: l) }
       end
 
       def map_category(row)

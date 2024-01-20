@@ -9,5 +9,4 @@ class ApplicationController < ActionController::Base
   def humanized_category(plaid_category)
     plaid_category.detailed_category[plaid_category.primary_category.length + 1..].humanize
   end
-
 end
