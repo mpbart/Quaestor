@@ -35,8 +35,10 @@ module CsvImport
 
       def normalize_amount(row)
         amount = row['Amount'].to_f
-        if row['Transaction Type'] == CsvImport::Constants::Mint::TransactionType::CREDIT && amount > 0.0 ||
-           row['Transaction Type'] == CsvImport::Constants::Mint::TransactionType::DEBIT && amount < 0.0
+        if (row['Transaction Type'] == CsvImport::Constants::Mint::TransactionType::CREDIT &&
+            amount > 0.0) ||
+           (row['Transaction Type'] == CsvImport::Constants::Mint::TransactionType::DEBIT &&
+            amount < 0.0)
           amount * -1.0
         else
           amount

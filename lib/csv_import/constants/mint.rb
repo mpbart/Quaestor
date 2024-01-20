@@ -16,6 +16,7 @@ module CsvImport
 
       def self.mappings
         @mappings ||= begin
+          # rubocop:disable Layout/LineLength
           conversions = {
             'Auto Insurance'             => %w[GENERAL_SERVICES LOAN_PAYMENTS_CAR_PAYMENT],
             'Auto Payment'               => %w[LOAN_PAYMENTS LOAN_PAYMENTS_CAR_PAYMENT],
@@ -195,6 +196,7 @@ module CsvImport
                                                GENERAL_MERCHANDISE_OTHER_GENERAL_MERCHANDISE],
             'Honeymoon'                  => %w[TRAVEL TRAVEL_VACATION]
           }
+          # rubocop:enable Layout/LineLength
 
           conversions.each do |_k, value|
             next if value.respond_to?(:call)
@@ -215,7 +217,10 @@ module CsvImport
       end
 
       def self.classify_rental_car_and_taxi_category(description)
-        if description.match?(/hertz/i) || description.match?(/avis/i) || description.match?(/expedia/i) || description.match?(/alamo/i)
+        if description.match?(/hertz/i) ||
+           description.match?(/avis/i) ||
+           description.match?(/expedia/i) ||
+           description.match?(/alamo/i)
           %w[TRAVEL TRAVEL_RENTAL_CARS]
         else
           %w[TRANSPORTATION TRANSPORTATION_TAXIS_AND_RIDE_SHARES]
@@ -241,7 +246,9 @@ module CsvImport
       end
 
       def self.classify_travel_category(description)
-        if description.match?(/toll/i) || description.match?(/skyway/i) || description.match?(/itr.*concession/i)
+        if description.match?(/toll/i) ||
+           description.match?(/skyway/i) ||
+           description.match?(/itr.*concession/i)
           %w[TRANSPORTATION TRANSPORTATION_TOLLS]
         elsif description.match?(/amtrak/i)
           %w[TRANSPORTATION TRANSPORTATION_PUBLIC_TRANSIT]

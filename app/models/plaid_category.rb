@@ -2,11 +2,11 @@
 
 class PlaidCategory < ActiveRecord::Base
   def self.grouped_by_top_level
-    @@top_level ||= PlaidCategory.all.group_by(&:primary_category)
+    @grouped_by_top_level ||= PlaidCategory.all.group_by(&:primary_category)
   end
 
   def self.top_level_records
-    @@top_level_records ||= select(:primary_category).distinct.to_a
+    @top_level_records ||= select(:primary_category).distinct.to_a
   end
 
   def self.category_children(top_level_key)

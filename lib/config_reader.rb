@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'json'
 
 class ConfigReader
   def self.for(client_name)
-    config_file.dig(client_name)
+    config_file.dig[client_name]
   end
 
   def self.config_file

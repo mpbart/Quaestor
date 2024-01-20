@@ -14,7 +14,8 @@ module CsvImport
 
       unless category
         raise MappingNotFoundError,
-              "Could not find mapping for category #{transaction['Category']} - #{transaction['Description']}"
+              "Could not find mapping for category #{transaction['Category']} - " \
+              "#{transaction['Description']}"
       end
 
       category

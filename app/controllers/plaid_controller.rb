@@ -7,6 +7,7 @@ class PlaidController < ActionController::Base
   skip_before_action :verify_authenticity_token
   TOKEN_REGEX = /\w+-\w+-\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/
 
+  # rubocop:disable Naming/AccessorMethodName
   # Add accounts from new financial institution for user
   def get_access_token
     params.permit(:public_token)
@@ -24,6 +25,7 @@ class PlaidController < ActionController::Base
 
     render json: { success: true }
   end
+  # rubocop:enable Naming/AccessorMethodName
 
   def refresh_accounts
     finance_manager.refresh_accounts

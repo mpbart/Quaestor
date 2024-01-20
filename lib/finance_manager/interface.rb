@@ -20,8 +20,6 @@ module FinanceManager
     # TODO: Refactor into a separate plaid object to handle all plaid-related things
     def create_plaid_client
       config = ConfigReader.for('plaid')
-      # TODO: Fix this by just using ENV vars :shrug:
-      # env = config['environment'].fetch(ENV['RAILS_ENV']) { raise StandardError, "No mapping found for environment #{ENV['RAILS_ENV']}" }
       plaid_config = Plaid::Configuration.new
       plaid_config.server_index = Plaid::Configuration::Environment['sandbox']
       plaid_config.api_key['PLAID-CLIENT-ID'] = config['client_id']
@@ -37,7 +35,6 @@ module FinanceManager
         ActiveRecord::Base.transaction do
           request = Plaid::AccountsGetRequest.new({ access_token: credential.access_token })
           response = plaid_client.accounts_get(request)
-          accounts = response.accounts
           PlaidResponse.record_accounts_response!(response.to_hash, credential)
 
           next unless response.accounts&.any?
