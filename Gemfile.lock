@@ -90,6 +90,10 @@ GEM
     concurrent-ruby (1.2.2)
     connection_pool (2.4.1)
     crass (1.0.6)
+    database_cleaner-active_record (2.1.0)
+      activerecord (>= 5.a)
+      database_cleaner-core (~> 2.0.0)
+    database_cleaner-core (2.0.1)
     date (3.3.4)
     devise (4.9.3)
       bcrypt (~> 3.0)
@@ -102,6 +106,11 @@ GEM
       ruby2_keywords
     encryptor (3.0.0)
     erubi (1.12.0)
+    factory_bot (6.4.5)
+      activesupport (>= 5.0.0)
+    factory_bot_rails (6.4.3)
+      factory_bot (~> 6.4)
+      railties (>= 5.0.0)
     faraday (2.7.11)
       base64
       faraday-net_http (>= 2.0, < 3.1)
@@ -184,6 +193,10 @@ GEM
       activesupport (= 7.1.1)
       bundler (>= 1.15.0)
       railties (= 7.1.1)
+    rails-controller-testing (1.0.5)
+      actionpack (>= 5.0.1.rc1)
+      actionview (>= 5.0.1.rc1)
+      activesupport (>= 5.0.1.rc1)
     rails-dom-testing (2.2.0)
       activesupport (>= 5.0.0)
       minitest
@@ -222,6 +235,14 @@ GEM
     rspec-mocks (3.12.6)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
+    rspec-rails (6.1.0)
+      actionpack (>= 6.1)
+      activesupport (>= 6.1)
+      railties (>= 6.1)
+      rspec-core (~> 3.12)
+      rspec-expectations (~> 3.12)
+      rspec-mocks (~> 3.12)
+      rspec-support (~> 3.12)
     rspec-support (3.12.1)
     ruby2_keywords (0.0.5)
     sass-rails (6.0.0)
@@ -278,14 +299,18 @@ DEPENDENCIES
   awesome_print
   byebug
   cocoon
+  database_cleaner-active_record
   devise (~> 4)
+  factory_bot_rails (~> 6.4)
   listen
   pg
   plaid (~> 23)
   pry
   puma (~> 6)
   rails (~> 7)
+  rails-controller-testing
   rspec (~> 3)
+  rspec-rails (~> 6.1)
   sass-rails (~> 6)
   spring
   spring-watcher-listen

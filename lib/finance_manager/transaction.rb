@@ -75,7 +75,7 @@ module FinanceManager
         raise BadParametersError.new("Amount must be filled when splitting a transaction")
       end
 
-      return false unless new_transaction_details[:amount].to_f > 0.0
+      return false unless new_transaction_details[:amount].to_f > 0.0 && new_transaction_details[:amount].to_f < original_transaction.amount
 
       ActiveRecord::Base.transaction do
         new_transaction_record = ::Transaction.create!(original_transaction.attributes.except('id')
@@ -106,16 +106,12 @@ module FinanceManager
       end
     end
 
-    def self.edit!(transaction_record, new_transaction_details)
-      transaction_record.update!(**new_transaction_details)
-    end
-
     def self.generate_transaction_id
       Base64.encode64(SecureRandom.random_bytes(36))[..-2]
     end
 
     def self.unknown_account_error(transaction)
-      raise UnknownAccountError, "Could not find account matching #{transaction.account_id} for transaction #{transaction[:transaction_id]}"
+      raise UnknownAccountError, "Could not find account matching #{transaction.account_id} for transaction #{transaction.transaction_id}"
     end
 
     def self.unknown_transaction_error(transaction)
