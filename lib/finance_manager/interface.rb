@@ -91,17 +91,6 @@ module FinanceManager
       end
     end
 
-    def edit_transaction!(transaction_id, new_transaction_details)
-      begin
-        return unless transaction = ::Transaction.find(transaction_id)
-        Financemanager::Transaction.edit!(transaction, new_transaction_details)
-        true
-      rescue => e
-        Rails.logger.error("Error editing transaction: #{e}")
-        false
-      end
-    end
-
     def import_transactions_csv(csv_file)
       CsvImport::Importer.new.process_csv(csv_file)
     end
