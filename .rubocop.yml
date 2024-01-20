@@ -1,0 +1,39 @@
+AllCops:
+  TargetRubyVersion: 3.0
+  Exclude:
+    - 'db/**/*'
+    - 'Gemfile*'
+    - 'Rakefile'
+    - 'bin/*'
+    - 'config/**/*'
+
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 100
+
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: 'table'
+  EnforcedColonStyle: 'table'
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
