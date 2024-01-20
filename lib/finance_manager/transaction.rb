@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 require 'securerandom'
 require 'bigdecimal'
@@ -10,13 +12,18 @@ module FinanceManager
 
     def self.create(transaction)
       account = ::Account.find_by(plaid_identifier: transaction.account_id)
-      category = ::PlaidCategory.find_by(detailed_category: transaction.personal_finance_category.detailed)
+      category = ::PlaidCategory.find_by(
+        detailed_category: transaction.personal_finance_category.detailed
+      )
 
       unknown_account_error(transaction) unless account
       unknown_category_error(transaction) unless category
 
       if ::Transaction.exists?(transaction.transaction_id)
-        Rails.logger.warn("Duplicate transaction with ID #{transaction.transaction_id} recorded. Ignoring and continuing")
+        Rails.logger.warn(
+          "Duplicate transaction with ID #{transaction.transaction_id} recorded." \
+          'Ignoring and continuing'
+        )
         return
       end
 
@@ -35,15 +42,21 @@ module FinanceManager
         payment_metadata:       transaction.payment_meta,
         location_metadata:      transaction.location,
         pending_transaction_id: transaction.pending_transaction_id,
-        account_owner:          transaction.account_owner,
+        account_owner:          transaction.account_owner
       )
     end
 
     def self.update(transaction)
       existing = ::Transaction.find_by(id: transaction.transaction_id)
-      Rails.logger.warn("Could not find transaction to update with id #{transaction.transaction_id}") unless existing
+      unless existing
+        Rails.logger.warn(
+          "Could not find transaction to update with id #{transaction.transaction_id}"
+        )
+      end
 
-      category = ::PlaidCategory.find_by(detailed_category: transaction.personal_finance_category.detailed)
+      category = ::PlaidCategory.find_by(
+        detailed_category: transaction.personal_finance_category.detailed
+      )
       unknown_category_error(transaction) unless category
 
       existing.id                     = transaction.transaction_id
@@ -65,22 +78,30 @@ module FinanceManager
 
     def self.remove(transaction)
       transaction = ::Transaction.find_by(id: transaction.transaction_id)
-      Rails.logger.warn("Could not find transaction to remove with id #{transaction.transaction_id}") unless transaction
+      unless transaction
+        Rails.logger.warn(
+          "Could not find transaction to remove with id #{transaction.transaction_id}"
+        )
+      end
 
       transaction.destroy
     end
 
     def self.split!(original_transaction, new_transaction_details)
       if new_transaction_details[:amount].nil?
-        raise BadParametersError.new("Amount must be filled when splitting a transaction")
+        raise BadParametersError, 'Amount must be filled when splitting a transaction'
       end
 
-      return false unless new_transaction_details[:amount].to_f > 0.0 && new_transaction_details[:amount].to_f < original_transaction.amount
+      unless new_transaction_details[:amount].to_f > 0.0 &&
+             new_transaction_details[:amount].to_f < original_transaction.amount
+        return false
+      end
 
       ActiveRecord::Base.transaction do
-        new_transaction_record = ::Transaction.create!(original_transaction.attributes.except('id')
-          .merge(new_transaction_details.reject{ |k,v| v.blank? })
-          .merge({id: generate_transaction_id, split: true})
+        new_transaction_record = ::Transaction.create!(
+          original_transaction.attributes.except('id')
+          .merge(new_transaction_details.reject { |_k, v| v.blank? })
+          .merge({ id: generate_transaction_id, split: true })
         )
         new_transaction_record.split = true
         new_transaction_record.save!
@@ -98,12 +119,11 @@ module FinanceManager
     def self.add_to_transaction_group!(original_transaction, new_transaction)
       if original_transaction.transaction_group.present?
         group = original_transaction.transaction_group
-        group.transactions << new_transaction
       else
         group = ::TransactionGroup.create!
         group.transactions << original_transaction
-        group.transactions << new_transaction
       end
+      group.transactions << new_transaction
     end
 
     def self.generate_transaction_id
@@ -111,7 +131,9 @@ module FinanceManager
     end
 
     def self.unknown_account_error(transaction)
-      raise UnknownAccountError, "Could not find account matching #{transaction.account_id} for transaction #{transaction.transaction_id}"
+      raise UnknownAccountError,
+            "Could not find account matching #{transaction.account_id} for transaction" \
+            "#{transaction.transaction_id}"
     end
 
     def self.unknown_transaction_error(transaction)
@@ -119,7 +141,8 @@ module FinanceManager
     end
 
     def self.unknown_category_error(transaction)
-      raise UnknownCategoryError, "Could not find category for #{transaction.personal_finance_category.detailed_category}"
+      raise UnknownCategoryError,
+            "Could not find category for #{transaction.personal_finance_category.detailed_category}"
     end
   end
 end

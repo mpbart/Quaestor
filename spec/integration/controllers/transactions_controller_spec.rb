@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'pry'
 
-RSpec.describe TransactionsController, type: :controller do 
+RSpec.describe TransactionsController, type: :controller do
   let(:user) { create(:user) }
   before { sign_in user }
 
@@ -38,7 +40,7 @@ RSpec.describe TransactionsController, type: :controller do
     it 'returns a success response' do
       patch :update, params: { id: transaction.id, transaction: { description: new_description } }
 
-      expect(JSON.parse(response.body)).to eq({"success" => true})
+      expect(JSON.parse(response.body)).to eq({ 'success' => true })
     end
 
     it 'updates the transaction' do
@@ -51,20 +53,23 @@ RSpec.describe TransactionsController, type: :controller do
   describe 'split transaction' do
     let!(:transaction) { create(:transaction, user: user, amount: 100.0) }
 
-    subject(:split_transaction) { post :split_transactions, params: { transaction: { amount: 40.0, parent_transaction_id: transaction.id } } }
+    subject(:split_transaction) do
+      post :split_transactions,
+           params: { transaction: { amount: 40.0, parent_transaction_id: transaction.id } }
+    end
 
     it 'returns a success response' do
-      split_transaction 
+      split_transaction
 
-      expect(JSON.parse(response.body)).to eq({"success" => true})
+      expect(JSON.parse(response.body)).to eq({ 'success' => true })
     end
 
     it 'creates the new transaction' do
-      expect{ split_transaction }.to change{ Transaction.count }.by(1)
+      expect { split_transaction }.to change { Transaction.count }.by(1)
     end
 
     it 'updates the original transaction' do
-      split_transaction 
+      split_transaction
 
       transaction.reload
       expect(transaction.amount).to eq(60.0)

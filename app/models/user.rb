@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
@@ -14,5 +16,4 @@ class User < ApplicationRecord
   def paginated_transactions(page_num:)
     transactions.by_date.paginate(page: page_num, per_page: 50)
   end
-
 end

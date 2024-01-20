@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'finance_manager/interface'
 
@@ -27,8 +29,8 @@ RSpec.describe FinanceManager::Interface do
         name:          acct_name,
         official_name: acct_official_name,
         type:          acct_type,
-        subtype:       acct_subtype)
-      ]
+        subtype:       acct_subtype
+      )]
     end
 
     before do
@@ -38,13 +40,13 @@ RSpec.describe FinanceManager::Interface do
     subject(:refresh_accounts) { instance.refresh_accounts }
 
     it 'records the raw response from plaid in the database' do
-      expect{ refresh_accounts }.to change{ PlaidResponse.count }.by(1)
+      expect { refresh_accounts }.to change { PlaidResponse.count }.by(1)
       expect(PlaidResponse.order('created_at DESC').first.response).to eq(response.to_hash)
     end
 
     context 'when the account is new' do
       it 'creates a new account' do
-        expect { refresh_accounts }.to change{ Account.count }.by(1)
+        expect { refresh_accounts }.to change { Account.count }.by(1)
 
         saved_acct = Account.order('created_at DESC').first
         expect(saved_acct.plaid_identifier).to eq(acct_id)
@@ -56,7 +58,7 @@ RSpec.describe FinanceManager::Interface do
       end
 
       it 'creates a new balance' do
-        expect{ refresh_accounts }.to change{ Balance.count }.by(1)
+        expect { refresh_accounts }.to change { Balance.count }.by(1)
         balance = Balance.order('created_at DESC').first
 
         expect(balance.amount).to eq(10.0)
@@ -69,11 +71,11 @@ RSpec.describe FinanceManager::Interface do
       before { create(:account, plaid_identifier: acct_id, user: user) }
 
       it 'does not create a new account in the database' do
-        expect{ refresh_accounts }.to change{ Account.count }.by(0)
+        expect { refresh_accounts }.to change { Account.count }.by(0)
       end
 
       it 'creates a new balance' do
-        expect{ refresh_accounts }.to change{ Balance.count }.by(1)
+        expect { refresh_accounts }.to change { Balance.count }.by(1)
       end
     end
   end
@@ -92,7 +94,7 @@ RSpec.describe FinanceManager::Interface do
         modified:    modified,
         removed:     removed,
         next_cursor: next_cursor,
-        has_more:    has_more,
+        has_more:    has_more
       )
     end
 
@@ -123,13 +125,13 @@ RSpec.describe FinanceManager::Interface do
               primary:          category.primary_category,
               detailed:         category.detailed_category,
               confidence_level: 'HIGH'
-            ),
+            )
           )
         ]
       end
 
       it 'creates the transaction' do
-        expect{ refresh_transactions }.to change{ Transaction.count }.by(1)
+        expect { refresh_transactions }.to change { Transaction.count }.by(1)
         transaction = Transaction.order('created_at DESC').first
 
         expect(transaction.account).to eq(account)
@@ -160,7 +162,7 @@ RSpec.describe FinanceManager::Interface do
               primary:          existing_transaction.plaid_category.primary_category,
               detailed:         existing_transaction.plaid_category.detailed_category,
               confidence_level: existing_transaction.category_confidence
-            ),
+            )
           )
         ]
       end
@@ -173,11 +175,15 @@ RSpec.describe FinanceManager::Interface do
     end
 
     context 'when removing a transaction' do
-      let(:existing_transaction) { create(:transaction, pending: true, account: account, user: user) }
-      let(:removed)              { [Plaid::Transaction.new(transaction_id: existing_transaction.id)] }
+      let(:existing_transaction) do
+        create(:transaction, pending: true, account: account, user: user)
+      end
+      let(:removed) do
+        [Plaid::Transaction.new(transaction_id: existing_transaction.id)]
+      end
 
       it 'soft-deletes the transaction' do
-        expect{ refresh_transactions }.to change{ Transaction.count }.by(-1)
+        expect { refresh_transactions }.to change { Transaction.count }.by(-1)
         expect(Transaction.unscoped.find_by(id: existing_transaction.id).deleted_at).not_to eq(nil)
       end
     end
@@ -186,15 +192,17 @@ RSpec.describe FinanceManager::Interface do
       let(:added) { [Plaid::Transaction.new] }
 
       it 'rolls back the transaction and does not save any new records' do
-        expect{ refresh_transactions }.to raise_error{ FinanceManager::Transaction::UnknownAccountError }
-          .and change{ Transaction.count }.by(0)
-          .and change{ PlaidResponse.count }.by(0)
+        expect { refresh_transactions }.to raise_error {
+                                             FinanceManager::Transaction::UnknownAccountError
+                                           }
+          .and change { Transaction.count }.by(0)
+          .and change { PlaidResponse.count }.by(0)
         expect(plaid_credential.reload.cursor).not_to eq(next_cursor)
       end
     end
 
     it 'records the raw plaid response to the database' do
-      expect{ refresh_transactions }.to change{ PlaidResponse.count }.by(1)
+      expect { refresh_transactions }.to change { PlaidResponse.count }.by(1)
     end
 
     it 'updates the cursor' do
@@ -205,16 +213,20 @@ RSpec.describe FinanceManager::Interface do
   end
 
   describe '#split_transaction!' do
-    let!(:existing_transaction) { create(:transaction, amount: original_amount, account: account, user: user) }
-    let(:split_details)         { {amount: 3.50} }
+    let!(:existing_transaction) do
+      create(:transaction, amount: original_amount, account: account, user: user)
+    end
+    let(:split_details)         { { amount: 3.50 } }
     let(:original_amount)       { 10.0 }
     let(:account)               { create(:account, user: user) }
 
-    subject(:split_transaction) { instance.split_transaction!(existing_transaction.id, split_details) }
+    subject(:split_transaction) do
+      instance.split_transaction!(existing_transaction.id, split_details)
+    end
 
     context 'when the transaction is successfully split' do
       it 'saves the new transaction successfully' do
-        expect{ split_transaction }.to change{ Transaction.count }.by(1)
+        expect { split_transaction }.to change { Transaction.count }.by(1)
         split_transaction = user.transactions.where.not(id: existing_transaction.id).take
 
         expect(split_transaction.amount).to eq(3.50)
@@ -226,10 +238,10 @@ RSpec.describe FinanceManager::Interface do
     end
 
     context 'when amount is not passed in' do
-      let(:split_details) { {description: 'new description'} }
+      let(:split_details) { { description: 'new description' } }
 
-      it 'does not save a new transaction' do 
-        expect{ split_transaction }.to change{ Transaction.count }.by(0)
+      it 'does not save a new transaction' do
+        expect { split_transaction }.to change { Transaction.count }.by(0)
       end
 
       it 'returns false' do
@@ -238,10 +250,10 @@ RSpec.describe FinanceManager::Interface do
     end
 
     context 'when amount is greater than the original transaction amount' do
-      let(:split_details) { {amount: 11.0} }
+      let(:split_details) { { amount: 11.0 } }
 
       it 'does not save a new transaction' do
-        expect{ split_transaction }.to change{ Transaction.count }.by(0)
+        expect { split_transaction }.to change { Transaction.count }.by(0)
       end
 
       it 'returns false' do
@@ -255,7 +267,9 @@ RSpec.describe FinanceManager::Interface do
     let(:inst_name)     { 'new institution name' }
     let(:institution)   { Plaid::Institution.new(institution_id: inst_id, name: inst_name) }
     let(:response)      { Plaid::InstitutionsGetByIdResponse.new(institution: institution) }
-    let(:item_response) { Plaid::ItemGetResponse.new(item: Plaid::Item.new(institution_id: inst_id)) }
+    let(:item_response) do
+      Plaid::ItemGetResponse.new(item: Plaid::Item.new(institution_id: inst_id))
+    end
 
     before do
       allow(plaid_client).to receive(:item_get).and_return(item_response)

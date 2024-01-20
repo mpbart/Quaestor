@@ -1,15 +1,22 @@
+# frozen_string_literal: true
+
 module CsvImport
   class TransactionCategoryMapper
     class MappingNotFoundError < StandardError; end
-    
+
     def initialize
       @source_mappings = CsvImport::Constants::Mint.new
     end
 
     def [](transaction)
-      category = @source_mappings.map_category(transaction.dig('Category'), transaction.dig('Description'))
+      category = @source_mappings.map_category(transaction['Category'],
+                                               transaction['Description'])
 
-      raise MappingNotFoundError.new("Could not find mapping for category #{transaction.dig('Category')} - #{ transaction.dig('Description')}") unless category
+      unless category
+        raise MappingNotFoundError,
+              "Could not find mapping for category #{transaction['Category']} - " \
+              "#{transaction['Description']}"
+      end
 
       category
     end

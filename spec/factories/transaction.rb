@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :transaction do
     user
@@ -5,7 +7,7 @@ FactoryBot.define do
     plaid_category
 
     id { SecureRandom.uuid }
-    description { "test transaction" }
+    description { 'test transaction' }
     amount { 10.0 }
     date { Date.current }
     category_confidence { 'HIGH' }
@@ -14,6 +16,6 @@ FactoryBot.define do
     payment_metadata    { {} }
     location_metadata   { {} }
     pending { false }
-    account_owner       { account.mask }
+    account_owner { account.mask }
   end
 end
