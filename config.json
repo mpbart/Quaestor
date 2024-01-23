@@ -1,10 +1,6 @@
-// Fill this file out with your own access tokens
 {
-  "twitter": {
-    "consumer_key": null,
-    "consumer_secret": null,
-    "access_token": null,
-    "access_token_secret": null 
-  },
-  "hackernews": null
+  "plaid": {
+    "client_id": "foo",
+    "secret": "bar"
+  }
 }
