@@ -1,11 +1,11 @@
 # README
 ## Overview
-This is a Personal Finance Manager I'm building for personal use. The main use case is tracking finances, creating a budget, tracking changes in spending and income over time, etc.
+This is a locally-hostable Personal Finance Manager built with a focus on simplicity and ease of use. It can be used to categorize transactions, create a budget, track changes in spending and income over time, and analyze your net worth.
 
 Quickstart:
 1. Build the docker image with `docker compose build`
 2. Setup the database with `docker compose run web bin/prep_db`
-3. Fill out config.json with private keys necessary to authenticate with 3rd party clients. Currently that's only plaid which requires:
+3. Fill out config.json with private keys necessary to authenticate with 3rd party APIs. Currently only Plaid is required which needs:
   * client_id
   * secret
   * environment (map your app's environment to plaid's environment)
