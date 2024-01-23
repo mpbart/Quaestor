@@ -9,6 +9,10 @@ require 'devise'
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Setup encryption keys to be used for the duration of the test
+  ENV['ENCRYPTION_KEY'] = Random.hex
+  ENV['DEVISE_SECRET_KEY'] = Random.hex
+
   config.cache_classes = false
 
   # Do not eager load code on boot. This avoids loading your whole application
