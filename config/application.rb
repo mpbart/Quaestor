@@ -13,7 +13,7 @@ require 'acts_as_paranoid'
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 
-module PersonalCrm
+module Quaestor
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.1
