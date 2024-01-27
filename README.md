@@ -1,8 +1,8 @@
 # README
 ## Overview
-[![Test Suite](https://github.com/mpbart/personal-crm/actions/workflows/rspec.yml/badge.svg)](https://github.com/mpbart/personal-crm/actions/workflows/rspec.yml)
+[![Test Suite](https://github.com/mpbart/Quaestor/actions/workflows/rspec.yml/badge.svg)](https://github.com/mpbart/Quaestor/actions/workflows/rspec.yml)
 
-This is a locally-hostable Personal Finance Manager built with a focus on simplicity and ease of use. It can be used to categorize transactions, create a budget, track changes in spending and income over time, and analyze your net worth.
+Quaestor is a locally-hostable Personal Finance Manager built with a focus on simplicity and ease of use. It can be used to categorize transactions, create a budget, track changes in spending and income over time, and analyze changes to your net worth.
 
 Quickstart:
 1. Build the docker image with `docker compose build`
