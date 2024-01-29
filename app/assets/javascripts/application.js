@@ -28,6 +28,20 @@ $(function() {
     activateTab($(event.currentTarget), $('.active'));
   });
 
+  // Set behavior of next and previous page buttons for transactions
+  $('#previous-page-button').click(function() {
+    const currentPage = getTransactionPageNum();
+    if (currentPage > 1) {
+      const newPage = currentPage - 1;
+      window.location = `/transactions?page=${newPage}`;
+    }
+  });
+
+  $('#next-page-button').click(function() {
+    const newPage = getTransactionPageNum() + 1;
+    window.location = `/transactions?page=${newPage}`;
+  });
+
   // Initialize ability to edit transactions by clicking a row
   // in the table
   if(getUrl() == "transactions") {
@@ -99,4 +113,9 @@ showTransactionSplitUpdateSuccessIcon = function(data, status, xhr) {
 
 showTransactionSplitUpdateFailureIcon = function(xhr, status, error) {
   $('#failureIconSplit').show();
+}
+
+getTransactionPageNum = function() {
+  const page = new URL(document.URL).searchParams.get('page');
+  return parseInt(page) || 1;
 }

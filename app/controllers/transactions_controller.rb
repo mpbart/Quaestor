@@ -9,7 +9,7 @@ class TransactionsController < ApplicationController
 
   def index
     @categories ||= PlaidCategory.grouped_by_top_level
-    @transactions = current_user.paginated_transactions(page_num: 1)
+    @transactions = current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
   end
 
   def show
