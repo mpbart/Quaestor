@@ -8,8 +8,8 @@ class TransactionsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @categories ||= PlaidCategory.grouped_by_top_level
     @transactions = current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
+                                .includes(:account, :plaid_category)
   end
 
   def show
