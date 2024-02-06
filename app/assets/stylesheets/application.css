@@ -25,3 +25,7 @@
 .ui.form ::placeholder {
   color: rgb(0, 0, 0);
 }
+
+.ui.padded.table td {
+  padding: 0.85em 0.85em;
+}
