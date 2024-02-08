@@ -26,7 +26,7 @@
             <% @accounts.each do |account| %>
               <tr>
                 <td><%= account.name %></td>
-                <td><%= account.account_type %></td>
+                <td><%= account.account_sub_type %></td>
                 <td><%= account.mask %></td>
                 <td><%= account.institution_name %></td>
                 <td><%= account.balances.last&.amount || 0 %></td>
@@ -37,29 +37,38 @@
       </div>
     </div>
     <div class="six wide column">
-      <h3 class="ui center aligned header">Recent Transactions Overview</h3>
-        <div id="recent_transactions">
-          <table class="ui selectable basic table">
-            <thead>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Category</th>
-              <th>Amount</th>
-            </thead>
-            <tbody>
-              <% @transactions.each do |transaction| %>
-                <tr>
-                  <td><%= short_format_date(transaction.date) %></td>
-                  <td><%= transaction.description %></td>
-                  <td><%= humanized_category(transaction.plaid_category) %></td>
-                  <td><%= transaction.amount %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
     </div>
     <div class="five wide column">
+      <div class="ui form">
+        <h4 class="ui centered header">Add New Account</h4>
+        <%= form_for :account, url: accounts_path do |form| %>
+          <div class="field">
+            <%= form.label :name %>
+            <%= form.text_field :name %>
+          </div>
+          <div class="field">
+            <%= form.label :institution_name %>
+            <%= form.text_field :institution_name %>
+          </div>
+          <div class="field">
+            <%= form.label :account_number_last_4 %>
+            <%= form.text_field :mask %>
+          </div>
+          <div class="field">
+            <%= form.label :account_type %>
+            <%= form.select :type, Account::ACCOUNT_TYPES.keys, {class: 'ui dropdown'}%>
+          </div>
+          <div class="field">
+            <%= form.label :account_sub_type %>
+            <%= form.select :sub_type, [] %>
+          </div>
+          <div class="field">
+            <%= form.label :current_balance %>
+            <%= form.text_field :balance %>
+          </div>
+          <%= form.submit %>
+        <% end %>
+      </div>
     </div>
   </div>
 </body>

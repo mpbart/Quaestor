@@ -40,6 +40,25 @@ module FinanceManager
       create_balance(record, account.balances)
     end
 
+    def self.create_manually(params, user)
+      record = ::Account.create!(
+        user:             user,
+        institution_name: params[:institution_name],
+        institution_id:   params[:institution_id],
+        plaid_identifier: params[:account_id],
+        name:             params[:name],
+        official_name:    params[:official_name],
+        account_type:     params[:type],
+        account_sub_type: params[:subtype],
+        mask:             params[:mask]
+      )
+
+      Balance.create!(
+        account: record,
+        amount:  params[:balance]
+      )
+    end
+
     def self.create_balance(account, balance)
       # De-dupe balances so that multiple refreshes per day does not result in duplicate balance
       # records being created

@@ -22,6 +22,18 @@ $(function() {
            function() { console.log('refreshed accounts'); });
   });
 
+  $('#account_type').change(function() {
+    const accountType = $(this).val();
+
+    $.get(`/accounts/subtypes/${accountType}`, function(data) {
+      const values = data.subtypes.map(x => Object({name: x.replace('_', ' '), value: x}));
+      $('#account_sub_type').dropdown({
+        values: values
+      });
+      $('.ui.dropdown').dropdown('refresh');
+    });
+  });
+
   // Ensure that tabs are activated/deactivated on click
   getHeaderTabs().click(function(event) {
 
