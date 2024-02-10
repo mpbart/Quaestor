@@ -12,7 +12,7 @@ $(function() {
   $('#transaction-labels > option').filter($("option[data-selected='true']")).each(function(_idx, el) {
       $('#transaction-labels').dropdown('set selected', el.text)
   });
-
+  setAccountSubTypeMenu($('#account_type').val());
 
  /**
   * Set up event handlers
@@ -25,13 +25,7 @@ $(function() {
   $('#account_type').change(function() {
     const accountType = $(this).val();
 
-    $.get(`/accounts/subtypes/${accountType}`, function(data) {
-      const values = data.subtypes.map(x => Object({name: x.replace('_', ' '), value: x}));
-      $('#account_sub_type').dropdown({
-        values: values
-      });
-      $('.ui.dropdown').dropdown('refresh');
-    });
+    setAccountSubTypeMenu(accountType);
   });
 
   // Ensure that tabs are activated/deactivated on click
@@ -130,4 +124,15 @@ showTransactionSplitUpdateFailureIcon = function(xhr, status, error) {
 getTransactionPageNum = function() {
   const page = new URL(document.URL).searchParams.get('page');
   return parseInt(page) || 1;
+}
+
+setAccountSubTypeMenu = function(accountType) {
+  $.get(`/accounts/subtypes/${accountType}`, function(data) {
+    const values = data.subtypes.map(x => Object({name: x.replace('_', ' '), value: x}));
+    $('#account_sub_type').dropdown('setup menu', {
+      values: values
+    });
+
+    $('#account_sub_type').dropdown('refresh');
+  });
 }
