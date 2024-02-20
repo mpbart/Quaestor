@@ -8,7 +8,7 @@ class Account < ActiveRecord::Base
   # Account types mapped to their corresponding account sub-types
   ACCOUNT_TYPES = {
     'depository' => %w[checking savings hsa cd moeny_market paypal prepaid
-                       cash_management ebt],
+                       cash_management ebt cash],
     'credit'     => ['credit_card'],
     'loan'       => %w[auto business commercial construction consumer home_equity
                        loan mortgage overdraft line_of_credit student other],
@@ -18,5 +18,5 @@ class Account < ActiveRecord::Base
                      'mutual_fund', 'non-taxable_brokerage_account', 'other', 'pension', 'prif',
                      'profit_sharing_plan', 'roth', 'roth 401k', 'trust', 'ugma', 'utma'],
     'other'      => []
-  }
+  }.freeze
 end

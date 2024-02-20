@@ -7,6 +7,7 @@ $(function() {
   $('#account-options').dropdown({action: 'hide'});
   getHeaderTabs().tab();  
   $('.ui.dropdown').dropdown();
+  $('.ui.accordion').accordion();
   $('#plaid-category-id').dropdown('set selected',
       $('#plaid-category-id > option').filter($("option[selected='true']")).prop('text'));
   $('#transaction-labels > option').filter($("option[data-selected='true']")).each(function(_idx, el) {
