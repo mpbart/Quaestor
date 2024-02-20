@@ -42,7 +42,7 @@ class PlaidController < ActionController::Base
         # Might need to only have transactions since it expects the linked institution to
         # have accounts with all types listed below
         products:      %w[
-          transactions liabilities
+          transactions
         ],
         country_codes: ['US'],
         language:      'en'

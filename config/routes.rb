@@ -19,8 +19,10 @@ Rails.application.routes.draw do
     post '/hard_delete', to: 'transactions#hard_delete'
   end
   resources :split_transactions, only: [:index, :show]
+  resources :accounts, only: [:create]
+
+  get 'accounts/subtypes/:subtype', to: 'accounts#subtypes'
   post '/split_transactions', to: 'transactions#split_transactions'
-  post '/upload_csv', to: 'transactions#upload_csv'
 
   # Analytics
   get 'analytics',    to: 'analytics#index'
