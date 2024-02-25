@@ -61,11 +61,11 @@
               </div>
               <div class="field">
                 <%= form.label :account_type %>
-                <%= form.select :type, Account::ACCOUNT_TYPES.keys, {class: 'ui dropdown'} %>
+                <%= form.select :type, Account::ACCOUNT_TYPES.keys, {}, {class: 'ui dropdown'} %>
               </div>
               <div class="field">
                 <%= form.label :account_sub_type %>
-                <%= form.select :sub_type, [], {class: 'ui dropdown'} %>
+                <%= form.select :sub_type, [], {}, {class: 'ui dropdown'} %>
               </div>
               <div class="field">
                 <%= form.label :current_balance %>
