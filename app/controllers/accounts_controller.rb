@@ -4,7 +4,7 @@ class AccountsController < ApplicationController
   def create
     FinanceManager::Account.create_manually(params[:account], current_user)
   rescue StandardError => e
-    render json: { success: false, error: e}
+    render json: { success: false, error: e }
   end
 
   def subtypes
