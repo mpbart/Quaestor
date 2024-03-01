@@ -19,8 +19,9 @@ $(function() {
   * Set up event handlers
   */
   $('#refresh-button').click(function() {
+    dimPage();
     $.post('/refresh_accounts',
-           function() { console.log('refreshed accounts'); });
+           function() { unDimPage(); });
   });
 
   $('#account_type').change(function() {
@@ -128,12 +129,25 @@ getTransactionPageNum = function() {
 }
 
 setAccountSubTypeMenu = function(accountType) {
+  if (accountType == null) {
+    return;
+  }
+
   $.get(`/accounts/subtypes/${accountType}`, function(data) {
     const values = data.subtypes.map(x => Object({name: x.replace('_', ' '), value: x}));
     $('#account_sub_type').dropdown('setup menu', {
       values: values
     });
+    $('#account_sub_type').addClass('ui dropdown');
 
     $('#account_sub_type').dropdown('refresh');
   });
+}
+
+dimPage = function() {
+  $('.ui.dimmer').dimmer('show');
+}
+
+unDimPage = function() {
+  $('.ui.dimmer').dimmer('hide');
 }

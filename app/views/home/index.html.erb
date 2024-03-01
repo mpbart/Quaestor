@@ -1,16 +1,8 @@
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="description" content="Quaestor">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Quaestor</title>
-</head>
-
 <%= stylesheet_link_tag "application", media: "all" %>
 
 <body>
   <div class="ui divided padded grid">
+    <%= render "shared/dimmer" %>
     <div class="five wide column">
     <h3 class="ui center aligned header">Accounts Overview</h3>
       <div id="accounts">
