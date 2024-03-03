@@ -31,9 +31,8 @@
     <div class="six wide column">
     </div>
     <div class="five wide column">
-      <div class="ui accordion">
+      <div class="ui accordion button" id="add-account-button">
         <div class="active title">
-          <i class="dropdown icon"></i>
           <strong>Add New Account</strong>
         </div>
         <div class="content">
@@ -63,7 +62,9 @@
                 <%= form.label :current_balance %>
                 <%= form.text_field :balance %>
               </div>
-              <%= form.submit %>
+              <button class="ui button" type="submit">
+                Save Account
+              </button>
             <% end %>
           </div>
         </div>

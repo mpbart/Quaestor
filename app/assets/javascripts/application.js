@@ -18,6 +18,15 @@ $(function() {
  /**
   * Set up event handlers
   */
+  $('#add-account-button').click(function() {
+    const button = $('#add-account-button');
+    if (button.css('border-width')[0] == '1') {
+      button.css('border-width', '0px');
+    } else {
+      button.css('border-width', '1px');
+    }
+  });
+
   $('#refresh-button').click(function() {
     dimPage();
     $.post('/refresh_accounts',
