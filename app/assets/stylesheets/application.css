@@ -33,3 +33,20 @@
 .ui.large.text.loader {
   top: 15% !important;
 }
+
+.ui.accordion.button {
+  background: #ffffff;
+  color: white;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d4d4d5;
+  cursor: pointer;
+}
+
+.ui.dropdown.selection .text {
+  font-weight: 400 !important;
+}
+
+.ui.accordion.button.title:hover {
+  background-color: #0a71a8;
+}
