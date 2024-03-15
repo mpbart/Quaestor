@@ -1,36 +1,10 @@
 <%= stylesheet_link_tag "application", media: "all" %>
 
 <body>
-  <div class="ui divided padded grid">
+  <div class="ui padded grid">
     <%= render "shared/dimmer" %>
     <div class="five wide column">
-    <h3 class="ui center aligned header">Accounts Overview</h3>
-      <div id="accounts">
-        <table class="ui selectable very basic table">
-          <thead>
-            <th>Name</th>
-            <th>Account Type</th>
-            <th>Number</th>
-            <th>Institution</th>
-            <th>Balance</th>
-          </thead>
-          <tbody>
-            <% @accounts.each do |account| %>
-              <tr>
-                <td><%= account.name %></td>
-                <td><%= account.account_sub_type %></td>
-                <td><%= account.mask %></td>
-                <td><%= account.institution_name %></td>
-                <td><%= account.balances.last&.amount || 0 %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="six wide column">
-    </div>
-    <div class="five wide column">
+      <div class="left floated column">
       <div class="ui accordion button" id="add-account-button">
         <div class="active title">
           <strong>Add New Account</strong>
@@ -66,6 +40,65 @@
                 Save Account
               </button>
             <% end %>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="six wide column">
+      <h3 class="ui center aligned header">Accounts Overview</h3>
+      <div id="accounts">
+        <table class="ui selectable very basic table">
+          <thead>
+            <th>Name</th>
+            <th>Account Type</th>
+            <th>Number</th>
+            <th>Institution</th>
+            <th>Balance</th>
+          </thead>
+          <tbody>
+            <% @accounts.each do |account| %>
+              <tr>
+                <td><%= account.name %></td>
+                <td><%= account.account_sub_type %></td>
+                <td><%= account.mask %></td>
+                <td><%= account.institution_name %></td>
+                <td><%= account.balances.last&.amount || 0 %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="five wide column">
+      <div class="ui grid">
+        <div class="two column row">
+          <div class="right floated right aligned column">
+            <div class="ui accordion button" id="add-account-button">
+              <div class="active title">
+                <strong>Record Balance</strong>
+              </div>
+              <div class="content">
+                <div class="ui form">
+                  <%= form_for :balance, url: balances_path do |form| %>
+                    <div class="field">
+                      <%= form.label :name %>
+                      <%= form.text_field :name %>
+                    </div>
+                    <div class="field">
+                      <%= form.label :institution_name %>
+                      <%= form.text_field :institution_name %>
+                    </div>
+                    <div class="field">
+                      <%= form.label :current_balance %>
+                      <%= form.text_field :balance %>
+                    </div>
+                    <button class="ui button" type="submit">
+                      Save Account
+                    </button>
+                  <% end %>
+                </div>
+            </div>
           </div>
         </div>
       </div>

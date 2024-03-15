@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   end
   resources :split_transactions, only: [:index, :show]
   resources :accounts, only: [:create]
+  resources :balances, only: [:create]
 
   get 'accounts/subtypes/:subtype', to: 'accounts#subtypes'
   post '/split_transactions', to: 'transactions#split_transactions'
