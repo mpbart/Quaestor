@@ -27,10 +27,28 @@ $(function() {
     }
   });
 
+ /**
+  * Refresh Accounts Button with behavior to show warning banner
+  * if an error is returned
+  */
   $('#refresh-button').click(function() {
     dimPage();
     $.post('/refresh_accounts',
-           function() { unDimPage(); });
+      function(data) {
+        unDimPage();
+        console.log(data);
+        if (data.failed_accounts.length != 0) {
+          addAccountsToWarningBanner(data.failed_accounts);
+          showWarningBanner();
+        }
+      });
+  });
+
+ /**
+  * Add behavior to dismiss warning banner if the x is clicked
+  */
+  $('#account_refresh_failure_banner').on('click', function() {
+    $(this).closest('.message').transition('fade');
   });
 
   $('#account_type').change(function() {
@@ -159,4 +177,16 @@ dimPage = function() {
 
 unDimPage = function() {
   $('.ui.dimmer').dimmer('hide');
+}
+
+addAccountsToWarningBanner = function(accounts) {
+  elt = $('#account_refresh_failure_banner > ul')
+  console.log(accounts);
+  for (const account of accounts) {
+    elt.append("<li>" + account + "</li>");
+  }
+}
+
+showWarningBanner = function() {
+  $('#account_refresh_failure_banner').removeClass('hidden');
 }

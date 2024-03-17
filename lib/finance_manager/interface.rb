@@ -8,6 +8,7 @@ require_relative 'transaction'
 
 module FinanceManager
   class Interface
+    ITEM_LOGIN_REQUIRED = 'ITEM_LOGIN_REQUIRED'
     DATE_FORMAT = '%Y-%m-%d'
 
     attr_reader :user, :plaid_client
@@ -31,6 +32,7 @@ module FinanceManager
     end
 
     def refresh_accounts
+      failed_accounts = []
       user.plaid_credentials.each do |credential|
         ActiveRecord::Base.transaction do
           request = Plaid::AccountsGetRequest.new({ access_token: credential.access_token })
@@ -42,11 +44,19 @@ module FinanceManager
           response.accounts.each do |account|
             FinanceManager::Account.handle(account, credential)
           end
+        rescue Plaid::ApiError => e
+          body = JSON.parse(e.response_body)
+          raise e unless body['error_code'] == ITEM_LOGIN_REQUIRED
+
+          failed_accounts << credential.institution_name
+          Rails.logger.error("Failed to refresh #{credential.institution_name} - #{e}")
         end
       end
+      failed_accounts
     end
 
     def refresh_transactions
+      failed_accounts = []
       user.plaid_credentials.each do |credential|
         ActiveRecord::Base.transaction do
           transactions_remaining = true
@@ -75,8 +85,15 @@ module FinanceManager
           modified.each { |transaction| FinanceManager::Transaction.update(transaction) }
           removed.each { |transaction| FinanceManager::Transaction.remove(transaction) }
           credential.update_columns(cursor: cursor)
+        rescue Plaid::ApiError => e
+          body = JSON.parse(e.response_body)
+          raise e unless body['error_code'] == ITEM_LOGIN_REQUIRED
+
+          failed_accounts << credential.institution_name
+          Rails.logger.error("Failed to refresh #{credential.institution_name} - #{e}")
         end
       end
+      failed_accounts
     end
 
     def split_transaction!(transaction_id, new_transaction_details)

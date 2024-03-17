@@ -28,10 +28,10 @@ class PlaidController < ActionController::Base
   # rubocop:enable Naming/AccessorMethodName
 
   def refresh_accounts
-    finance_manager.refresh_accounts
-    finance_manager.refresh_transactions
+    failed_accounts = finance_manager.refresh_accounts
+    failed_accounts += finance_manager.refresh_transactions
 
-    render json: { status: 'complete' }
+    render json: { status: 'complete', failed_accounts: failed_accounts.uniq}
   end
 
   def create_link_token
