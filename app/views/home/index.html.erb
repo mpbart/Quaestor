@@ -1,7 +1,7 @@
 <%= stylesheet_link_tag "application", media: "all" %>
 
 <body>
-  <div class="ui padded grid">
+  <div class="ui divided padded grid">
     <%= render "shared/dimmer" %>
     <div class="five wide column">
       <div class="left floated column">
@@ -47,6 +47,7 @@
     </div>
     <div class="six wide column">
       <h3 class="ui center aligned header">Accounts Overview</h3>
+      <%= render partial: "shared/account_refresh_error" %>
       <div id="accounts">
         <table class="ui selectable very basic table">
           <thead>
