@@ -25,6 +25,8 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=password
       - ENCRYPTION_KEY=
+      - PLAID_SECRET_ID=
+      - PLAID_CLIENT_ID=
     volumes:
       - .:/code:cached
 
