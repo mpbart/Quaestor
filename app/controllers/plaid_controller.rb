@@ -31,7 +31,7 @@ class PlaidController < ActionController::Base
     failed_accounts = finance_manager.refresh_accounts
     failed_accounts += finance_manager.refresh_transactions
 
-    render json: { status: 'complete', failed_accounts: failed_accounts.uniq}
+    render json: { status: 'complete', failed_accounts: failed_accounts.uniq }
   end
 
   def create_link_token

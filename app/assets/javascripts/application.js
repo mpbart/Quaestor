@@ -36,7 +36,6 @@ $(function() {
     $.post('/refresh_accounts',
       function(data) {
         unDimPage();
-        console.log(data);
         if (data.failed_accounts.length != 0) {
           addAccountsToWarningBanner(data.failed_accounts);
           showWarningBanner();
