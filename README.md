@@ -7,8 +7,7 @@ Quaestor is a locally-hostable Personal Finance Manager built with a focus on si
 Quickstart:
 1. Build the docker image with `docker compose build`
 2. Setup the database with `docker compose run web bin/prep_db`
-3. Fill out config.json with private keys necessary to authenticate with 3rd party APIs. Currently only Plaid is required which needs:
-  * client_id
-  * secret
-  * environment (map your app's environment to plaid's environment)
+3. Add the values necessary for plaid authentication to the `docker-compose.yml` file:
+  * `PLAID_CLIENT_ID`
+  * `PLAID_SECRET_ID`
 4. Start the application with `docker compose up` and navigate to http://localhost:2424
