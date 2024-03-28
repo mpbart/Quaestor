@@ -1,9 +1,17 @@
 (async function($) {
    const fetchLinkToken = async () => {
-   const response = await fetch('/create_link_token', { method: 'POST' });
-   const responseJSON = await response.json();
-   return responseJSON.link_token;
- };
+     const response = await fetch('/create_link_token', { method: 'POST' });
+     const responseJSON = await response.json();
+     return responseJSON.link_token;
+   };
+
+   const fetchUpdateLinkToken = async () => {
+     const arr = window.location.toString().split('/');
+     const id = arr[arr.length - 1];
+     const response = await fetch(`/fix_account/${id}`, { method: 'POST' });
+     const responseJSON = await response.json();
+     return responseJSON.link_token;
+   };
 
  const configs = {
    // Required, fetch a link token from your server and pass it
@@ -63,4 +71,23 @@ let handler = Plaid.create(configs);
 $('#link-button').on('click', function(e) {
   handler.open();
 });
+
+$('#fix-account-button').on('click', function(e) {
+   let updateModeConfigs = {
+     onSuccess: function(public_token, metadata) { },
+     onExit: function(err, metadata) { 
+      if (err != null) {
+        console.log(err);
+      }
+     },
+     onEvent: function(eventName, metadata) { }
+  };
+  fetchUpdateLinkToken().then(result => {
+    updateModeConfigs.token = result;
+
+    let updateHandler = Plaid.create(updateModeConfigs);
+    updateHandler.open();
+  });
+});
+
 }(jQuery));

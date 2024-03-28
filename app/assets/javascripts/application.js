@@ -78,9 +78,15 @@ $(function() {
 
   // Initialize ability to edit transactions by clicking a row
   // in the table
-  if(getUrl() == "transactions") {
+  if (getUrl() == "transactions") {
     $('tr').click(function(obj) {
         window.location = $(this).data('url');
+    })
+  }
+
+  if (getUrl() == "home") {
+    $('tr').click(function(obj) {
+      window.location = $(this).data('url');
     })
   }
 
