@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'plaid'
-require 'config_reader'
 require 'csv_import/importer'
 require_relative 'account'
 require_relative 'transaction'
@@ -20,11 +19,10 @@ module FinanceManager
 
     # TODO: Refactor into a separate plaid object to handle all plaid-related things
     def create_plaid_client
-      config = ConfigReader.for('plaid')
       plaid_config = Plaid::Configuration.new
-      plaid_config.server_index = Plaid::Configuration::Environment['sandbox']
-      plaid_config.api_key['PLAID-CLIENT-ID'] = config['client_id']
-      plaid_config.api_key['PLAID-SECRET'] = config['secret']
+      plaid_config.server_index = Plaid::Configuration::Environment['development']
+      plaid_config.api_key['PLAID-CLIENT-ID'] = ENV.fetch('PLAID_CLIENT_ID')
+      plaid_config.api_key['PLAID-SECRET'] = ENV.fetch('PLAID_SECRET_ID')
 
       api_client = Plaid::ApiClient.new(plaid_config)
 
