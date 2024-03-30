@@ -31,3 +31,5 @@ config.json
 
 # Ignore db_backups
 db_backups/*
+
+.tool-versions
