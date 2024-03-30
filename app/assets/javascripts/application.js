@@ -99,10 +99,14 @@ $(function() {
   $('#failureIcon').hide();
   $('#successIconSplit').hide();
   $('#failureIconSplit').hide();
+  $('#successIconAccount').hide();
+  $('#failureIconAccount').hide();
+  $('#successIconBalance').hide();
+  $('#failureIconBalance').hide();
   $('#edit-transaction-form').on('ajax:success', showTransactionUpdateSuccessIcon);
-  $('#edit-transaction-form').on('ajax:failure', showTransactionUpdateFailureIcon);
   $('#split-transactions-form').on('ajax:success', showTransactionSplitUpdateSuccessIcon);
-  $('#split-transactions-form').on('ajax:failure', showTransactionSplitUpdateFailureIcon);
+  $('#create-account-form').on('ajax:success', showCreateAccountSuccessIcon);
+  $('#create-balance-form').on('ajax:success', showCreateBalanceSuccessIcon);
   $('#edit-transaction-button').click(function(data, _h) {
     console.log(data.currentTarget.form);
   });
@@ -139,10 +143,6 @@ showTransactionUpdateSuccessIcon = function(data, status, xhr) {
   }
 }
 
-showTransactionUpdateFailureIcon = function(xhr, status, error) {
-  $('#failureIcon').show();
-}
-
 showTransactionSplitUpdateSuccessIcon = function(data, status, xhr) {
   if (data.detail[0]['success']) {
     $('#successIconSplit').show();
@@ -151,8 +151,22 @@ showTransactionSplitUpdateSuccessIcon = function(data, status, xhr) {
   }
 }
 
-showTransactionSplitUpdateFailureIcon = function(xhr, status, error) {
-  $('#failureIconSplit').show();
+showCreateAccountSuccessIcon = function(data, status, error) {
+  if (data.detail[0]['success']) {
+    $('#successIconAccount').show();
+  } else {
+    console.log(data.detail[0]['error']);
+    $('#failureIconAccount').show();
+  }
+}
+
+showCreateBalanceSuccessIcon = function(data, status, error) {
+  if (data.detail[0]['success']) {
+    $('#successIconBalance').show();
+  } else {
+    console.log(data.detail[0]['error']);
+    $('#failureIconBalance').show();
+  }
 }
 
 getTransactionPageNum = function() {
