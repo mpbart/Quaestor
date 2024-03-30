@@ -16,7 +16,7 @@
           </thead>
           <tbody>
             <% @accounts.each do |account| %>
-              <tr>
+              <tr data-url="<%= account_path(account) %>">
                 <td><%= account.name %></td>
                 <td><%= account.account_sub_type %></td>
                 <td><%= account.mask %></td>

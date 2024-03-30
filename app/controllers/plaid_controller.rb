@@ -56,6 +56,28 @@ class PlaidController < ActionController::Base
     render json: { link_token: link_token_response.link_token }
   end
 
+  def fix_account_connection
+    access_token = PlaidCredential.find_by(
+      institution_name: Account.find(params[:account_id]).institution_name
+    ).access_token
+
+    link_token_create_request = Plaid::LinkTokenCreateRequest.new(
+      {
+        user:          { client_user_id: current_user.id.to_s },
+        client_name:   'personal-dash',
+        access_token:  access_token,
+        country_codes: ['US'],
+        language:      'en'
+      }
+    )
+
+    link_token_response = finance_manager.plaid_client.link_token_create(
+      link_token_create_request
+    )
+
+    render json: { link_token: link_token_response.link_token }
+  end
+
   private
 
   def finance_manager

@@ -7,6 +7,10 @@ class AccountsController < ApplicationController
     render json: { success: false, error: e }
   end
 
+  def show
+    @account = Account.find(params[:id])
+  end
+
   def subtypes
     render json: { subtypes: Account::ACCOUNT_TYPES[params[:subtype]] }
   end
