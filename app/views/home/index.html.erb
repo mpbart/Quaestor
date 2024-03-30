@@ -10,8 +10,8 @@
           <strong>Add New Account</strong>
         </div>
         <div class="content">
-          <div class="ui form">
-            <%= form_for :account, url: accounts_path do |form| %>
+          <div id="create-account-form" class="ui form">
+            <%= form_for :account, url: accounts_path, remote: true do |form| %>
               <div class="field">
                 <%= form.label :name %>
                 <%= form.text_field :name %>
@@ -36,9 +36,13 @@
                 <%= form.label :current_balance %>
                 <%= form.text_field :balance %>
               </div>
-              <button class="ui button" type="submit">
-                Save Account
-              </button>
+              <span>
+                <button class="ui button" type="submit">
+                  Save Account
+                </button>
+                <i id="successIconAccount" class="green check icon"></i>
+                <i id="failureIconAccount" class="red times icon"></i>
+              </span>
             <% end %>
           </div>
         </div>
