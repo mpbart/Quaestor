@@ -80,23 +80,28 @@
                 <strong>Record Balance</strong>
               </div>
               <div class="content">
-                <div class="ui form">
-                  <%= form_for :balance, url: balances_path do |form| %>
+                <div id="create-balance-form" class="ui form">
+                  <%= form_for :balance, url: balances_path, remote: true do |form| %>
+                    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                     <div class="field">
-                      <%= form.label :name %>
-                      <%= form.text_field :name %>
-                    </div>
-                    <div class="field">
-                      <%= form.label :institution_name %>
-                      <%= form.text_field :institution_name %>
+                      <%= form.label :account%>
+                      <%= form.select :account_id, Account.all.map{ |a| [a.name, a.id] }, {include_blank: true}, {class: 'ui dropdown'} %>
                     </div>
                     <div class="field">
                       <%= form.label :current_balance %>
                       <%= form.text_field :balance %>
                     </div>
-                    <button class="ui button" type="submit">
-                      Save Account
-                    </button>
+                    <div class="field">
+                      <%= form.label :date %>
+                      <%= form.date_field :date, value: Date.current %>
+                    </div>
+                    <span>
+                      <button class="ui button" type="submit">
+                        Save Balance
+                      </button>
+                      <i id="successIconBalance" class="green check icon"></i>
+                      <i id="failureIconBalance" class="red times icon"></i>
+                    </span>
                   <% end %>
                 </div>
             </div>
@@ -108,3 +113,4 @@
 </body>
 
 <%= javascript_include_tag "plaid" %>
+<%= javascript_include_tag "rails-ujs" %>
