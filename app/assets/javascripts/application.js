@@ -103,10 +103,10 @@ $(function() {
   $('#failureIconAccount').hide();
   $('#successIconBalance').hide();
   $('#failureIconBalance').hide();
-  $('#edit-transaction-form').on('ajax:success', showTransactionUpdateSuccessIcon);
-  $('#split-transactions-form').on('ajax:success', showTransactionSplitUpdateSuccessIcon);
-  $('#create-account-form').on('ajax:success', showCreateAccountSuccessIcon);
-  $('#create-balance-form').on('ajax:success', showCreateBalanceSuccessIcon);
+  $('#edit-transaction-form').on('ajax:success', showTransactionUpdateIcon);
+  $('#split-transactions-form').on('ajax:success', showTransactionSplitIcon);
+  $('#create-account-form').on('ajax:success', showCreateAccountIcon);
+  $('#create-balance-form').on('ajax:success', showCreateBalanceIcon);
   $('#edit-transaction-button').click(function(data, _h) {
     console.log(data.currentTarget.form);
   });
@@ -135,7 +135,7 @@ formatDate = function(date) {
   return d.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
 }
 
-showTransactionUpdateSuccessIcon = function(data, status, xhr) {
+showTransactionUpdateIcon = function(data, status, xhr) {
   if (data.detail[0]['success']) {
     $('#successIcon').show();
   } else {
@@ -143,7 +143,7 @@ showTransactionUpdateSuccessIcon = function(data, status, xhr) {
   }
 }
 
-showTransactionSplitUpdateSuccessIcon = function(data, status, xhr) {
+showTransactionSplitIcon = function(data, status, xhr) {
   if (data.detail[0]['success']) {
     $('#successIconSplit').show();
   } else {
@@ -151,7 +151,7 @@ showTransactionSplitUpdateSuccessIcon = function(data, status, xhr) {
   }
 }
 
-showCreateAccountSuccessIcon = function(data, status, error) {
+showCreateAccountIcon = function(data, status, error) {
   if (data.detail[0]['success']) {
     $('#successIconAccount').show();
   } else {
@@ -160,7 +160,7 @@ showCreateAccountSuccessIcon = function(data, status, error) {
   }
 }
 
-showCreateBalanceSuccessIcon = function(data, status, error) {
+showCreateBalanceIcon = function(data, status, error) {
   if (data.detail[0]['success']) {
     $('#successIconBalance').show();
   } else {
