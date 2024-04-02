@@ -99,10 +99,14 @@ $(function() {
   $('#failureIcon').hide();
   $('#successIconSplit').hide();
   $('#failureIconSplit').hide();
-  $('#edit-transaction-form').on('ajax:success', showTransactionUpdateSuccessIcon);
-  $('#edit-transaction-form').on('ajax:failure', showTransactionUpdateFailureIcon);
-  $('#split-transactions-form').on('ajax:success', showTransactionSplitUpdateSuccessIcon);
-  $('#split-transactions-form').on('ajax:failure', showTransactionSplitUpdateFailureIcon);
+  $('#successIconAccount').hide();
+  $('#failureIconAccount').hide();
+  $('#successIconBalance').hide();
+  $('#failureIconBalance').hide();
+  $('#edit-transaction-form').on('ajax:success', showTransactionUpdateIcon);
+  $('#split-transactions-form').on('ajax:success', showTransactionSplitIcon);
+  $('#create-account-form').on('ajax:success', showCreateAccountIcon);
+  $('#create-balance-form').on('ajax:success', showCreateBalanceIcon);
   $('#edit-transaction-button').click(function(data, _h) {
     console.log(data.currentTarget.form);
   });
@@ -131,7 +135,7 @@ formatDate = function(date) {
   return d.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
 }
 
-showTransactionUpdateSuccessIcon = function(data, status, xhr) {
+showTransactionUpdateIcon = function(data, status, xhr) {
   if (data.detail[0]['success']) {
     $('#successIcon').show();
   } else {
@@ -139,11 +143,7 @@ showTransactionUpdateSuccessIcon = function(data, status, xhr) {
   }
 }
 
-showTransactionUpdateFailureIcon = function(xhr, status, error) {
-  $('#failureIcon').show();
-}
-
-showTransactionSplitUpdateSuccessIcon = function(data, status, xhr) {
+showTransactionSplitIcon = function(data, status, xhr) {
   if (data.detail[0]['success']) {
     $('#successIconSplit').show();
   } else {
@@ -151,8 +151,22 @@ showTransactionSplitUpdateSuccessIcon = function(data, status, xhr) {
   }
 }
 
-showTransactionSplitUpdateFailureIcon = function(xhr, status, error) {
-  $('#failureIconSplit').show();
+showCreateAccountIcon = function(data, status, error) {
+  if (data.detail[0]['success']) {
+    $('#successIconAccount').show();
+  } else {
+    console.log(data.detail[0]['error']);
+    $('#failureIconAccount').show();
+  }
+}
+
+showCreateBalanceIcon = function(data, status, error) {
+  if (data.detail[0]['success']) {
+    $('#successIconBalance').show();
+  } else {
+    console.log(data.detail[0]['error']);
+    $('#failureIconBalance').show();
+  }
 }
 
 getTransactionPageNum = function() {

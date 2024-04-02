@@ -2,6 +2,8 @@
 
 module FinanceManager
   class Account
+    BalanceStruct = Struct.new(:current, :available, :limit)
+
     def self.handle(account, credential)
       user = credential.user
       record = user.accounts.find_by(plaid_identifier: account.account_id)
@@ -75,6 +77,5 @@ module FinanceManager
         limit:     balance.limit
       )
     end
-    private_class_method :create_balance
   end
 end
