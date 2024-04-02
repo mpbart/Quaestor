@@ -49,7 +49,7 @@ module FinanceManager
         name:             params[:name],
         official_name:    params[:official_name],
         account_type:     params[:type],
-        account_sub_type: params[:subtype],
+        account_sub_type: params[:sub_type],
         mask:             params[:mask]
       )
 
