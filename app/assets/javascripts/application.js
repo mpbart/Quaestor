@@ -180,13 +180,13 @@ setAccountSubTypeMenu = function(accountType) {
   }
 
   $.get(`/accounts/subtypes/${accountType}`, function(data) {
+    var subTypeSelect = $('#account_sub_type');
     const values = data.subtypes.map(x => Object({name: x.replace('_', ' '), value: x}));
-    $('#account_sub_type').dropdown('setup menu', {
-      values: values
-    });
-    $('#account_sub_type').addClass('ui dropdown');
 
-    $('#account_sub_type').dropdown('refresh');
+    subTypeSelect.empty();
+    $.each(values, function(idx, option) {
+      subTypeSelect.append($('<option>', {value: option.value, text: option.name}));
+    });
   });
 }
 
