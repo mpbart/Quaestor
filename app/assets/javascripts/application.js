@@ -67,13 +67,23 @@ $(function() {
     const currentPage = getTransactionPageNum();
     if (currentPage > 1) {
       const newPage = currentPage - 1;
-      window.location = `/transactions?page=${newPage}`;
+      const searchParams = getSearchParams();
+      if (searchParams) {
+        window.location = `/transactions?page=${newPage}&q=${searchParams}`;
+      } else {
+        window.location = `/transactions?page=${newPage}`;
+      }
     }
   });
 
   $('#next-page-button').click(function() {
     const newPage = getTransactionPageNum() + 1;
-    window.location = `/transactions?page=${newPage}`;
+    const searchParams = getSearchParams();
+    if (searchParams) {
+      window.location = `/transactions?page=${newPage}&q=${searchParams}`;
+    } else {
+      window.location = `/transactions?page=${newPage}`;
+    }
   });
 
   // Initialize ability to edit transactions by clicking a row
@@ -172,6 +182,10 @@ showCreateBalanceIcon = function(data, status, error) {
 getTransactionPageNum = function() {
   const page = new URL(document.URL).searchParams.get('page');
   return parseInt(page) || 1;
+}
+
+getSearchParams = function() {
+  return new URL(document.URL).searchParams.get('q');
 }
 
 setAccountSubTypeMenu = function(accountType) {
