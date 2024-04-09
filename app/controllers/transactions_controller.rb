@@ -8,8 +8,15 @@ class TransactionsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @transactions = current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
-                                .includes(:account, :plaid_category)
+    @transactions = if params[:q]
+                      current_user.paginated_transactions(
+                        where_clause: "description ILIKE '%#{params[:q]}%'",
+                        page_num:     params[:page]&.to_i || 1
+                      ).includes(:account, :plaid_category)
+                    else
+                      current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
+                                  .includes(:account, :plaid_category)
+                    end
   end
 
   def show

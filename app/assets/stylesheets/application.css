@@ -50,3 +50,13 @@
 .ui.accordion.button.title:hover {
   background-color: #0a71a8;
 }
+
+.ui.tabular.menu .right.item {
+  padding-bottom: 8px;
+  padding-top: 8px;
+}
+
+#search-transactions {
+  padding-right: 0.75em;
+  border-radius: 500em !important;
+}

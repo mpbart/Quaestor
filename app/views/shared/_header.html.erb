@@ -17,12 +17,22 @@
   <a class="item" id="budgets-tab" href="/budgets">
     Budgets
   </a>
-  <div id="account-options" class="ui dropdown link right item">
-    <span class="text">Account Options</span>
-    <i class="dropdown icon"></i>
-    <div class="menu">
-      <div class="item" id="link-button">Link New Account</div>
-      <div class="item" id="refresh-button">Refresh Accounts</div>
+  <div class="right item">
+    <div class="ui form" id="search-transactions">
+      <div class="ui icon input">
+        <%= form_with url: '/transactions', method: :get do |form| %>
+          <%= text_field_tag :q, params[:q], placeholder: "Search Transactions", class: "ui search"%>
+        <% end %>
+        <i class="search icon"></i>
+      </div>
+    </div>
+    <div id="account-options" class="ui dropdown link">
+      <span class="text">Account Options</span>
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        <div class="item" id="link-button">Link New Account</div>
+        <div class="item" id="refresh-button">Refresh Accounts</div>
+      </div>
     </div>
   </div>
 </div>
