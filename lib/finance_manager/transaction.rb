@@ -10,6 +10,24 @@ module FinanceManager
     class UnknownTransactionError < StandardError; end
     class BadParametersError < StandardError; end
 
+    def self.search(current_user, params)
+      if params[:q]
+        current_user.paginated_transactions(
+          where_clause: "description ILIKE '%#{params[:q]}%'",
+          page_num:     params[:page]&.to_i || 1
+        ).includes(:account, :plaid_category)
+      elsif params[:label]
+        ::Transaction.search_by_label_name(
+          current_user,
+          params[:label],
+          params[:page]&.to_i || 1
+        )
+      else
+        current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
+          .includes(:account, :plaid_category)
+      end
+    end
+
     def self.create(transaction)
       account = ::Account.find_by(plaid_identifier: transaction.account_id)
       category = ::PlaidCategory.find_by(

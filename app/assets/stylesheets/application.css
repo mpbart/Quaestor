@@ -60,3 +60,7 @@
   padding-right: 0.75em;
   border-radius: 500em !important;
 }
+
+.ui.label {
+  border-radius: .50rem;
+}
