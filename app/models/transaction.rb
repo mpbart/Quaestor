@@ -15,4 +15,13 @@ optional: true
   def grouped_transactions
     transaction_group&.transactions&.where&.not(id: id) || []
   end
+
+  def self.search_by_label_name(user, label_name, page_num)
+    joins(:labels).where(
+      labels: { name: label_name }
+    ).where(user_id: user.id)
+     .by_date
+     .paginate(page: page_num, per_page: 50)
+     .includes(:account, :plaid_category)
+  end
 end
