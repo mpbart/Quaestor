@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-  <%= javascript_importmap_tags %>
   <head>
     <title>Quaestor</title>
     <%= csrf_meta_tags %>
@@ -9,6 +8,7 @@
     <%= render "shared/header" %>
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <link rel='icon' type='image/png' href='/favicon.png'>
+    <%= javascript_importmap_tags %>
   </head>
 
   <body>

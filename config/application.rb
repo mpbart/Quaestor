@@ -7,6 +7,7 @@ require 'rails/all'
 require 'devise'
 require 'will_paginate'
 require 'cocoon'
+require 'importmap-rails'
 require 'sprockets/railtie'
 require 'acts_as_paranoid'
 
