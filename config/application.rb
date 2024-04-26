@@ -8,6 +8,7 @@ require 'devise'
 require 'will_paginate'
 require 'cocoon'
 require 'importmap-rails'
+require 'turbo-rails'
 require 'sprockets/railtie'
 require 'acts_as_paranoid'
 
@@ -19,6 +20,7 @@ module Quaestor
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.1
     config.time_zone = 'America/Detroit'
+    config.action_view.form_with_generates_remote_forms = false
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
