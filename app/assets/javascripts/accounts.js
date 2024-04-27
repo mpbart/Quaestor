@@ -1,31 +1,3 @@
-$(function() {
-  $('#successIconAccount').hide();
-  $('#failureIconAccount').hide();
-  $('#successIconBalance').hide();
-  $('#failureIconBalance').hide();
-  $('#create-account-form').on('ajax:success', showCreateAccountIcon);
-  $('#create-balance-form').on('ajax:success', showCreateBalanceIcon);
-  $('#account-options').dropdown({action: 'hide'});
-
-  setAccountSubTypeMenu($('#account_type').val());
-
-  // Add event handlers
-  $('#add-account-button').click(function() {
-    const button = $('#add-account-button');
-    if (button.css('border-width')[0] == '1') {
-      button.css('border-width', '0px');
-    } else {
-      button.css('border-width', '1px');
-    }
-  });
-
-
-  $('#account_type').change(function() {
-    const accountType = $(this).val();
-
-    setAccountSubTypeMenu(accountType);
-  });
-});
 
 setAccountSubTypeMenu = function(accountType) {
 if (accountType == null) {
@@ -59,3 +31,31 @@ showCreateBalanceIcon = function(data, status, error) {
     $('#failureIconBalance').show();
   }
 }
+$(function() {
+  $('#successIconAccount').hide();
+  $('#failureIconAccount').hide();
+  $('#successIconBalance').hide();
+  $('#failureIconBalance').hide();
+  $('#create-account-form').on('ajax:success', showCreateAccountIcon);
+  $('#create-balance-form').on('ajax:success', showCreateBalanceIcon);
+  $('#account-options').dropdown({action: 'hide'});
+
+  setAccountSubTypeMenu($('#account_type').val());
+
+  // Add event handlers
+  $('#add-account-button').click(function() {
+    const button = $('#add-account-button');
+    if (button.css('border-width')[0] == '1') {
+      button.css('border-width', '0px');
+    } else {
+      button.css('border-width', '1px');
+    }
+  });
+
+
+  $('#account_type').change(function() {
+    const accountType = $(this).val();
+
+    setAccountSubTypeMenu(accountType);
+  });
+});

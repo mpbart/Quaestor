@@ -1,12 +1,12 @@
 <%= stylesheet_link_tag "application", media: "all" %>
 
+<%= turbo_frame_tag 'transactions' do %>
 <body>
   <div class="ui padded grid">
     <%= render "shared/dimmer" %>
     <div class="one wide column">
     </div>
     <div class="fourteen wide column">
-      <%= turbo_frame_tag 'transactions' do %>
       <h2 class="ui center aligned header">Transactions</h2>
       <%= render partial: "shared/account_refresh_error" %>
         <div id="recent_transactions">
@@ -46,12 +46,12 @@
             <i class='right chevron icon'></i>
           </button>
         </div>
-      <% end %>
     </div>
     <div class="one wide column">
     </div>
   </div>
 </body>
+<% end %>
 
 <%= javascript_include_tag "plaid" %>
 <%= javascript_include_tag "transactions" %>
