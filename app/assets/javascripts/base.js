@@ -1,54 +1,5 @@
 HEADER_TABS = ["home-tab", "transactions-tab", "analytics-tab", "budgets-tab"]
 
-$(function() {
- /**
-  * Semantic init
-  */
-  getHeaderTabs().tab();  
-  $('.ui.dropdown').dropdown();
-  $('.ui.accordion').accordion();
-
- /*
-  * Refresh Accounts Button with behavior to show warning banner
-  * if an error is returned
-  */
-  $('#refresh-button').click(function() {
-    dimPage();
-    $.post('/refresh_accounts',
-      function(data) {
-        unDimPage();
-        if (data.failed_accounts.length != 0) {
-          addAccountsToWarningBanner(data.failed_accounts);
-          showWarningBanner();
-        }
-      });
-  });
-
- /**
-  * Add behavior to dismiss warning banner if the x is clicked
-  */
-  $('#account_refresh_failure_banner').on('click', function() {
-    $(this).closest('.message').transition('fade');
-  });
-
-  // Ensure that tabs are activated/deactivated on click
-  getHeaderTabs().click(function(event) {
-
-    activateTab($(event.currentTarget), $('.active'));
-  });
-
-  if (getUrl() == "home") {
-    $('tr').click(function(obj) {
-      window.location = $(this).data('url');
-    })
-  }
-
-  // Activate the tab for the current url
-  if (HEADER_TABS.includes(`${getUrl()}-tab`)) {
-    activateTab($(`#${getUrl()}-tab`), $('.active'));
-  }
-});
-
 
 // helper methods
 activateTab = function(tabToActivate, tabToDeactivate) {
@@ -100,3 +51,57 @@ addAccountsToWarningBanner = function(accounts) {
 showWarningBanner = function() {
   $('#account_refresh_failure_banner').removeClass('hidden');
 }
+
+
+$(function() {
+ /**
+  * Semantic init
+  */
+  getHeaderTabs().tab();  
+  $('.ui.dropdown').dropdown();
+  $('.ui.accordion').accordion();
+
+ /*
+  * Refresh Accounts Button with behavior to show warning banner
+  * if an error is returned
+  */
+  $('#refresh-button').click(function() {
+    dimPage();
+    $.post('/refresh_accounts',
+      function(data) {
+        unDimPage();
+        if (data.failed_accounts.length != 0) {
+          addAccountsToWarningBanner(data.failed_accounts);
+          showWarningBanner();
+        }
+      });
+  });
+
+ /**
+  * Add behavior to dismiss warning banner if the x is clicked
+  */
+  $('#account_refresh_failure_banner').on('click', function() {
+    $(this).closest('.message').transition('fade');
+  });
+
+  // Ensure that tabs are activated/deactivated on click
+  getHeaderTabs().click(function(event) {
+
+    activateTab($(event.currentTarget), $('.active'));
+  });
+
+  if (getUrl() == "home") {
+    $('tr').click(function(obj) {
+      window.location = $(this).data('url');
+    })
+  }
+
+  // Activate the tab for the current url
+  if (HEADER_TABS.includes(`${getUrl()}-tab`)) {
+    activateTab($(`#${getUrl()}-tab`), $('.active'));
+  }
+
+  $('turbo-frame#search').on('turbo:submit-end', function(event) {
+    Turbo.visit(event.detail.fetchResponse.response.url, {action: 'advance'})
+  });
+});

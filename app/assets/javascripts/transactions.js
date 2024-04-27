@@ -15,6 +15,12 @@ showTransactionSplitIcon = function(event) {
   }
 }
 
+makeTableRowsClickable = function() {
+  $('tr').click(function(obj) {
+      Turbo.visit($(this).data('url'), {action: 'advance'});
+  })
+}
+
 getUrl = function() {
   return window.location.pathname.substr(1).split("/")[0] || "home";
 }
@@ -60,9 +66,12 @@ $(function() {
   // Initialize ability to edit transactions by clicking a row
   // in the table
   if (getUrl() == "transactions") {
-    $('tr').click(function(obj) {
-        window.location = $(this).data('url');
-    })
+    makeTableRowsClickable();
   }
 
+});
+
+// Ensure table rows are still clickable after loading a turbo frame
+$('turbo-frame#transactions').on('turbo:frame-load', function(event) {
+  makeTableRowsClickable();
 });
