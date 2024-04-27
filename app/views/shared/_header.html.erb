@@ -11,13 +11,22 @@
   </a>
   <div class="right item">
     <%= turbo_frame_tag "search", target: "transactions" do %>
-    <div class="ui form" id="search-transactions">
-      <div class="ui icon input">
-        <%= form_with url: '/transactions', method: :get do |form| %>
-          <%= text_field_tag :q, params[:q], placeholder: "Search Transactions", class: "ui search"%>
-        <% end %>
-        <i class="search icon"></i>
-      </div>
+    <div class="ui dropdown">
+        <span class="text">Manage Transactions</span>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+          <div class="header">Filter Transactions</div>
+          <div class="ui left icon input">
+            <i class="search icon"></i>
+            <input type="text" name="search" placeholder="Search">
+          </div>
+          <div class="divider"></div>
+          <div class="item">Filter by Category</div>
+          <div class="item">Filter by Date</div>
+          <div class="item">Filter by Account</div>
+          <div class="divider"></div>
+          <div class="item"><i class="tag icon"></i>Create Label</div>
+        </div>
     </div>
     <% end %>
     <div id="account-options" class="ui dropdown link">

@@ -8,7 +8,7 @@
       <%= turbo_frame_tag 'transactions' do %>
       <h3 class="ui center aligned header">Transaction Details</h3>
         <div>
-          <%= form_for @transaction, html: { :class => 'ui form', :id => 'edit-transaction-form' }, remote: true do |f| %>
+          <%= form_for @transaction, html: { :class => 'ui form', :id => 'edit-transaction-form' } do |f| %>
             <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
             <div class="fields">
               <div class="field"><label>Date:</label> <%= f.text_field :date %></div>
@@ -56,7 +56,7 @@
       <h3 class="ui center aligned header">Existing Split Transactions</h3>
       <div id='grouped-transaction-div'>
         <% @transaction.grouped_transactions.each do |grouped_transaction| %>
-          <%= form_for grouped_transaction, html: { :class => 'ui form', :id => 'edit-transactions-form' }, remote: true do |f| %>
+          <%= form_for grouped_transaction, html: { :class => 'ui form', :id => 'edit-transactions-form' } do |f| %>
             <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
             <div class="fields">
               <div class="field"><label>Date:</label> <%= f.text_field :date %></div>
@@ -103,7 +103,7 @@
 
       <h3 class="ui center aligned header">Create New Split Transaction</h3>
       <div id='split-transaction-div'>
-        <%= form_for @split_transaction, html: { :class => 'ui form', :id => 'split-transactions-form'}, url: '/split_transactions', remote: true do |f| %>
+        <%= form_for @split_transaction, html: { :class => 'ui form', :id => 'split-transactions-form'}, url: '/split_transactions' do |f| %>
           <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
           <%= f.hidden_field(:parent_transaction_id, value: @transaction.id) %>
           <div class="fields">

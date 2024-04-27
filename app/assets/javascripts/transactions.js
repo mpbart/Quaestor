@@ -1,10 +1,30 @@
+
+showTransactionUpdateIcon = function(event) {
+  if (event.detail.success) {
+    $('#successIcon').show();
+  } else {
+    $('#failureIcon').show();
+  }
+} 
+
+showTransactionSplitIcon = function(event) {
+  if (data.detail[0]['success']) {
+    $('#successIconSplit').show();
+  } else {
+    $('#failureIconSplit').show();
+  }
+}
+
+getUrl = function() {
+  return window.location.pathname.substr(1).split("/")[0] || "home";
+}
 $(function() {
   $('#successIcon').hide();
   $('#failureIcon').hide();
   $('#successIconSplit').hide();
   $('#failureIconSplit').hide();
-  $('#edit-transaction-form').on('ajax:success', showTransactionUpdateIcon);
-  $('#split-transactions-form').on('ajax:success', showTransactionSplitIcon);
+  $('#edit-transaction-form').on('turbo:submit-end', showTransactionUpdateIcon);
+  $('#split-transactions-form').on('turbo:submit-end', showTransactionSplitIcon);
 
   // Set the values for dropdowns on the transactions SHOW page
   $('#plaid-category-id').dropdown('set selected',
@@ -45,23 +65,3 @@ $(function() {
   }
 
 });
-
-showTransactionUpdateIcon = function(data, status, xhr) {
-  if (data.detail[0]['success']) {
-    $('#successIcon').show();
-  } else {
-    $('#failureIcon').show();
-  }
-} 
-
-showTransactionSplitIcon = function(data, status, xhr) {
-  if (data.detail[0]['success']) {
-    $('#successIconSplit').show();
-  } else {
-    $('#failureIconSplit').show();
-  }
-}
-
-getUrl = function() {
-  return window.location.pathname.substr(1).split("/")[0] || "home";
-}
