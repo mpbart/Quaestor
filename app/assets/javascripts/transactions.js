@@ -18,6 +18,7 @@ showTransactionSplitIcon = function(event) {
 getUrl = function() {
   return window.location.pathname.substr(1).split("/")[0] || "home";
 }
+
 $(function() {
   $('#successIcon').hide();
   $('#failureIcon').hide();
@@ -39,9 +40,9 @@ $(function() {
       const newPage = currentPage - 1;
       const searchParams = getSearchParams();
       if (searchParams) {
-        window.location = `/transactions?page=${newPage}&q=${searchParams}`;
+        Turbo.visit(`/transactions?page=${newPage}&q=${searchParams}`, {action: 'replace'});
       } else {
-        window.location = `/transactions?page=${newPage}`;
+        Turbo.visit(`/transactions?page=${newPage}`, {action: 'replace'});
       }
     }
   });
@@ -50,9 +51,9 @@ $(function() {
     const newPage = getTransactionPageNum() + 1;
     const searchParams = getSearchParams();
     if (searchParams) {
-      window.location = `/transactions?page=${newPage}&q=${searchParams}`;
+      Turbo.visit(`/transactions?page=${newPage}&q=${searchParams}`, {action: 'replace'});
     } else {
-      window.location = `/transactions?page=${newPage}`;
+      Turbo.visit(`/transactions?page=${newPage}`, {action: 'replace'});
     }
   });
 
