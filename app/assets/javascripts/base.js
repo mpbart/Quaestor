@@ -92,7 +92,7 @@ $(function() {
 
   if (getUrl() == "home") {
     $('tr').click(function(obj) {
-      window.location = $(this).data('url');
+      Turbo.visit($(this).data('url'), {action: 'advance'});
     })
   }
 
