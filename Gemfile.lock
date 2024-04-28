@@ -125,6 +125,10 @@ GEM
       activesupport (>= 6.1)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
+    importmap-rails (2.0.1)
+      actionpack (>= 6.0.0)
+      activesupport (>= 6.0.0)
+      railties (>= 6.0.0)
     io-console (0.7.2)
     irb (1.11.2)
       rdoc
@@ -178,8 +182,6 @@ GEM
       nio4r (~> 2.0)
     racc (1.7.3)
     rack (2.2.8.1)
-    rack-proxy (0.7.7)
-      rack
     rack-session (1.0.2)
       rack (< 3)
     rack-test (2.1.0)
@@ -227,6 +229,10 @@ GEM
       ffi (~> 1.0)
     rdoc (6.6.3.1)
       psych (>= 4.0.0)
+    redis (5.2.0)
+      redis-client (>= 0.22.0)
+    redis-client (0.22.1)
+      connection_pool
     regexp_parser (2.9.0)
     reline (0.4.3)
       io-console (~> 0.5)
@@ -280,14 +286,13 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
-    semantic_range (3.0.0)
     spring (4.1.1)
     spring-watcher-listen (2.1.0)
       listen (>= 2.7, < 4.0)
       spring (>= 4)
-    sprockets (3.7.2)
+    sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
-      rack (> 1, < 3)
+      rack (>= 2.2.4, < 4)
     sprockets-rails (3.4.2)
       actionpack (>= 5.2)
       activesupport (>= 5.2)
@@ -296,19 +301,15 @@ GEM
     thor (1.3.1)
     tilt (2.3.0)
     timeout (0.4.1)
-    turbolinks (5.2.1)
-      turbolinks-source (~> 5.2)
-    turbolinks-source (5.2.0)
+    turbo-rails (2.0.5)
+      actionpack (>= 6.0.0)
+      activejob (>= 6.0.0)
+      railties (>= 6.0.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
     warden (1.2.9)
       rack (>= 2.0.9)
-    webpacker (5.4.4)
-      activesupport (>= 5.2)
-      rack-proxy (>= 0.6.1)
-      railties (>= 5.2)
-      semantic_range (>= 2.3.0)
     webrick (1.8.1)
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
@@ -328,6 +329,7 @@ DEPENDENCIES
   database_cleaner-active_record
   devise (~> 4)
   factory_bot_rails (~> 6.4)
+  importmap-rails (~> 2)
   listen
   pg
   plaid (~> 23)
@@ -335,16 +337,16 @@ DEPENDENCIES
   puma (~> 6)
   rails (~> 7)
   rails-controller-testing
+  redis (~> 5)
   rspec (~> 3)
   rspec-rails (~> 6.1)
   rubocop (~> 1.60)
   sass-rails (~> 6)
   spring
   spring-watcher-listen
-  sprockets-rails
-  turbolinks (~> 5)
+  sprockets (~> 4)
+  turbo-rails (~> 2)
   tzinfo-data
-  webpacker (~> 5)
   will_paginate (~> 3.3)
 
 RUBY VERSION

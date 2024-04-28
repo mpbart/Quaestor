@@ -20,8 +20,8 @@ optional: true
     joins(:labels).where(
       labels: { name: label_name }
     ).where(user_id: user.id)
-     .by_date
-     .paginate(page: page_num, per_page: 50)
-     .includes(:account, :plaid_category)
+                  .by_date
+                  .paginate(page: page_num, per_page: 50)
+                  .includes(:account, :plaid_category)
   end
 end

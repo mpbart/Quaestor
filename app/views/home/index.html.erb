@@ -1,5 +1,6 @@
 <%= stylesheet_link_tag "application", media: "all" %>
 
+<%= turbo_frame_tag 'home' do %>
 <body>
   <div class="ui divided padded grid">
     <%= render "shared/dimmer" %>
@@ -11,7 +12,7 @@
         </div>
         <div class="content">
           <div id="create-account-form" class="ui form">
-            <%= form_for :account, url: accounts_path, remote: true do |form| %>
+            <%= form_for :account, url: accounts_path do |form| %>
               <div class="field">
                 <%= form.label :name %>
                 <%= form.text_field :name %>
@@ -85,7 +86,7 @@
               </div>
               <div class="content">
                 <div id="create-balance-form" class="ui form">
-                  <%= form_for :balance, url: balances_path, remote: true do |form| %>
+                  <%= form_for :balance, url: balances_path do |form| %>
                     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                     <div class="field">
                       <%= form.label :account%>
@@ -115,7 +116,7 @@
     </div>
   </div>
 </body>
+<% end %>
 
 <%= javascript_include_tag "plaid" %>
-<%= javascript_include_tag "rails-ujs" %>
 <%= javascript_include_tag "accounts" %>

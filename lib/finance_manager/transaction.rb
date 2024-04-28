@@ -24,7 +24,7 @@ module FinanceManager
         )
       else
         current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
-          .includes(:account, :plaid_category)
+                    .includes(:account, :plaid_category)
       end
     end
 

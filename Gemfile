@@ -9,10 +9,12 @@ gem 'rails', '~> 7'
 gem 'puma', '~> 6'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 6'
-# Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
-gem 'webpacker', '~> 5'
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
+
+# Javascript import maps for rails
+gem 'importmap-rails', '~> 2'
+
+# Turbo makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
+gem 'turbo-rails', '~> 2'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
@@ -29,9 +31,11 @@ gem 'will_paginate', '~> 3.3'
 
 gem 'cocoon'
 
-gem 'sprockets-rails'
+gem 'sprockets', '~> 4'
 
 gem 'acts_as_paranoid', '~> 0.9'
+
+gem 'redis', '~> 5'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

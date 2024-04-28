@@ -14,6 +14,7 @@ services:
     tty: true
     depends_on:
       - db
+      - redis
     ports:
       - target: 3000
         published: 2424
@@ -27,8 +28,16 @@ services:
       - ENCRYPTION_KEY=
       - PLAID_SECRET_ID=
       - PLAID_CLIENT_ID=
+      - REDIS_URL=redis://redis:6379
     volumes:
       - .:/code:cached
 
+  redis:
+    command: redis-server --appendonly yes
+    image: redis:7.2
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_14_data:
+  redis_data:

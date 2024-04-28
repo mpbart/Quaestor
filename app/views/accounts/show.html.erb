@@ -1,5 +1,6 @@
 <%= stylesheet_link_tag "application", media: "all" %>
 
+<%= turbo_frame_tag "home" do %>
 <body>
   <div class="ui card">
     <div class="content">
@@ -21,5 +22,6 @@
   </div>
   <div id="fix-account-button" class="ui button">Fix Broken Account Connection</div>
 </body>
+<% end %>
 
 <%= javascript_include_tag "plaid" %>

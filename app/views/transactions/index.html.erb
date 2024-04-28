@@ -1,5 +1,6 @@
 <%= stylesheet_link_tag "application", media: "all" %>
 
+<%= turbo_frame_tag 'transactions' do %>
 <body>
   <div class="ui padded grid">
     <%= render "shared/dimmer" %>
@@ -50,6 +51,7 @@
     </div>
   </div>
 </body>
+<% end %>
 
 <%= javascript_include_tag "plaid" %>
 <%= javascript_include_tag "transactions" %>

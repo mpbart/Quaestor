@@ -1,10 +1,37 @@
+
+showTransactionUpdateIcon = function(event) {
+  if (event.detail.success) {
+    $('#successIcon').show();
+  } else {
+    $('#failureIcon').show();
+  }
+} 
+
+showTransactionSplitIcon = function(event) {
+  if (data.detail[0]['success']) {
+    $('#successIconSplit').show();
+  } else {
+    $('#failureIconSplit').show();
+  }
+}
+
+makeTableRowsClickable = function() {
+  $('tr').click(function(obj) {
+      Turbo.visit($(this).data('url'), {action: 'advance'});
+  })
+}
+
+getUrl = function() {
+  return window.location.pathname.substr(1).split("/")[0] || "home";
+}
+
 $(function() {
   $('#successIcon').hide();
   $('#failureIcon').hide();
   $('#successIconSplit').hide();
   $('#failureIconSplit').hide();
-  $('#edit-transaction-form').on('ajax:success', showTransactionUpdateIcon);
-  $('#split-transactions-form').on('ajax:success', showTransactionSplitIcon);
+  $('#edit-transaction-form').on('turbo:submit-end', showTransactionUpdateIcon);
+  $('#split-transactions-form').on('turbo:submit-end', showTransactionSplitIcon);
 
   // Set the values for dropdowns on the transactions SHOW page
   $('#plaid-category-id').dropdown('set selected',
@@ -19,9 +46,9 @@ $(function() {
       const newPage = currentPage - 1;
       const searchParams = getSearchParams();
       if (searchParams) {
-        window.location = `/transactions?page=${newPage}&q=${searchParams}`;
+        Turbo.visit(`/transactions?page=${newPage}&q=${searchParams}`, {action: 'replace'});
       } else {
-        window.location = `/transactions?page=${newPage}`;
+        Turbo.visit(`/transactions?page=${newPage}`, {action: 'replace'});
       }
     }
   });
@@ -30,38 +57,21 @@ $(function() {
     const newPage = getTransactionPageNum() + 1;
     const searchParams = getSearchParams();
     if (searchParams) {
-      window.location = `/transactions?page=${newPage}&q=${searchParams}`;
+      Turbo.visit(`/transactions?page=${newPage}&q=${searchParams}`, {action: 'replace'});
     } else {
-      window.location = `/transactions?page=${newPage}`;
+      Turbo.visit(`/transactions?page=${newPage}`, {action: 'replace'});
     }
   });
 
   // Initialize ability to edit transactions by clicking a row
   // in the table
   if (getUrl() == "transactions") {
-    $('tr').click(function(obj) {
-        window.location = $(this).data('url');
-    })
+    makeTableRowsClickable();
   }
 
 });
 
-showTransactionUpdateIcon = function(data, status, xhr) {
-  if (data.detail[0]['success']) {
-    $('#successIcon').show();
-  } else {
-    $('#failureIcon').show();
-  }
-} 
-
-showTransactionSplitIcon = function(data, status, xhr) {
-  if (data.detail[0]['success']) {
-    $('#successIconSplit').show();
-  } else {
-    $('#failureIconSplit').show();
-  }
-}
-
-getUrl = function() {
-  return window.location.pathname.substr(1).split("/")[0] || "home";
-}
+// Ensure table rows are still clickable after loading a turbo frame
+$('turbo-frame#transactions').on('turbo:frame-load', function(event) {
+  makeTableRowsClickable();
+});

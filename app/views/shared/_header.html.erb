@@ -1,16 +1,8 @@
-<script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
-<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
-
-
 <div class="ui tabular menu">
   <a class="active item" id="home-tab" href="/">
     Home
   </a>
-  <a class="item" id="transactions-tab" href="/transactions">
-    Transactions
-  </a>
+  <%= link_to "Transactions", transactions_path, data: {turbo_frame: "transactions", turbo_action: "advance"}, class: "item", id: "transactions-tab" %>
   <a class="item" id="analytics-tab" href="/analytics">
     Analytics
   </a>
@@ -18,14 +10,16 @@
     Budgets
   </a>
   <div class="right item">
-    <div class="ui form" id="search-transactions">
-      <div class="ui icon input">
-        <%= form_with url: '/transactions', method: :get do |form| %>
-          <%= text_field_tag :q, params[:q], placeholder: "Search Transactions", class: "ui search"%>
-        <% end %>
-        <i class="search icon"></i>
+    <%= turbo_frame_tag "search", target: "transactions" do %>
+      <div class="ui form" id="search-transactions">
+        <div class="ui icon input">
+          <%= form_with url: '/transactions', method: :get do |form| %>
+            <%= text_field_tag :q, params[:q], placeholder: "Search Transactions", class: "ui search"%>
+          <% end %>
+          <i class="search icon"></i>
+        </div>
       </div>
-    </div>
+    <% end %>
     <div id="account-options" class="ui dropdown link">
       <span class="text">Account Options</span>
       <i class="dropdown icon"></i>
@@ -37,4 +31,4 @@
   </div>
 </div>
 
-<%= javascript_include_tag "application" %>
+<%= javascript_include_tag "base" %>
