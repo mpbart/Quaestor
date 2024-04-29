@@ -59,6 +59,7 @@ $(function() {
   */
   getHeaderTabs().tab();  
   $('.ui.dropdown').dropdown();
+  $('#filter-form').popup({on: "click"});
   $('.ui.accordion').accordion();
 
  /*

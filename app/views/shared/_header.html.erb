@@ -11,12 +11,33 @@
   </a>
   <div class="right item">
     <%= turbo_frame_tag "search", target: "transactions" do %>
-      <div class="ui form" id="search-transactions">
-        <div class="ui icon input">
-          <%= form_with url: '/transactions', method: :get do |form| %>
-            <%= text_field_tag :q, params[:q], placeholder: "Search Transactions", class: "ui search"%>
-          <% end %>
-          <i class="search icon"></i>
+      <div id="filter-form" class="ui button">
+        <span class="text">Filter Transactions</span>
+        <i class="filter icon"></i>
+      </div>
+      <div class="ui flowing popup">
+        <div class="menu">
+          <div class="item">
+            <%= form_with url: '/transactions', method: :get do |form| %>
+              <div class="field">
+                <%= form.label :Search %>
+                <div class="ui input">
+                  <%= form.text_field :q, placeholder: "Search Transactions" %>
+                </div>
+              </div>
+              <div class="field">
+                <%= form.label "Filter by Account" %>
+                <%= form.select :account_id, Account.all.map{ |a| [a.name, a.id] }, {include_blank: true}, {class: 'ui dropdown'} %>
+              </div>
+              <div class="field">
+                <%= form.label "Filter by Category" %>
+                <%= form.select :plaid_category_id, PlaidCategory.all.map{ |a| [humanized_category(a), a.id] }, {include_blank: true}, {class: 'ui dropdown'} %>
+              </div>
+              <button class="ui button" type="submit">
+                Save
+              </button>
+            <% end %>
+          </div>
         </div>
       </div>
     <% end %>
