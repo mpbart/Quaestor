@@ -67,6 +67,11 @@ $(function() {
       $('#transaction-labels').dropdown('set selected', el.text)
   });
 
+  // Prevent the row click event from firing when clicking a label
+  $('a.ui.label').click(function(e) {
+    e.stopPropagation();
+  });
+
   // Initialize ability to edit transactions by clicking a row
   // in the table
   if (getUrl() == "transactions") {
