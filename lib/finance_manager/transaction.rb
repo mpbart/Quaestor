@@ -9,19 +9,29 @@ module FinanceManager
     class UnknownAccountError < StandardError; end
     class UnknownTransactionError < StandardError; end
     class BadParametersError < StandardError; end
+    FILTER_PARAMS = ["q", "account_id", "plaid_category_id", "label_id"].freeze
+    PARAM_TO_CLAUSE = {
+      "q" => ->(val)                 { Arel::Table.new(:transactions)[:description].matches("%#{val}%") },
+      "account_id"  =>  ->(val)      { Arel::Table.new(:accounts)[:id].eq(val) },
+      "plaid_category_id" => ->(val) { Arel::Table.new(:plaid_categories)[:id].eq(val) },
+      "label_id" =>  ->(val)         { Arel::Table.new(:labels)[:id].eq(val) }
+    }
 
     def self.search(current_user, params)
-      if params[:q]
-        current_user.paginated_transactions(
-          where_clause: "description ILIKE '%#{params[:q]}%'",
-          page_num:     params[:page]&.to_i || 1
-        ).includes(:account, :plaid_category)
-      elsif params[:label]
-        ::Transaction.search_by_label_name(
-          current_user,
-          params[:label],
-          params[:page]&.to_i || 1
-        )
+
+      if params.values_at(*FILTER_PARAMS).any?(&:present?)
+        where_clause = params.to_h.slice(*FILTER_PARAMS).map do |key, value|
+          PARAM_TO_CLAUSE[key].call(value) if value.present?
+        end.compact.reduce(:and)
+
+        query = current_user.transactions
+          .joins(:account)
+          .joins(:plaid_category)
+          .left_joins(:labels)
+          .by_date
+          .paginate(page: params[:page]&.to_i || 1, per_page: 50)
+          .includes(:account, :plaid_category, :labels)
+          .where(where_clause)
       else
         current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
                     .includes(:account, :plaid_category)
