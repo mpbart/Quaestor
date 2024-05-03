@@ -8,6 +8,47 @@
     </div>
     <div class="fourteen wide column">
       <h2 class="ui center aligned header">Transactions</h2>
+      <div class="ten wide row">
+      <div class="ui accordion">
+        <div class="active title">
+          <i class="dropdown icon"></i>
+          Filter Transactions
+        </div>
+        <div class="content">
+        <%= turbo_frame_tag "search", target: "transactions" do %>
+          <%= form_with url: '/transactions', method: :get, class: 'ui form' do |form| %>
+            <div class="four fields">
+              <div class="field">
+                <%= form.label :Search %>
+                <div class="ui input">
+                  <%= form.text_field :q, placeholder: "Search Transactions" %>
+                </div>
+              </div>
+              <div class="field four wide">
+                <%= form.label "Filter by Account" %>
+                <%= form.select :account_id, Account.all.map{ |a| [a.name, a.id] }, {include_blank: true}, {class: 'ui dropdown'} %>
+              </div>
+              <div class="field">
+                <%= form.label "Filter by Category" %>
+                <%= form.select :plaid_category_id, PlaidCategory.all.map{ |a| [humanized_category(a), a.id] }, {include_blank: true}, {class: 'ui dropdown'} %>
+              </div>
+              <div class="field">
+                <%= form.label "Filter by Label" %>
+                <div class="two fields">
+                  <div class="field">
+                    <%= form.select :label_id, Label.all.map{ |l| [l.name, l.id] }, {include_blank: true}, {class: 'ui dropdown'} %>
+                  </div>
+                  <div class="field">
+                    <%= form.submit "Filter", class: 'ui fluid primary bottom button' %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+        </div>
+      </div>
+      </div>
       <%= render partial: "shared/account_refresh_error" %>
         <div id="recent_transactions">
           <table class="ui selectable padded basic table">

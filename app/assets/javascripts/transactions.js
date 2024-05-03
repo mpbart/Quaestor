@@ -81,4 +81,5 @@ $('turbo-frame#transactions').on('turbo:frame-load', function(event) {
   makeTableRowsClickable();
   initializePreviousPageButton();
   initializeNextPageButton();
+  $('.ui.accordion').accordion();
 });
