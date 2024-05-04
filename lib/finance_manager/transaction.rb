@@ -9,14 +9,16 @@ module FinanceManager
     class UnknownAccountError < StandardError; end
     class UnknownTransactionError < StandardError; end
     class BadParametersError < StandardError; end
-    FILTER_PARAMS = %w[q account_id plaid_category_id label_id].freeze
+    FILTER_PARAMS = %w[q account_id plaid_category_id label_id start_date end_date].freeze
     PARAM_TO_CLAUSE = {
       'q'                 => lambda { |val|
                                Arel::Table.new(:transactions)[:description].matches("%#{val}%")
                              },
       'account_id'        => ->(val) { Arel::Table.new(:accounts)[:id].eq(val) },
       'plaid_category_id' => ->(val) { Arel::Table.new(:plaid_categories)[:id].eq(val) },
-      'label_id'          => ->(val) { Arel::Table.new(:labels)[:id].eq(val) }
+      'label_id'          => ->(val) { Arel::Table.new(:labels)[:id].eq(val) },
+      'start_date'        => ->(val) { Arel::Table.new(:transactions)[:date].gteq(val) },
+      'end_date'          => ->(val) { Arel::Table.new(:transactions)[:date].lteq(val) }
     }.freeze
 
     def self.search(current_user, params)
