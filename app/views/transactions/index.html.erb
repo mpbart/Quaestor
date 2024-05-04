@@ -26,11 +26,11 @@
               </div>
               <div class="field four wide">
                 <%= form.label "Filter by Account" %>
-                <%= form.select :account_id, Account.all.map{ |a| [a.name, a.id] }, {include_blank: true}, {class: 'ui dropdown'} %>
+                <%= form.select :account_id, Account.all.map{ |a| [a.name, a.id] }, {include_blank: true}, {class: 'ui search dropdown'} %>
               </div>
               <div class="field">
                 <%= form.label "Filter by Category" %>
-                <%= form.select :plaid_category_id, PlaidCategory.all.map{ |a| [humanized_category(a), a.id] }, {include_blank: true}, {class: 'ui dropdown'} %>
+                <%= form.select :plaid_category_id, PlaidCategory.all.map{ |a| [humanized_category(a), a.id] }, {include_blank: true}, {class: 'ui search dropdown'} %>
               </div>
               <div class="field">
                 <%= form.label "Filter by Label" %>
