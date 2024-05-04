@@ -38,6 +38,14 @@ services:
     volumes:
       - redis_data:/data
 
+  sidekiq:
+    build: .
+    command: sidekiq
+    depends_on:
+      - db
+      - redis
+    environment: *web_environment
+
 volumes:
   postgres_14_data:
   redis_data:
