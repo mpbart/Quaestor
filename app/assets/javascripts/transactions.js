@@ -79,6 +79,9 @@ $(function() {
   }
   initializePreviousPageButton();
   initializeNextPageButton();
+  $('turbo-frame#search').on('turbo:submit-end', function(event) {
+    Turbo.visit(event.detail.fetchResponse.response.url, {action: 'advance'})
+  });
 });
 
 // Ensure table rows are still clickable after loading a turbo frame
@@ -87,4 +90,7 @@ $('turbo-frame#transactions').on('turbo:frame-load', function(event) {
   initializePreviousPageButton();
   initializeNextPageButton();
   $('.ui.accordion').accordion();
+  $('turbo-frame#search').on('turbo:submit-end', function(event) {
+    Turbo.visit(event.detail.fetchResponse.response.url, {action: 'advance'})
+  });
 });
