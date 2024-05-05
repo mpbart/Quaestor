@@ -67,6 +67,11 @@ $(function() {
       $('#transaction-labels').dropdown('set selected', el.text)
   });
 
+  // Prevent the row click event from firing when clicking a label
+  $('a.ui.label').click(function(e) {
+    e.stopPropagation();
+  });
+
   // Initialize ability to edit transactions by clicking a row
   // in the table
   if (getUrl() == "transactions") {
@@ -74,6 +79,9 @@ $(function() {
   }
   initializePreviousPageButton();
   initializeNextPageButton();
+  $('turbo-frame#search').on('turbo:submit-end', function(event) {
+    Turbo.visit(event.detail.fetchResponse.response.url, {action: 'advance'})
+  });
 });
 
 // Ensure table rows are still clickable after loading a turbo frame
@@ -81,4 +89,8 @@ $('turbo-frame#transactions').on('turbo:frame-load', function(event) {
   makeTableRowsClickable();
   initializePreviousPageButton();
   initializeNextPageButton();
+  $('.ui.accordion').accordion();
+  $('turbo-frame#search').on('turbo:submit-end', function(event) {
+    Turbo.visit(event.detail.fetchResponse.response.url, {action: 'advance'})
+  });
 });

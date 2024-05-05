@@ -59,6 +59,7 @@ $(function() {
   */
   getHeaderTabs().tab();  
   $('.ui.dropdown').dropdown();
+  $('#filter-form').popup({on: "click"});
   $('.ui.accordion').accordion();
 
  /*
@@ -101,7 +102,4 @@ $(function() {
     activateTab($(`#${getUrl()}-tab`), $('.active'));
   }
 
-  $('turbo-frame#search').on('turbo:submit-end', function(event) {
-    Turbo.visit(event.detail.fetchResponse.response.url, {action: 'advance'})
-  });
 });

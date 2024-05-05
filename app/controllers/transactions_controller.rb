@@ -8,7 +8,8 @@ class TransactionsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @transactions = FinanceManager::Transaction.search(current_user, params)
+    permitted = params.permit(*FinanceManager::Transaction::FILTER_PARAMS + [:page])
+    @transactions = FinanceManager::Transaction.search(current_user, permitted)
   end
 
   def show

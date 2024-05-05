@@ -10,7 +10,7 @@ optional: true
   belongs_to :plaid_category
   has_and_belongs_to_many :labels
 
-  scope :by_date, -> { order('date DESC').order('description DESC') }
+  scope :by_date, -> { order('transactions.date DESC').order('transactions.description DESC') }
 
   def grouped_transactions
     transaction_group&.transactions&.where&.not(id: id) || []
