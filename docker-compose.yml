@@ -20,7 +20,7 @@ services:
         published: 2424
         protocol: tcp
         mode: host
-    environment:
+    environment: &web_environment
       - DEVISE_SECRET_KEY=
       - DB_HOST=db
       - DB_USERNAME=postgres
