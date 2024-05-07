@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'query_builder'
 require 'finance_manager/interface'
 
 class TransactionsController < ApplicationController
@@ -8,8 +9,8 @@ class TransactionsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    permitted = params.permit(*FinanceManager::Transaction::FILTER_PARAMS + [:page])
-    @transactions = FinanceManager::Transaction.search(current_user, permitted)
+    permitted = params.permit(*QueryBuilder::FILTER_PARAMS + [:page])
+    @transactions = QueryBuilder.filter(current_user, permitted)
   end
 
   def show

@@ -9,37 +9,6 @@ module FinanceManager
     class UnknownAccountError < StandardError; end
     class UnknownTransactionError < StandardError; end
     class BadParametersError < StandardError; end
-    FILTER_PARAMS = %w[q account_id plaid_category_id label_id start_date end_date].freeze
-    PARAM_TO_CLAUSE = {
-      'q'                 => lambda { |val|
-                               Arel::Table.new(:transactions)[:description].matches("%#{val}%")
-                             },
-      'account_id'        => ->(val) { Arel::Table.new(:accounts)[:id].eq(val) },
-      'plaid_category_id' => ->(val) { Arel::Table.new(:plaid_categories)[:id].eq(val) },
-      'label_id'          => ->(val) { Arel::Table.new(:labels)[:id].eq(val) },
-      'start_date'        => ->(val) { Arel::Table.new(:transactions)[:date].gteq(val) },
-      'end_date'          => ->(val) { Arel::Table.new(:transactions)[:date].lteq(val) }
-    }.freeze
-
-    def self.search(current_user, params)
-      if params.values_at(*FILTER_PARAMS).any?(&:present?) || params['page']
-        where_clause = params.to_h.slice(*FILTER_PARAMS).map do |key, value|
-          PARAM_TO_CLAUSE[key].call(value) if value.present?
-        end.compact.reduce(:and)
-
-        current_user.transactions
-                    .joins(:account)
-                    .joins(:plaid_category)
-                    .left_joins(:labels)
-                    .by_date
-                    .paginate(page: params['page']&.to_i || 1, per_page: 50)
-                    .includes(:account, :plaid_category, :labels)
-                    .where(where_clause)
-      else
-        current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
-                    .includes(:account, :plaid_category)
-      end
-    end
 
     def self.create(transaction)
       account = ::Account.find_by(plaid_identifier: transaction.account_id)
