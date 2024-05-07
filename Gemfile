@@ -37,6 +37,8 @@ gem 'acts_as_paranoid', '~> 0.9'
 
 gem 'redis', '~> 5'
 
+gem 'sidekiq', '~> 7.2'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'database_cleaner-active_record'

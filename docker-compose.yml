@@ -20,7 +20,7 @@ services:
         published: 2424
         protocol: tcp
         mode: host
-    environment:
+    environment: &web_environment
       - DEVISE_SECRET_KEY=
       - DB_HOST=db
       - DB_USERNAME=postgres
@@ -37,6 +37,14 @@ services:
     image: redis:7.2
     volumes:
       - redis_data:/data
+
+  sidekiq:
+    build: .
+    command: sidekiq
+    depends_on:
+      - db
+      - redis
+    environment: *web_environment
 
 volumes:
   postgres_14_data:

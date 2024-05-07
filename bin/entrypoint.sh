@@ -6,6 +6,10 @@ case "$1" in
     exec bundle exec puma -C config/puma.rb
   ;;
 
+  sidekiq)
+    exec bundle exec sidekiq -c 3
+  ;;
+
   backup_db)
     ./bin/backup_db.sh "$2"
   ;;
