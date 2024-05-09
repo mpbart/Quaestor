@@ -82,9 +82,9 @@
                   <td><%= transaction.account&.name %></td>
                   <td><%= humanized_category(transaction.plaid_category) %></td>
                   <td>
-                    <% transaction.labels.pluck(:name).sort.each_with_index do |name, idx| %>
+                    <% transaction.labels.pluck(:id, :name).sort.each_with_index do |(id, name), idx| %>
                       <% color = label_idx_to_color(idx) %>
-                      <a href="/transactions?label=<%= name %>" class="ui <%= color %> label"><%= name %></a>
+                      <a href="/transactions?label_id=<%= id %>" class="ui <%= color %> label"><%= name %></a>
                     <% end %>
                   </td>
                   <td class="<%= amount_klass %>"><%= number_to_currency(transaction.amount * -1.0) %></td>

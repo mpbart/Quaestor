@@ -89,6 +89,10 @@ $('turbo-frame#transactions').on('turbo:frame-load', function(event) {
   makeTableRowsClickable();
   initializePreviousPageButton();
   initializeNextPageButton();
+  // Prevent the row click event from firing when clicking a label
+  $('a.ui.label').click(function(e) {
+    e.stopPropagation();
+  });
   $('.ui.accordion').accordion();
   $('turbo-frame#search').on('turbo:submit-end', function(event) {
     Turbo.visit(event.detail.fetchResponse.response.url, {action: 'advance'})
