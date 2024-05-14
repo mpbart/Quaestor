@@ -11,6 +11,7 @@ require 'importmap-rails'
 require 'turbo-rails'
 require 'sprockets/railtie'
 require 'acts_as_paranoid'
+require 'sidekiq'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.

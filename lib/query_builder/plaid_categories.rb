@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QueryBuilder
   module PlaidCategories
     def plaid_categories_table

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'query_builder/transactions'
 require 'query_builder/accounts'
 require 'query_builder/plaid_categories'

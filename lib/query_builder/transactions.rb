@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QueryBuilder
   module Transactions
     def transactions_table

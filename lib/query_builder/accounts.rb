@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QueryBuilder
   module Accounts
     def accounts_table

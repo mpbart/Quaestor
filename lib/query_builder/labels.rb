@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QueryBuilder
   module Labels
     def labels_table
