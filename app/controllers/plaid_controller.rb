@@ -30,6 +30,7 @@ class PlaidController < ActionController::Base
   def refresh_accounts
     failed_accounts = finance_manager.refresh_accounts
     failed_accounts += finance_manager.refresh_transactions
+    DatabaseBackupWorker.perform_async
 
     render json: { status: 'complete', failed_accounts: failed_accounts.uniq }
   end
