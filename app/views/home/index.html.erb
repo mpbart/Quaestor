@@ -69,11 +69,22 @@
                 <td><%= account.account_sub_type %></td>
                 <td><%= account.mask %></td>
                 <td><%= account.institution_name %></td>
-                <td><%= account.balances.last&.amount || 0 %></td>
+                <td class="right aligned"><%= number_to_currency(account.balances.last&.amount) || 0 %></td>
               </tr>
             <% end %>
           </tbody>
         </table>
+        <div class="ui divider"></div>
+        <div class="ui grid">
+          <div class="ui three column row">
+            <div class="left floated column">
+              <h4>Estimated Net Worth</h4>
+            </div>
+            <div class="right aligned right floated column">
+              <h4><%= number_to_currency(@accounts.sum{ |a| a.balances.last&.amount || 0 }) %></h4>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="five wide column">
