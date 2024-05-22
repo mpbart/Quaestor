@@ -7,5 +7,6 @@ class HomeController < ApplicationController
     @accounts = current_user.accounts
     @transactions = current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
                                 .includes(:account, :plaid_category)
+    @net_worth = Account.net_worth(current_user.id)
   end
 end
