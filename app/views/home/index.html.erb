@@ -81,7 +81,7 @@
               <h4>Estimated Net Worth</h4>
             </div>
             <div class="right aligned right floated column">
-              <h4><%= number_to_currency(@accounts.sum{ |a| a.balances.last&.amount || 0 }) %></h4>
+              <h4><%= number_to_currency(@net_worth) %></h4>
             </div>
           </div>
         </div>
