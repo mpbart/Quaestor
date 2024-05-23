@@ -54,26 +54,56 @@
       <h3 class="ui center aligned header">Accounts Overview</h3>
       <%= render partial: "shared/account_refresh_error" %>
       <div id="accounts">
-        <table class="ui selectable very basic table">
-          <thead>
-            <th>Name</th>
-            <th>Account Type</th>
-            <th>Number</th>
-            <th>Institution</th>
-            <th>Balance</th>
-          </thead>
-          <tbody>
-            <% @accounts.each do |account| %>
-              <tr data-url="<%= account_path(account) %>">
-                <td><%= account.name %></td>
-                <td><%= account.account_sub_type %></td>
-                <td><%= account.mask %></td>
-                <td><%= account.institution_name %></td>
-                <td class="right aligned"><%= number_to_currency(account.balances.last&.amount) || 0 %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+        <div class="ui fluid accordion">
+          <div class="title split-title">
+            <span>
+              <i class="dropdown icon"></i>
+              First
+            </span>
+            <span>
+              $1,000
+            </span>
+          </div>
+          <div class="content">
+            <div class="ui list padded">
+              <div class="item">
+                <div class="content">
+                  <div class="left floated">
+                  <%= inline_svg('angle_icon.svg') %>
+                  <%= inline_svg('dash-icon.svg') %>
+                  Account Name</div>
+                  <div class="right floated">$123.22</div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="content">
+                  <div class="left floated">
+                  <%= inline_svg('angle_icon.svg') %>
+                  <%= inline_svg('dash-icon.svg') %>
+                  Other Account Name
+                  </div>
+                  <div class="right floated">$23.22</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ui fluid accordion">
+          <div class="title">
+            <i class="dropdown icon"></i>
+            Second
+          </div>
+          <div class="content">
+            <div class="ui list padded">
+              <div class="item">
+                <div class="content">
+                  <div class="left floated">Other Account</div>
+                  <div class="right floated">9,990.12</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="ui divider"></div>
         <div class="ui grid">
           <div class="ui three column row">
