@@ -54,56 +54,37 @@
       <h3 class="ui center aligned header">Accounts Overview</h3>
       <%= render partial: "shared/account_refresh_error" %>
       <div id="accounts">
-        <div class="ui fluid accordion">
-          <div class="title split-title">
-            <span>
-              <i class="dropdown icon"></i>
-              First
-            </span>
-            <span>
-              $1,000
-            </span>
-          </div>
-          <div class="content">
-            <div class="ui list padded">
-              <div class="item">
-                <div class="content">
-                  <div class="left floated">
-                  <%= inline_svg('angle_icon.svg') %>
-                  <%= inline_svg('dash-icon.svg') %>
-                  Account Name</div>
-                  <div class="right floated">$123.22</div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="content">
-                  <div class="left floated">
-                  <%= inline_svg('angle_icon.svg') %>
-                  <%= inline_svg('dash-icon.svg') %>
-                  Other Account Name
+        <% @accounts.group_by{ |a| a.account_type}.each do |type, accounts| %>
+          <div class="ui fluid accordion">
+            <div class="title split-title">
+              <span>
+                <i class="dropdown icon"></i>
+                <strong><%= type %><%= " (#{accounts.count})"%></strong>
+              </span>
+              <span>
+                <strong><%= accounts.sum{ |a| a.balances.last&.amount || 0 } %></strong>
+              </span>
+            </div>
+            <div class="content">
+              <div class="ui list padded">
+                <% accounts.each do |account| %>
+                  <div class="item">
+                    <div class="content">
+                      <div class="left floated">
+                        <%= inline_svg('angle_icon.svg') %>
+                        <%= inline_svg('dash-icon.svg') %>
+                        <%= account.name %>
+                      </div>
+                      <div class="right floated">
+                        <%= number_to_currency(account.balances.last&.amount) %>
+                      </div>
+                    </div>
                   </div>
-                  <div class="right floated">$23.22</div>
-                </div>
+                <% end %>
               </div>
             </div>
           </div>
-        </div>
-        <div class="ui fluid accordion">
-          <div class="title">
-            <i class="dropdown icon"></i>
-            Second
-          </div>
-          <div class="content">
-            <div class="ui list padded">
-              <div class="item">
-                <div class="content">
-                  <div class="left floated">Other Account</div>
-                  <div class="right floated">9,990.12</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <% end %>
         <div class="ui divider"></div>
         <div class="ui grid">
           <div class="ui three column row">
