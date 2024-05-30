@@ -65,5 +65,24 @@
   border-radius: .50rem;
 }
 
-#filter-button {
+.ui.list.padded .item:last-child {
+  margin-bottom: 10px;
+}
+
+.angle-icon {
+  width: 20px;
+  height: 20px;
+  shape-rendering: crispEdges;
+}
+
+.dash-icon {
+  width: 10px;
+  height: 20px;
+  shape-rendering: crispEdges;
+}
+
+.title.split-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

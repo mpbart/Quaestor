@@ -45,6 +45,8 @@ services:
       - db
       - redis
     environment: *web_environment
+    volumes:
+      - .:/code:cached
 
 volumes:
   postgres_14_data:
