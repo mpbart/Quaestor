@@ -39,6 +39,8 @@ gem 'redis', '~> 5'
 
 gem 'sidekiq', '~> 7.2'
 
+gem 'haml', '~> 6.3'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'database_cleaner-active_record'

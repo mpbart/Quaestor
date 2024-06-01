@@ -95,3 +95,8 @@
   display: flex;
   align-items: center;
 }
+
+h4.ui.center.aligned {
+  margin-top: 1rem;
+  margin-bottom: 0.85rem;
+}

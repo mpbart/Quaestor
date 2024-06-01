@@ -19,7 +19,7 @@
                     <strong><%= type %><%= " (#{accounts.count})"%></strong>
                   </span>
                   <span>
-                    <% balance_klass = Account::DEBT_ACCOUNT_TYPES.include?(type) ? 'red-text' : 'green-text' %>
+                    <% balance_klass = Account::DEBT_ACCOUNT_TYPES.include?(type) ? 'black-text' : 'green-text' %>
                     <strong class='<%= balance_klass %>'><%= number_to_currency(Account.current_balance(current_user.id, accounts.pluck(:id)).round(2)) %></strong>
                   </span>
                 </div>
@@ -57,56 +57,154 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="five wide column">
-      <div class="left floated column">
-      <div class="ui accordion button" id="add-account-button">
-        <div class="active title">
-          <strong>Add New Account</strong>
-        </div>
+      <div class="ui fluid card">
         <div class="content">
-          <div id="create-account-form" class="ui form">
-            <%= form_for :account, url: accounts_path do |form| %>
-              <div class="field">
-                <%= form.label :name %>
-                <%= form.text_field :name %>
-              </div>
-              <div class="field">
-                <%= form.label :institution_name %>
-                <%= form.text_field :institution_name %>
-              </div>
-              <div class="field">
-                <%= form.label :account_number_last_4 %>
-                <%= form.text_field :mask %>
-              </div>
-              <div class="field">
-                <%= form.label :account_type %>
-                <%= form.select :type, Account::ACCOUNT_TYPES.keys, {include_blank: true}, {class: 'ui dropdown'} %>
-              </div>
-              <div class="field">
-                <%= form.label :account_sub_type %>
-                <%= form.select :sub_type, [], {}, {class: 'ui dropdown'} %>
-              </div>
-              <div class="field">
-                <%= form.label :current_balance %>
-                <%= form.text_field :balance %>
-              </div>
+          <h3 class="ui center aligned header">Monthly Summary</h3>
+          <div class="meta">
+            May 1 - May 31
+          </div>
+          <div class="ui divider"></div>
+          <h4 class="ui center aligned header">Income</h4>
+          <div class="ui fluid accordion">
+            <div class="title split-title">
               <span>
-                <button class="ui button" type="submit">
-                  Save Account
-                </button>
-                <i id="successIconAccount" class="green check icon"></i>
-                <i id="failureIconAccount" class="red times icon"></i>
+                <i class="dropdown icon"></i>
+                <strong>Total Income</strong>
               </span>
-            <% end %>
+              <span>
+                <strong class='green-text'><%= number_to_currency(@income_by_source.sum{ |i| i[1] }.round(2)) %></strong>
+              </span>
+            </div>
+            <div class="content">
+              <div class="ui list padded">
+                <% @income_by_source.each do |income_type, amount| %>
+                  <div class="item">
+                    <div class="content">
+                      <div class="left floated vertical-aligned">
+                        <%= inline_svg('angle_icon.svg') %>
+                        <%= inline_svg('dash-icon.svg') %>
+                        <%= income_type %>
+                      </div>
+                      <div class="right floated vertical-aligned">
+                        <b class='green-text'><%= number_to_currency(amount.round(2)) %></b>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <div class="ui divider"></div>
+          <h4 class="ui center aligned header">Expenses</h4>
+          <div class="ui fluid accordion">
+            <div class="title split-title">
+              <span>
+                <i class="dropdown icon"></i>
+                <strong>Total Expenses</strong>
+              </span>
+              <span>
+                <strong> <%= number_to_currency(@expenses_by_source.sum{ |i| i[1] }.round(2)) %></strong>
+              </span>
+            </div>
+            <div class="content">
+              <div class="ui list padded">
+                <% @expenses_by_source.each do |expense_type, amount| %>
+                  <div class="item">
+                    <div class="content">
+                      <div class="left floated vertical-aligned">
+                        <%= inline_svg('angle_icon.svg') %>
+                        <%= inline_svg('dash-icon.svg') %>
+                        <%= expense_type %>
+                      </div>
+                      <div class="right floated vertical-aligned">
+                        <b><%= number_to_currency(amount.round(2)) %></b>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <div class="ui divider"></div>
+          <div class="ui list padded">
+            <div class="item">
+              <div class="content">
+                <div class="left floated vertical-aligned">
+                  <strong>Net Income</strong>
+                </div>
+                <div class="right floated vertical-aligned">
+                  <% net_income = @income_by_source.sum(&:second) - @expenses_by_source.sum(&:second) %>
+                  <% klass = net_income > 0 ? 'green-text' : 'red-text' %>
+                  <strong class='<%= klass %>'><%= number_to_currency(net_income) %></strong>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ui divider"></div>
+          <div class="ui list padded">
+            <div class="item">
+              <div class="content">
+                <div class="left floated vertical-aligned">
+                  <strong>Savings Rate</strong>
+                </div>
+                <div class="right floated vertical-aligned">
+                  <strong class='green-text'><%= ((net_income / @income_by_source.sum(&:second)) * 100.0).round(2) %>%</strong>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      </div>
+    </div>
+    <div class="five wide column">
     </div>
     <div class="five wide column">
       <div class="ui grid">
         <div class="two column row">
+          <div class="left floated column">
+            <div class="ui accordion button" id="add-account-button">
+              <div class="active title">
+                <strong>Add New Account</strong>
+              </div>
+              <div class="content">
+                <div id="create-account-form" class="ui form">
+                  <%= form_for :account, url: accounts_path do |form| %>
+                    <div class="field">
+                      <%= form.label :name %>
+                      <%= form.text_field :name %>
+                    </div>
+                    <div class="field">
+                      <%= form.label :institution_name %>
+                      <%= form.text_field :institution_name %>
+                    </div>
+                    <div class="field">
+                      <%= form.label :account_number_last_4 %>
+                      <%= form.text_field :mask %>
+                    </div>
+                    <div class="field">
+                      <%= form.label :account_type %>
+                      <%= form.select :type, Account::ACCOUNT_TYPES.keys, {include_blank: true}, {class: 'ui dropdown'} %>
+                    </div>
+                    <div class="field">
+                      <%= form.label :account_sub_type %>
+                      <%= form.select :sub_type, [], {}, {class: 'ui dropdown'} %>
+                    </div>
+                    <div class="field">
+                      <%= form.label :current_balance %>
+                      <%= form.text_field :balance %>
+                    </div>
+                    <span>
+                      <button class="ui button" type="submit">
+                        Save Account
+                      </button>
+                      <i id="successIconAccount" class="green check icon"></i>
+                      <i id="failureIconAccount" class="red times icon"></i>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="right floated right aligned column">
             <div class="ui accordion button" id="add-account-button">
               <div class="active title">
