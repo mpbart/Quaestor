@@ -62,7 +62,8 @@
                 <strong><%= type %><%= " (#{accounts.count})"%></strong>
               </span>
               <span>
-                <strong><%= accounts.sum{ |a| a.balances.last&.amount || 0 } %></strong>
+                <% balance_klass = Account::DEBT_ACCOUNT_TYPES.include?(type) ? 'red-text' : 'green-text' %>
+                <strong class='<%= balance_klass %>'><%= number_to_currency(Account.current_balance(current_user.id, accounts.pluck(:id)).round(2)) %></strong>
               </span>
             </div>
             <div class="content">
@@ -76,7 +77,7 @@
                         <%= account.name %>
                       </div>
                       <div class="right floated">
-                        <%= number_to_currency(account.balances.last&.amount) %>
+                        <%= number_to_currency(account.balances.last&.amount.round(2)) %>
                       </div>
                     </div>
                   </div>

@@ -15,7 +15,11 @@
  */
 
 .green-text {
-  color: #1eae1e;
+  color: #1EAE1E;
+}
+
+.red-text {
+  color: #DB2828;
 }
 
 .pending-transaction-background {
