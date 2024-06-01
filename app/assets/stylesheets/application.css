@@ -80,7 +80,7 @@
 }
 
 .dash-icon {
-  width: 10px;
+  width: 15px;
   height: 20px;
   shape-rendering: crispEdges;
 }
@@ -88,5 +88,10 @@
 .title.split-title {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.vertical-aligned {
+  display: flex;
   align-items: center;
 }

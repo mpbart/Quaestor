@@ -2,8 +2,62 @@
 
 <%= turbo_frame_tag 'home' do %>
 <body>
-  <div class="ui divided padded grid">
+  <div class="ui padded grid">
     <%= render "shared/dimmer" %>
+    <div class="three wide column">
+      <%= render partial: "shared/account_refresh_error" %>
+      <div class="ui fluid card">
+        <div class="content">
+          <h3 class="ui center aligned header">Accounts Overview</h3>
+          <div class="ui divider"></div>
+          <div id="accounts">
+            <% @accounts.group_by{ |a| a.account_type}.each do |type, accounts| %>
+              <div class="ui fluid accordion">
+                <div class="title split-title">
+                  <span>
+                    <i class="dropdown icon"></i>
+                    <strong><%= type %><%= " (#{accounts.count})"%></strong>
+                  </span>
+                  <span>
+                    <% balance_klass = Account::DEBT_ACCOUNT_TYPES.include?(type) ? 'red-text' : 'green-text' %>
+                    <strong class='<%= balance_klass %>'><%= number_to_currency(Account.current_balance(current_user.id, accounts.pluck(:id)).round(2)) %></strong>
+                  </span>
+                </div>
+                <div class="content">
+                  <div class="ui list padded">
+                    <% accounts.each do |account| %>
+                      <div class="item">
+                        <div class="content">
+                          <div class="left floated vertical-aligned">
+                            <%= inline_svg('angle_icon.svg') %>
+                            <%= inline_svg('dash-icon.svg') %>
+                            <%= account.name %>
+                          </div>
+                          <div style="color: #767676;" class="right floated vertical-aligned">
+                            <b><%= number_to_currency(account.balances.last&.amount.round(2)) %></b>
+                          </div>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+            <div class="ui divider"></div>
+            <div class="ui grid">
+              <div class="ui three column row">
+                <div class="left floated column">
+                  <h4>Estimated Net Worth</h4>
+                </div>
+                <div class="right aligned right floated column">
+                  <h4><%= number_to_currency(@net_worth) %></h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="five wide column">
       <div class="left floated column">
       <div class="ui accordion button" id="add-account-button">
@@ -48,55 +102,6 @@
           </div>
         </div>
       </div>
-      </div>
-    </div>
-    <div class="six wide column">
-      <h3 class="ui center aligned header">Accounts Overview</h3>
-      <%= render partial: "shared/account_refresh_error" %>
-      <div id="accounts">
-        <% @accounts.group_by{ |a| a.account_type}.each do |type, accounts| %>
-          <div class="ui fluid accordion">
-            <div class="title split-title">
-              <span>
-                <i class="dropdown icon"></i>
-                <strong><%= type %><%= " (#{accounts.count})"%></strong>
-              </span>
-              <span>
-                <% balance_klass = Account::DEBT_ACCOUNT_TYPES.include?(type) ? 'red-text' : 'green-text' %>
-                <strong class='<%= balance_klass %>'><%= number_to_currency(Account.current_balance(current_user.id, accounts.pluck(:id)).round(2)) %></strong>
-              </span>
-            </div>
-            <div class="content">
-              <div class="ui list padded">
-                <% accounts.each do |account| %>
-                  <div class="item">
-                    <div class="content">
-                      <div class="left floated">
-                        <%= inline_svg('angle_icon.svg') %>
-                        <%= inline_svg('dash-icon.svg') %>
-                        <%= account.name %>
-                      </div>
-                      <div class="right floated">
-                        <%= number_to_currency(account.balances.last&.amount.round(2)) %>
-                      </div>
-                    </div>
-                  </div>
-                <% end %>
-              </div>
-            </div>
-          </div>
-        <% end %>
-        <div class="ui divider"></div>
-        <div class="ui grid">
-          <div class="ui three column row">
-            <div class="left floated column">
-              <h4>Estimated Net Worth</h4>
-            </div>
-            <div class="right aligned right floated column">
-              <h4><%= number_to_currency(@net_worth) %></h4>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
     <div class="five wide column">
