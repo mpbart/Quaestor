@@ -19,7 +19,7 @@ class Account < ActiveRecord::Base
                        loan mortgage overdraft line_of_credit student other],
     'other'      => []
   }.freeze
-  DEBT_ACCOUNT_TYPES = %w[credit loan]
+  DEBT_ACCOUNT_TYPES = %w[credit loan].freeze
 
   NET_WORTH_SQL = <<-SQL
     WITH debts AS (
@@ -54,7 +54,8 @@ class Account < ActiveRecord::Base
   end
 
   def self.current_balance(user_id, account_ids)
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [BALANCE_SQL, user_id, account_ids])
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
+                                            [BALANCE_SQL, user_id, account_ids])
     ActiveRecord::Base.connection.execute(sanitized_sql).first['balance']
   end
 end
