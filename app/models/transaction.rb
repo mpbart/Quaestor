@@ -11,6 +11,7 @@ optional: true
   has_and_belongs_to_many :labels
 
   scope :by_date, -> { order('transactions.date DESC').order('transactions.description DESC') }
+  scope :within_days, ->(days) { where('transactions.date >= ?', Date.current - days.days) }
 
   def grouped_transactions
     transaction_group&.transactions&.where&.not(id: id) || []

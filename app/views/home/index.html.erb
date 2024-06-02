@@ -61,7 +61,7 @@
         <div class="content">
           <h3 class="ui center aligned header">Monthly Summary</h3>
           <div class="meta">
-            May 1 - May 31
+            <%= "#{Date.current.strftime('%b %d')} - #{(Date.current - 30.days).strftime('%b %d')}" %>
           </div>
           <div class="ui divider"></div>
           <h4 class="ui center aligned header">Income</h4>
@@ -72,21 +72,21 @@
                 <strong>Total Income</strong>
               </span>
               <span>
-                <strong class='green-text'><%= number_to_currency(@income_by_source.sum{ |i| i[1] }.round(2)) %></strong>
+                <strong class='green-text'><%= number_to_currency(@income_by_source.sum{ |_k, v| v.sum(&:first) }.abs.round(2)) %></strong>
               </span>
             </div>
             <div class="content">
               <div class="ui list padded">
-                <% @income_by_source.each do |income_type, amount| %>
+                <% @income_by_source.each do |income_type, transactions| %>
                   <div class="item">
                     <div class="content">
                       <div class="left floated vertical-aligned">
                         <%= inline_svg('angle_icon.svg') %>
                         <%= inline_svg('dash-icon.svg') %>
-                        <%= income_type %>
+                        <%= income_type[transactions[0][1].length + 1..].humanize %>
                       </div>
                       <div class="right floated vertical-aligned">
-                        <b class='green-text'><%= number_to_currency(amount.round(2)) %></b>
+                        <b class='green-text'><%= number_to_currency(transactions.sum(&:first).abs.round(2)) %></b>
                       </div>
                     </div>
                   </div>
@@ -103,21 +103,21 @@
                 <strong>Total Expenses</strong>
               </span>
               <span>
-                <strong> <%= number_to_currency(@expenses_by_source.sum{ |i| i[1] }.round(2)) %></strong>
+                <strong> <%= number_to_currency(@expenses_by_source.sum{ |_k, v| v.sum(&:first) }.round(2)) %></strong>
               </span>
             </div>
             <div class="content">
               <div class="ui list padded">
-                <% @expenses_by_source.each do |expense_type, amount| %>
+                <% @expenses_by_source.each do |expense_type, transactions| %>
                   <div class="item">
                     <div class="content">
                       <div class="left floated vertical-aligned">
                         <%= inline_svg('angle_icon.svg') %>
                         <%= inline_svg('dash-icon.svg') %>
-                        <%= expense_type %>
+                        <%= expense_type[transactions[0][1].length + 1..].humanize %>
                       </div>
                       <div class="right floated vertical-aligned">
-                        <b><%= number_to_currency(amount.round(2)) %></b>
+                        <b><%= number_to_currency(transactions.sum(&:first).round(2)) %></b>
                       </div>
                     </div>
                   </div>
@@ -133,7 +133,7 @@
                   <strong>Net Income</strong>
                 </div>
                 <div class="right floated vertical-aligned">
-                  <% net_income = @income_by_source.sum(&:second) - @expenses_by_source.sum(&:second) %>
+                  <% net_income = @income_by_source.sum{ |_k, v| v.sum(&:first) }.abs - @expenses_by_source.sum{ |_k, v| v.sum(&:first) } %>
                   <% klass = net_income > 0 ? 'green-text' : 'red-text' %>
                   <strong class='<%= klass %>'><%= number_to_currency(net_income) %></strong>
                 </div>
@@ -148,7 +148,7 @@
                   <strong>Savings Rate</strong>
                 </div>
                 <div class="right floated vertical-aligned">
-                  <strong class='green-text'><%= ((net_income / @income_by_source.sum(&:second)) * 100.0).round(2) %>%</strong>
+                  <strong class='green-text'><%= ((net_income / @income_by_source.sum{ |_k, v| v.sum(&:first) }.abs) * 100.0).round(2) %>%</strong>
                 </div>
               </div>
             </div>
