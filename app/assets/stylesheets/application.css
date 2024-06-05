@@ -15,7 +15,11 @@
  */
 
 .green-text {
-  color: #1eae1e;
+  color: #1EAE1E;
+}
+
+.red-text {
+  color: #DB2828;
 }
 
 .pending-transaction-background {
@@ -76,7 +80,7 @@
 }
 
 .dash-icon {
-  width: 10px;
+  width: 15px;
   height: 20px;
   shape-rendering: crispEdges;
 }
@@ -85,4 +89,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.vertical-aligned {
+  display: flex;
+  align-items: center;
+}
+
+h4.ui.center.aligned {
+  margin-top: 1rem;
+  margin-bottom: 0.85rem;
 }

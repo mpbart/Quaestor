@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'finance_manager/transaction'
+
 class HomeController < ApplicationController
   before_action :authenticate_user!
 
@@ -8,5 +10,7 @@ class HomeController < ApplicationController
     @transactions = current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
                                 .includes(:account, :plaid_category)
     @net_worth = Account.net_worth(current_user.id)
+    @income_by_source = FinanceManager::Transaction.income_by_source(current_user)
+    @expenses_by_source = FinanceManager::Transaction.expenses_by_source(current_user)
   end
 end
