@@ -1,0 +1,140 @@
+= stylesheet_link_tag "application", media: "all"
+
+= turbo_frame_tag 'transactions' do
+  %body
+    %div.ui.divided.padded.grid
+      %div.one.wide.column
+      %div.fourteen.wide.column
+        %h3.ui.center.aligned.header
+          Transaction Details
+          %div
+            = form_for @transaction, html: { :class => 'ui form', :id => 'edit-transaction-form' } do |f|
+              = hidden_field_tag :authenticity_token, form_authenticity_token
+              %div.fields
+                %div.field
+                  %label
+                    Date:
+                  = f.text_field :date
+                %div .field.one.wide
+                  %label
+                    Amount:
+                  = f.text_field :amount
+                %div.field
+                  %label
+                    Description:
+                  = f.text_field :description
+                %div.field.four.wide
+                  %label
+                    Labels:
+                  %input{ type: "hidden", name: "transaction[label_ids][]", value: "" }
+                  %select#transaction-labels.ui.dropdown{ name: "transaction[label_ids][]", multiple: ""}
+                    %option{ value: "" }
+                      Select Tags
+                    - Label.all.each do |label|
+                      - if @label_ids.include?(label.id)
+                        %option{ value: label.id, data: {selected: "true"} }
+                          = label.name
+                      - else
+                        %option{ value: label.id }
+                          = label.name
+                %div.field.five.wide
+                  %label
+                    Category:
+                  %div.two.fields
+                    %div.field
+                      %select#plaid-category-id.ui.search.dropdown{ name: "transaction[plaid_category_id]" }
+                        - PlaidCategory.all.each do |category|
+                          - if @transaction.plaid_category_id == category.id
+                            %option{ value: category.id,  selected="true" }
+                              = humanized_category(category)
+                          - else
+                            %option{ value: category.id } 
+                              = humanized_category(category)
+                    %div.field.six.wide
+                      = f.submit :id => 'edit-transaction-button', :class => 'ui fluid basic primary bottom button'
+                %div.field
+                  %i#successIcon.green.check.icon
+                %div.field
+                  %i#failureIcon.red.times.icon
+        %div.ui.hidden.divider
+          %h3.ui.center.aligned.header
+            Existing Split Transactions
+        %div#grouped-transaction-div
+          - @transaction.grouped_transactions.each do |grouped_transaction|
+            = form_for grouped_transaction, html: { :class => 'ui form', :id => 'edit-transactions-form' } do |f|
+              = hidden_field_tag :authenticity_token, form_authenticity_token
+              %div.fields
+                %div.field
+                  %label
+                    Date:
+                  = f.text_field :date
+                %div.field.one.wide
+                  %label
+                    Amount:
+                  = f.text_field :amount
+                %div.field
+                  %label
+                    Description:
+                  = f.text_field :description
+                %div.field.four.wide
+                  %label
+                    Labels:
+                  %input{ type: "hidden", name: "transaction[label_ids][]", value: "" }
+                  %select#transaction-labels.ui.dropdown{ name: "transaction[label_ids][]", multiple: "" }
+                    %option{ value: "" }
+                      Select Tags
+                    - grouped_label_ids = grouped_transaction.labels.pluck(:id).to_set
+                    - Label.all.each do |label|
+                      - if grouped_label_ids.include?(label.id)
+                        %option{ value: label.id,  data: {selected: "true"} }
+                          = label.name
+                      - else
+                        %option{ value: label.id }
+                          = label.name
+                %div.field.five.wide
+                  %label
+                    Category:
+                  %div.two.fields
+                    %div.field
+                      %select#plaid-category-id.ui.search.dropdown{ name: "transaction[plaid_category_id]" }
+                        - PlaidCategory.all.each do |category| %>
+                          - if grouped_transaction.plaid_category_id == category.id
+                            %option{ value: category.id, selected: "true" }
+                              = humanized_category(category)
+                          - else
+                            %option{ value: category.id } 
+                              = humanized_category(category)
+                    %div.field.six.wide
+                      = f.submit :id => 'grouped-transaction-button', :class => 'ui fluid basic primary bottom button'
+
+        %h3.ui.center.aligned.header
+          Create New Split Transaction
+        %div#split-transaction-div
+          = form_for @split_transaction, html: { :class => 'ui form', :id => 'split-transactions-form'}, url: '/split_transactions' do |f|
+            = hidden_field_tag :authenticity_token, form_authenticity_token
+            = f.hidden_field(:parent_transaction_id, value: @transaction.id)
+            %div class="fields"
+              %div.field
+                %label
+                  Date:
+                = f.text_field :date
+              %div.field.one.wide
+                %label
+                  Amount:
+                = f.text_field :amount
+              %div.field.eight.wide
+                %label
+                  Description:
+                %div.two.fields
+                  %div.field
+                    = f.text_field :description
+                  %div.field.six.wide
+                    = f.submit :id => 'split-transaction-button', :class => 'ui fluid basic primary bottom button'
+                  %div.field
+                    %i#successIconSplit.green.check.icon
+                  %div.field
+                    %i#failureIconSplit.red.times.icon
+      %div.one.wide.column
+        = button_to "Hard Delete", transaction_hard_delete_path(@transaction)
+
+= javascript_include_tag "transactions"
