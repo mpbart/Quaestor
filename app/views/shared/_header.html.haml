@@ -1,0 +1,20 @@
+%div.ui.tabular.menu
+  %a#home-tab.active.item{ href: "/" }
+    Home
+  = link_to "Transactions", transactions_path, data: {turbo_frame: "transactions", turbo_action: "advance"}, class: "item", id: "transactions-tab"
+  %a#analytics-tab.item{ href: "/analytics" }
+    Analytics
+  %a#budgets-tab.item{ href: "/budgets" }
+    Budgets
+  %div.right.item
+    %div#account-options.ui.dropdown.link
+      %span.text
+        Account Options
+      %i.dropdown.icon
+      %div.menu
+        %div#link-button.item
+          Link New Account
+        %div#refresh-button.item
+          Refresh Accounts
+
+= javascript_include_tag "base"
