@@ -14,75 +14,75 @@
             %i.dropdown.icon
             Filter Transactions
           %div.content
-          = turbo_frame_tag "search", target: "transactions" do
-            = form_with url: '/transactions', method: :get, class: 'ui form' do |form|
-              %div.five.fields
-                %div.field
-                  = form.label :Search
-                  %div.ui.input
-                    = form.text_field :q, placeholder: "Search Transactions"
-                %div.field
-                  %div.two.fields
-                    %div.field
-                      = form.label :start_date
-                      = form.date_field :start_date, value: nil
-                    %div.field
-                      = form.label :end_date
-                      = form.date_field :end_date, value: nil
-                %div.field.three.wide
-                  = form.label "Filter by Account"
-                  = form.select :account_id, Account.all.map{ |a| [a.name, a.id] }, {include_blank: true}, {class: 'ui search dropdown'}
-                %div.field
-                  = form.label "Filter by Category"
-                  = form.select :plaid_category_id, PlaidCategory.all.map{ |a| [humanized_category(a), a.id] }, {include_blank: true}, {class: 'ui search dropdown'}
-                %div.field
-                  = form.label "Filter by Label"
-                  %div.ui.grid
-                    %div.five.wide.column
-                      = form.select :label_id, Label.all.map{ |l| [l.name, l.id] }, {include_blank: true}, {class: 'ui dropdown'}
-                    %div.six.wide.column.right.floated
-                      = form.submit "Filter", class: 'ui fluid primary bottom button'
+            = turbo_frame_tag "search", target: "transactions" do
+              = form_with url: '/transactions', method: :get, class: 'ui form' do |form|
+                %div.five.fields
+                  %div.field
+                    = form.label :Search
+                    %div.ui.input
+                      = form.text_field :q, placeholder: "Search Transactions"
+                  %div.field
+                    %div.two.fields
+                      %div.field
+                        = form.label :start_date
+                        = form.date_field :start_date, value: nil
+                      %div.field
+                        = form.label :end_date
+                        = form.date_field :end_date, value: nil
+                  %div.field.three.wide
+                    = form.label "Filter by Account"
+                    = form.select :account_id, Account.all.map{ |a| [a.name, a.id] }, {include_blank: true}, {class: 'ui search dropdown'}
+                  %div.field
+                    = form.label "Filter by Category"
+                    = form.select :plaid_category_id, PlaidCategory.all.map{ |a| [humanized_category(a), a.id] }, {include_blank: true}, {class: 'ui search dropdown'}
+                  %div.field
+                    = form.label "Filter by Label"
+                    %div.ui.grid
+                      %div.five.wide.column
+                        = form.select :label_id, Label.all.map{ |l| [l.name, l.id] }, {include_blank: true}, {class: 'ui dropdown'}
+                      %div.six.wide.column.right.floated
+                        = form.submit "Filter", class: 'ui fluid primary bottom button'
         = render partial: "shared/account_refresh_error"
-          %div#recent_transactions
-            %table.ui.selectable.padded.basic.table
-              %thead
-                %th
-                  Date
-                %th
-                  Description
-                %th
-                  Account
-                %th
-                  Category
-                %th
-                  Labels
-                %th
-                  Amount
-              %tbody
-                - @transactions.each do |transaction|
-                  - amount_klass = transaction.amount < 0 ? 'green-text' : 'black-text'
-                  - row_klass = transaction.pending ? 'pending-transaction-background': ''
-                  %tr{ class: row_klass, data: {url: transaction_path(transaction)} }
-                    %td
-                      = short_format_date(transaction.date)
-                    %td
-                      = transaction.description[..40]
-                    %td
-                      = transaction.account&.name
-                    %td
-                      = humanized_category(transaction.plaid_category)
-                    %td
-                      - transaction.labels.pluck(:id, :name).sort.each do |id, name|
-                        - color = label_id_to_color(id)
-                        %a{ href: "/transactions?label_id=#{id}", class: "ui #{color} label"}
-                          = name
-                    %td{ class: amount_klass }
-                      = number_to_currency(transaction.amount * -1.0)
-            %button#previous-page-button.ui.right.icon.button
-              %i.left.chevron.icon
-            %button#next-page-button.ui.right.floated.icon.button
-              %i.right.chevron.icon
-      %div.one.wide.column
+        %div#recent_transactions
+          %table.ui.selectable.padded.basic.table
+            %thead
+              %th
+                Date
+              %th
+                Description
+              %th
+                Account
+              %th
+                Category
+              %th
+                Labels
+              %th
+                Amount
+            %tbody
+              - @transactions.each do |transaction|
+                - amount_klass = transaction.amount < 0 ? 'green-text' : 'black-text'
+                - row_klass = transaction.pending ? 'pending-transaction-background': ''
+                %tr{ class: row_klass, data: {url: transaction_path(transaction)} }
+                  %td
+                    = short_format_date(transaction.date)
+                  %td
+                    = transaction.description[..40]
+                  %td
+                    = transaction.account&.name
+                  %td
+                    = humanized_category(transaction.plaid_category)
+                  %td
+                    - transaction.labels.pluck(:id, :name).sort.each do |id, name|
+                      - color = label_id_to_color(id)
+                      %a{ href: "/transactions?label_id=#{id}", class: "ui #{color} label"}
+                        = name
+                  %td{ class: amount_klass }
+                    = number_to_currency(transaction.amount * -1.0)
+          %button#previous-page-button.ui.right.icon.button
+            %i.left.chevron.icon
+          %button#next-page-button.ui.right.floated.icon.button
+            %i.right.chevron.icon
+    %div.one.wide.column
 
 = javascript_include_tag "plaid"
 = javascript_include_tag "transactions"

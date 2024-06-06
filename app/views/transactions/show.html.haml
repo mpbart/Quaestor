@@ -15,7 +15,7 @@
                   %label
                     Date:
                   = f.text_field :date
-                %div .field.one.wide
+                %div.field.one.wide
                   %label
                     Amount:
                   = f.text_field :amount
@@ -45,7 +45,7 @@
                       %select#plaid-category-id.ui.search.dropdown{ name: "transaction[plaid_category_id]" }
                         - PlaidCategory.all.each do |category|
                           - if @transaction.plaid_category_id == category.id
-                            %option{ value: category.id,  selected="true" }
+                            %option{ value: category.id, selected: "true" }
                               = humanized_category(category)
                           - else
                             %option{ value: category.id } 
@@ -97,7 +97,7 @@
                   %div.two.fields
                     %div.field
                       %select#plaid-category-id.ui.search.dropdown{ name: "transaction[plaid_category_id]" }
-                        - PlaidCategory.all.each do |category| %>
+                        - PlaidCategory.all.each do |category|
                           - if grouped_transaction.plaid_category_id == category.id
                             %option{ value: category.id, selected: "true" }
                               = humanized_category(category)
@@ -112,8 +112,8 @@
         %div#split-transaction-div
           = form_for @split_transaction, html: { :class => 'ui form', :id => 'split-transactions-form'}, url: '/split_transactions' do |f|
             = hidden_field_tag :authenticity_token, form_authenticity_token
-            = f.hidden_field(:parent_transaction_id, value: @transaction.id)
-            %div class="fields"
+            = f.hidden_field :parent_transaction_id, value: @transaction.id
+            %div.fields
               %div.field
                 %label
                   Date:
