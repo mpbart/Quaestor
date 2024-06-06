@@ -1,0 +1,26 @@
+= stylesheet_link_tag "application", media: "all"
+
+= turbo_frame_tag "home" do
+  %body>
+    %div.ui.card
+      %div.content
+        %div.header
+          = @account.name
+      %div.content
+        %div.ui.list
+          %div.item
+            %b
+              Account ID: 
+            = @account.mask || 'XXXX'
+          %div.item
+            %b
+              Institution:
+            = @account.institution_name
+          %div.item
+            %b
+              Account Type
+            = @account.account_sub_type
+    %div#fix-account-button.ui.button
+      Fix Broken Account Connection
+
+= javascript_include_tag "plaid"
