@@ -1,0 +1,183 @@
+= stylesheet_link_tag "application", media: "all"
+
+= turbo_frame_tag 'home' do
+  %body
+    %div.ui.padded.grid
+      = render "shared/dimmer"
+      %div.three.wide.column
+        = render partial: "shared/account_refresh_error"
+        %div.ui.fluid.card
+          %div.content
+            %h3.ui.center.aligned.header
+              Accounts Overview
+            %div.ui.divider
+            %div#accounts
+              - @accounts.group_by{ |a| a.account_type}.each do |type, accounts|
+                %div.ui.fluid.accordion
+                  %div.title.split-title
+                    %span
+                      %i.dropdown.icon
+                      %strong
+                        = type + " (#{accounts.count})"
+                    %span
+                      - balance_klass = Account::DEBT_ACCOUNT_TYPES.include?(type) ? 'black-text' : 'green-text'
+                      %strong{ class: balance_klass }
+                        = number_to_currency(Account.current_balance(current_user.id, accounts.pluck(:id)).round(2))
+                  %div.content
+                    %div.ui.list.padded
+                      - accounts.each do |account|
+                        %div.item.clickable-list-item{ data: { url: account_path(account) } }
+                          %div.content
+                            %div.left.floated.vertical-aligned
+                              = inline_svg('angle_icon.svg')
+                              = inline_svg('dash-icon.svg')
+                              = account.name
+                            %div.right.floated.vertical-aligned{ style: "color: #767676;" }
+                              %b
+                                = number_to_currency(account.balances.last&.amount.round(2))
+              %div.ui.divider
+              %div.ui.grid
+                %div.ui.three.column.row
+                  %div.left.floated.column
+                    %h4
+                      Estimated Net Worth
+                  %div.right.aligned.right.floated.column
+                    %h4
+                      = number_to_currency(@net_worth)
+        %div.ui.fluid.card
+          %div.content
+            %h3.ui.center.aligned.header
+              Monthly Summary
+            %div.meta
+              = "#{Date.current.strftime('%b %d')} - #{(Date.current - 30.days).strftime('%b %d')}"
+            %div.ui.divider
+            %h4.ui.center.aligned.header
+              Income
+            %div.ui.fluid.accordion
+              %div.title.split-title
+                %span
+                  %i.dropdown.icon
+                  %strong
+                    Total Income
+                %span
+                  %strong.green-text
+                    = number_to_currency(@income_by_source.sum{ |_k, v| v.sum(&:first) }.abs.round(2))
+              %div.content
+                %div.ui.list.padded
+                  - @income_by_source.each do |income_type, transactions|
+                    %div.item
+                      %div.content
+                        %div.left.floated.vertical-aligned
+                          = inline_svg('angle_icon.svg')
+                          = inline_svg('dash-icon.svg')
+                          = income_type[transactions[0][1].length + 1..].humanize
+                        %div.right.floated.vertical-aligned
+                          %b.green-text
+                            = number_to_currency(transactions.sum(&:first).abs.round(2))
+            %div.ui.divider
+            %h4.ui.center.aligned.header
+              Expenses
+            %div.ui.fluid.accordion
+              %div.title.split-title
+                %span
+                  %i.dropdown.icon
+                  %strong>
+                    Total Expenses
+                %span
+                  %strong
+                    = number_to_currency(@expenses_by_source.sum{ |_k, v| v.sum(&:first) }.round(2))
+              %div.content
+                %div.ui.list.padded
+                  - @expenses_by_source.each do |expense_type, transactions|
+                    %div.item
+                      %div.content
+                        %div.left.floated.vertical-aligned
+                          = inline_svg('angle_icon.svg')
+                          = inline_svg('dash-icon.svg')
+                          = expense_type[transactions[0][1].length + 1..].humanize
+                        %div.right.floated.vertical-aligned
+                          %b
+                            = number_to_currency(transactions.sum(&:first).round(2))
+            %div.ui.divider
+            %div.ui.list.padded
+              %div.item
+                %div.content
+                  %div.left.floated.vertical-aligned
+                    %strong
+                      Net Income
+                  %div.right.floated.vertical-aligned
+                    - net_income = @income_by_source.sum{ |_k, v| v.sum(&:first) }.abs - @expenses_by_source.sum{ |_k, v| v.sum(&:first) }
+                    - klass = net_income > 0 ? 'green-text' : 'red-text'
+                    %strong{ class: klass }
+                      = number_to_currency(net_income)
+            %div.ui.divider
+            %div.ui.list.padded
+              %div.item
+                %div.content
+                  %div.left.floated.vertical-aligned
+                    %strong
+                      Savings Rate
+                  %div.right.floated.vertical-aligned
+                    %strong.green-text
+                      = ((net_income / @income_by_source.sum{ |_k, v| v.sum(&:first) }.abs) * 100.0).round(2)
+      %div.five.wide.column
+      %div.five.wide.column
+        %div.ui.grid
+          %div.two.column.row
+            %div.left.floated.column
+              %div#add-account-button.ui.accordion.button
+                %div.active.title
+                  %strong>
+                    Add New Account
+                %div.content
+                  %div#create-account-form.ui.form
+                    = form_for :account, url: accounts_path do |form|
+                      %div.field
+                        = form.label :name
+                        = form.text_field :name
+                      %div.field
+                        = form.label :institution_name
+                        = form.text_field :institution_name
+                      %div.field
+                        = form.label :account_number_last_4
+                        = form.text_field :mask
+                      %div.field
+                        = form.label :account_type
+                        = form.select :type, Account::ACCOUNT_TYPES.keys, {include_blank: true}, {class: 'ui dropdown'}
+                      %div.field
+                        = form.label :account_sub_type
+                        = form.select :sub_type, [], {}, {class: 'ui dropdown'}
+                      %div.field
+                        = form.label :current_balance
+                        = form.text_field :balance
+                      %span
+                        %button.ui.button{ type: "submit" }
+                          Save Account
+                        %i#successIconAccount.green.check.icon
+                        %i#failureIconAccount.red.times.icon
+            %div.right.floated.right.aligned.column
+              %div#add-account-button.ui.accordion.button
+                %div.active.title
+                  %strong
+                    Record Balance
+                %div.content
+                  %div#create-balance-form.ui.form
+                    = form_for :balance, url: balances_path do |form|
+                      = hidden_field_tag :authenticity_token, form_authenticity_token
+                      %div.field
+                        = form.label :account
+                        = form.select :account_id, Account.all.map{ |a| [a.name, a.id] }, {include_blank: true}, {class: 'ui dropdown'}
+                      %div.field
+                        = form.label :current_balance
+                        = form.text_field :balance
+                      %div.field
+                        = form.label :date
+                        = form.date_field :date, value: Date.current
+                      %span>
+                        %button.ui.button{ type: "submit" }
+                          Save Balance
+                        %i#successIconBalance.green.check.icon
+                        %i#failureIconBalance.red.times.icon
+
+= javascript_include_tag "plaid"
+= javascript_include_tag "accounts"

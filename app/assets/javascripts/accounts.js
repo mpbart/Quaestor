@@ -32,6 +32,13 @@ showCreateBalanceIcon = function(event) {
     $('#failureIconBalance').show();
   }
 }
+
+makeListItemClickable = function() {
+  $('.clickable-list-item').click(function(obj) {
+      Turbo.visit($(this).data('url'), {action: 'advance'});
+  })
+}
+
 $(function() {
   $('#successIconAccount').hide();
   $('#failureIconAccount').hide();
@@ -59,4 +66,6 @@ $(function() {
 
     setAccountSubTypeMenu(accountType);
   });
+
+  makeListItemClickable()
 });
