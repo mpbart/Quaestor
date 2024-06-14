@@ -3,6 +3,7 @@
 class ApplicationController < ActionController::Base
   helper_method :short_format_date, :amount_class
   helper_method :humanized_category, :label_id_to_color
+  helper_method :progress_bar_colors
 
   IDX_TO_COLOR = {
     1 => 'blue',
@@ -10,6 +11,11 @@ class ApplicationController < ActionController::Base
     3 => 'purple',
     4 => 'orange'
   }.freeze
+
+  PROGRESS_BAR_COLORS = %w[
+    #173d89 
+    #d17389
+  ].freeze
 
   def short_format_date(date)
     date.strftime('%b %e')
@@ -21,5 +27,9 @@ class ApplicationController < ActionController::Base
 
   def label_id_to_color(idx)
     IDX_TO_COLOR[idx]
+  end
+
+  def progress_bar_colors
+    PROGRESS_BAR_COLORS
   end
 end

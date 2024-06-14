@@ -100,3 +100,36 @@ h4.ui.center.aligned {
   margin-top: 1rem;
   margin-bottom: 0.85rem;
 }
+
+.small-padded {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+.ui.progress {
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.ui.progress.active {
+  animation: none !important;
+}
+
+.ui.progress:last-child {
+  margin-top: 0.5rem;
+}
+
+.ui.progress.multiple > .bar:not(:first-child) select {
+  border-radius: 0.285714rem; 
+}
+
+.ui.progress .bar {
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+  min-width: 0.01em;
+}
+
+.ui.progress.full .bar {
+  border-radius: 1rem;
+}

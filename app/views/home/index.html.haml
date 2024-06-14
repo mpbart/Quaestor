@@ -120,8 +120,40 @@
                   %div.right.floated.vertical-aligned
                     %strong.green-text
                       = ((net_income / @income_by_source.sum{ |_k, v| v.sum(&:first) }.abs) * 100.0).round(2)
-      %div.five.wide.column
-      %div.five.wide.column
+      %div.six.wide.column
+        - total_income = @income_by_source.sum{ |_k, v| v.sum(&:first) }.abs.round(2)
+        - total_expenses = @expenses_by_source.sum{ |_k, v| v.sum(&:first) }.round(2)
+        %div.ui.fluid.card
+          %div.content
+            %h3.ui.center.aligned.header
+              Spending Breakdown
+            %div.ui.divider
+            %div.title.split-title
+              %span
+                %strong
+                  INCOME
+              %span
+                %strong.green-text
+                  = number_to_currency(total_income)
+            %div#income-progress.ui.progress.full{ data: { percent: "100", content: 'abc', position: 'top center'} }
+              %div.bar{ style: "background-color: #179d89 !important" }
+            %div.title.split-title
+              %span
+                %strong
+                  EXPENSES
+              %span
+                %strong
+                  = number_to_currency(total_expenses)
+
+            - amounts = @expenses_by_source.map{ |k, v| [k, v.sum(&:first)] }.to_h
+            - percentages = amounts.map{ |k, v| [k, ((v / total_income) * 100).to_i] }.to_h
+            %div#expense-progress.ui.multiple.progress{ data: { percent: percentages.values.map(&:to_i).sort.reverse.join(",") } }
+              - percentages.sort_by{ |k, v| v }.reverse.each_with_index do |(name, percent), idx|
+                - color = progress_bar_colors[idx % progress_bar_colors.length + 1]
+                %div.bar{ style: "background-color: #{color} !important", data: { content: name, position: "top center" } }
+              
+              
+      %div.four.wide.column
         %div.ui.grid
           %div.two.column.row
             %div.left.floated.column
