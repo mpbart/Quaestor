@@ -1,0 +1,43 @@
+# frozen_string_literal: true
+
+module FinanceManager
+  module Transaction
+    class Calculations
+      attr_reader :user
+
+      def initialize(user)
+        @user = user
+      end
+
+      def income_by_source
+        @income_by_source ||=
+          user.transactions.joins(:plaid_category)
+              .within_days(30)
+              .pluck(:amount, :primary_category, :detailed_category)
+              .filter { |t| t[1] == 'INCOME' }
+              .group_by { |t| t[2] }
+      end
+
+      def expenses_by_source
+        @expenses_by_source ||=
+          user.transactions.joins(:plaid_category)
+              .within_days(30)
+              .pluck(:amount, :primary_category, :detailed_category)
+              .filter { |t| t[1] != 'INCOME' && !PlaidCategory::EXCLUDED_CATEGORIES.include?(t[2]) }
+              .group_by { |t| t[2] }
+      end
+
+      def grouped_by_source(grouped_transactions)
+        grouped_transactions.sum { |_k, v| v.sum(&:first) }.abs.round(2)
+      end
+
+      def recurring(grouped_transactions)
+        grouped_transactions.filter do |k, _v|
+          PlaidCategory::RECURRING_CATEGORIES.include?(k)
+        end
+      end
+
+      def non_recurring(grouped_transactions); end
+    end
+  end
+end

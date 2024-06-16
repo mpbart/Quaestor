@@ -64,10 +64,10 @@
                     = number_to_currency(@total_income)
               %div.content
                 %div.ui.list.padded
-                  - @income_by_source.each do |income_type, sub_categories|
+                  - @calcs.income_by_source.each do |income_type, transactions|
                     = render partial: "dropdown_list_item",
-                      locals: { label: income_type[sub_categories[0][1].length + 1..].humanize,
-                                value: number_to_currency(sub_categories.sum(&:first).abs.round(2)),
+                      locals: { label: income_type[transactions[0][1].length + 1..].humanize,
+                                value: number_to_currency(transactions.sum(&:first).abs.round(2)),
                                 value_klass: "green-text"}
             %div.ui.divider
             %h4.ui.center.aligned.header
@@ -83,10 +83,10 @@
                     = number_to_currency(@total_expenses)
               %div.content
                 %div.ui.list.padded
-                  - @expenses_by_source.each do |expense_type, sub_categories|
+                  - @calcs.expenses_by_source.each do |expense_type, transactions|
                     = render partial: "dropdown_list_item",
-                      locals: { label: expense_type[sub_categories[0][1].length + 1..].humanize,
-                                value: number_to_currency(sub_categories.sum(&:first).abs.round(2))}
+                      locals: { label: expense_type[transactions[0][1].length + 1..].humanize,
+                                value: number_to_currency(transactions.sum(&:first).abs.round(2))}
             %div.ui.divider
             %div.ui.list.padded
               %div.item
@@ -132,7 +132,7 @@
                 %strong
                   = number_to_currency(@total_expenses)
 
-            - amounts = @expenses_by_source.map{ |k, v| [k, v.sum(&:first)] }.to_h
+            - amounts = @calcs.expenses_by_source.map{ |k, v| [k, v.sum(&:first)] }.to_h
             - percentages = amounts.map{ |k, v| [k, ((v / @total_income) * 100).to_i] }.to_h
             %div#expense-progress.ui.multiple.progress{ data: { percent: percentages.values.map(&:to_i).sort.reverse.join(",") } }
               - percentages.sort_by{ |k, v| v }.reverse.each_with_index do |(name, percent), idx|

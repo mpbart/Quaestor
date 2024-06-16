@@ -5,12 +5,12 @@ require 'securerandom'
 require 'bigdecimal'
 
 module FinanceManager
-  class Transaction
+  module Transaction
     class UnknownAccountError < StandardError; end
     class UnknownTransactionError < StandardError; end
     class BadParametersError < StandardError; end
 
-    def self.create(transaction)
+    def create(transaction)
       account = ::Account.find_by(plaid_identifier: transaction.account_id)
       category = ::PlaidCategory.find_by(
         detailed_category: transaction.personal_finance_category.detailed
@@ -46,7 +46,7 @@ module FinanceManager
       )
     end
 
-    def self.update(transaction)
+    def update(transaction)
       existing = ::Transaction.find_by(id: transaction.transaction_id)
       unless existing
         Rails.logger.warn(
@@ -76,7 +76,7 @@ module FinanceManager
       existing.save! if existing.changed?
     end
 
-    def self.remove(transaction)
+    def remove(transaction)
       transaction = ::Transaction.find_by(id: transaction.transaction_id)
       unless transaction
         Rails.logger.warn(
@@ -87,7 +87,7 @@ module FinanceManager
       transaction.destroy
     end
 
-    def self.split!(original_transaction, new_transaction_details)
+    def split!(original_transaction, new_transaction_details)
       if new_transaction_details[:amount].nil?
         raise BadParametersError, 'Amount must be filled when splitting a transaction'
       end
@@ -116,7 +116,7 @@ module FinanceManager
       true
     end
 
-    def self.add_to_transaction_group!(original_transaction, new_transaction)
+    def add_to_transaction_group!(original_transaction, new_transaction)
       if original_transaction.transaction_group.present?
         group = original_transaction.transaction_group
       else
@@ -126,37 +126,21 @@ module FinanceManager
       group.transactions << new_transaction
     end
 
-    def self.income_by_source(user)
-      user.transactions.joins(:plaid_category)
-          .within_days(30)
-          .pluck(:amount, :primary_category, :detailed_category)
-          .filter { |t| t[1] == 'INCOME' }
-          .group_by { |t| t[2] }
-    end
-
-    def self.expenses_by_source(user)
-      user.transactions.joins(:plaid_category)
-          .within_days(30)
-          .pluck(:amount, :primary_category, :detailed_category)
-          .filter { |t| t[1] != 'INCOME' && !PlaidCategory::EXCLUDED_CATEGORIES.include?(t[2]) }
-          .group_by { |t| t[2] }
-    end
-
-    def self.generate_transaction_id
+    def generate_transaction_id
       Base64.encode64(SecureRandom.random_bytes(36))[..-2]
     end
 
-    def self.unknown_account_error(transaction)
+    def unknown_account_error(transaction)
       raise UnknownAccountError,
             "Could not find account matching #{transaction.account_id} for transaction" \
             "#{transaction.transaction_id}"
     end
 
-    def self.unknown_transaction_error(transaction)
+    def unknown_transaction_error(transaction)
       raise UnknownTransactionError, "Could not find transaction with id #{transaction.id}"
     end
 
-    def self.unknown_category_error(transaction)
+    def unknown_category_error(transaction)
       raise UnknownCategoryError,
             "Could not find category for #{transaction.personal_finance_category.detailed_category}"
     end
