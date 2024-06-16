@@ -1,0 +1,9 @@
+%div.item
+  %div.content
+    %div.left.floated.vertical-aligned
+      = inline_svg('angle_icon.svg')
+      = inline_svg('dash-icon.svg')
+      = label
+    %div.right.floated.vertical-aligned
+      %b{ "class": local_assigns[:value_klass].to_s }
+        = value
