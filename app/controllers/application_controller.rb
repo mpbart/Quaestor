@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   }.freeze
 
   PROGRESS_BAR_COLORS = %w[
-    #173d89 
+    #173d89
     #d17389
   ].freeze
 
