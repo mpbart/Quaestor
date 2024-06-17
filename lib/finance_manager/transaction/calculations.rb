@@ -27,7 +27,7 @@ module FinanceManager
               .group_by { |t| t[2] }
       end
 
-      def grouped_by_source(grouped_transactions)
+      def total_amount(grouped_transactions)
         grouped_transactions.sum { |_k, v| v.sum(&:first) }.abs.round(2)
       end
 
@@ -37,7 +37,11 @@ module FinanceManager
         end
       end
 
-      def non_recurring(grouped_transactions); end
+      def non_recurring(grouped_transactions)
+        grouped_transactions.reject do |k, _v|
+          PlaidCategory::RECURRING_CATEGORIES.include?(k)
+        end
+      end
     end
   end
 end

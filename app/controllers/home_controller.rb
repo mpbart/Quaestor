@@ -11,7 +11,7 @@ class HomeController < ApplicationController
                                 .includes(:account, :plaid_category)
     @net_worth = Account.net_worth(current_user.id)
     @calcs = FinanceManager::Transaction::Calculations.new(current_user)
-    @total_income = @calcs.grouped_by_source(@calcs.income_by_source)
-    @total_expenses = @calcs.grouped_by_source(@calcs.expenses_by_source)
+    @total_income = @calcs.total_amount(@calcs.income_by_source)
+    @total_expenses = @calcs.total_amount(@calcs.expenses_by_source)
   end
 end

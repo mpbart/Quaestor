@@ -133,3 +133,8 @@ h4.ui.center.aligned {
 .ui.progress.full .bar {
   border-radius: 1rem;
 }
+
+.cozy.column {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
