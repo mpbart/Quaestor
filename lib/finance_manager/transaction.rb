@@ -10,7 +10,7 @@ module FinanceManager
     class UnknownTransactionError < StandardError; end
     class BadParametersError < StandardError; end
 
-    def create(transaction)
+    def self.create(transaction)
       account = ::Account.find_by(plaid_identifier: transaction.account_id)
       category = ::PlaidCategory.find_by(
         detailed_category: transaction.personal_finance_category.detailed
@@ -46,7 +46,7 @@ module FinanceManager
       )
     end
 
-    def update(transaction)
+    def self.update(transaction)
       existing = ::Transaction.find_by(id: transaction.transaction_id)
       unless existing
         Rails.logger.warn(
@@ -76,7 +76,7 @@ module FinanceManager
       existing.save! if existing.changed?
     end
 
-    def remove(transaction)
+    def self.remove(transaction)
       transaction = ::Transaction.find_by(id: transaction.transaction_id)
       unless transaction
         Rails.logger.warn(
@@ -87,7 +87,7 @@ module FinanceManager
       transaction.destroy
     end
 
-    def split!(original_transaction, new_transaction_details)
+    def self.split!(original_transaction, new_transaction_details)
       if new_transaction_details[:amount].nil?
         raise BadParametersError, 'Amount must be filled when splitting a transaction'
       end
@@ -116,7 +116,7 @@ module FinanceManager
       true
     end
 
-    def add_to_transaction_group!(original_transaction, new_transaction)
+    def self.add_to_transaction_group!(original_transaction, new_transaction)
       if original_transaction.transaction_group.present?
         group = original_transaction.transaction_group
       else
@@ -126,21 +126,21 @@ module FinanceManager
       group.transactions << new_transaction
     end
 
-    def generate_transaction_id
+    def self.generate_transaction_id
       Base64.encode64(SecureRandom.random_bytes(36))[..-2]
     end
 
-    def unknown_account_error(transaction)
+    def self.unknown_account_error(transaction)
       raise UnknownAccountError,
             "Could not find account matching #{transaction.account_id} for transaction" \
             "#{transaction.transaction_id}"
     end
 
-    def unknown_transaction_error(transaction)
+    def self.unknown_transaction_error(transaction)
       raise UnknownTransactionError, "Could not find transaction with id #{transaction.id}"
     end
 
-    def unknown_category_error(transaction)
+    def self.unknown_category_error(transaction)
       raise UnknownCategoryError,
             "Could not find category for #{transaction.personal_finance_category.detailed_category}"
     end

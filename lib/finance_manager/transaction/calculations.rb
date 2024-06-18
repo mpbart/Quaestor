@@ -38,7 +38,7 @@ module FinanceManager
       end
 
       def non_recurring(grouped_transactions)
-        grouped_transactions.reject do |k, _v|
+        grouped_transactions.except do |k, _v|
           PlaidCategory::RECURRING_CATEGORIES.include?(k)
         end
       end
