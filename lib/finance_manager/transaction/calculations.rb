@@ -15,7 +15,7 @@ module FinanceManager
               .within_days(30)
               .pluck(:amount, :primary_category, :detailed_category)
               .filter { |t| t[1] == 'INCOME' }
-              .group_by { |t| t[2] }
+              .group_by { |t| t[1] }
       end
 
       def expenses_by_source
@@ -24,7 +24,7 @@ module FinanceManager
               .within_days(30)
               .pluck(:amount, :primary_category, :detailed_category)
               .filter { |t| t[1] != 'INCOME' && !PlaidCategory::EXCLUDED_CATEGORIES.include?(t[2]) }
-              .group_by { |t| t[2] }
+              .group_by { |t| t[1] }
       end
 
       def total_amount(grouped_transactions)

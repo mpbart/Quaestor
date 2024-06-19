@@ -149,14 +149,31 @@
                   EXPENSES
               %span
                 %div.ui.grid
-                  %div.two.column.row
+                  %div.two.column.row.consistent
                     %div.cozy.column
                       %strong
                         Total Spent
                     %div.cozy.column
                       %strong
                         ="% of Total"
-            %div.ui.divider
+            - @calcs.expenses_by_source.sort_by{ |k, v| v.sum(&:first) }.reverse.each do |name, transactions|
+              %div.ui.divider
+              %div.title.split-title
+                %span
+                  %strong
+                    = name.humanize
+                %span
+                  %div.ui.middle.aligned.small.progress{ data: { percent: ((transactions.sum(&:first) / @total_expenses).round(1) * 100.0).to_s } }
+                    %div.bar.blue
+                %span
+                  %div.ui.grid
+                    %div.two.column.row.consistent
+                      %div.cozy.column
+                        %strong
+                          = transactions.sum(&:first)
+                      %div.cozy.column
+                        %strong
+                          = "#{(transactions.sum(&:first) / @total_expenses).round(2) * 100.0} %"
               
       %div.four.wide.column
         %div.ui.grid

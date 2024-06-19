@@ -130,11 +130,22 @@ h4.ui.center.aligned {
   min-width: 0.01em;
 }
 
+.ui.progress.middle.small.aligned {
+  min-width: 270px;
+  margin: 0 0 0rem;
+}
+
 .ui.progress.full .bar {
   border-radius: 1rem;
+}
+
+.two.column.row.consistent {
+  min-width: 160px;
 }
 
 .cozy.column {
   padding-left: 0.5rem !important;
   padding-right: 0.5rem !important;
+  vertical-align: bottom;
+  text-align: end;
 }
