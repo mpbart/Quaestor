@@ -131,21 +131,20 @@ h4.ui.center.aligned {
 }
 
 .ui.progress.middle.small.aligned {
-  min-width: 270px;
   margin: 0 0 0rem;
+  top: 4px;
 }
 
 .ui.progress.full .bar {
   border-radius: 1rem;
 }
 
-.two.column.row.consistent {
-  min-width: 160px;
+.two.column.row.consistent .cozy.column:first-of-type {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
 }
 
 .cozy.column {
-  padding-left: 0.5rem !important;
-  padding-right: 0.5rem !important;
   vertical-align: bottom;
   text-align: end;
 }
