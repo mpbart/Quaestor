@@ -173,10 +173,10 @@
                       %div.two.column.row.consistent
                         %div.cozy.column
                           %strong
-                            = transactions.sum(&:first)
+                            = BigDecimal(transactions.sum(&:first), 8).to_digits
                         %div.cozy.column
                           %strong
-                            = "#{(transactions.sum(&:first) / @total_expenses).round(2) * 100.0} %"
+                            = "#{(BigDecimal(transactions.sum(&:first), 8) / BigDecimal(@total_expenses, 8)).round(2) * 100.0} %"
               
       %div.four.wide.column
         %div.ui.grid
