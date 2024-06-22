@@ -166,7 +166,7 @@
                     %strong
                       = name.humanize
                   %div.ui.eight.wide.column
-                    %div.ui.middle.aligned.small.progress{ data: { percent: ((transactions.sum(&:first) / @total_expenses).round(1) * 100.0).to_s } }
+                    %div.ui.middle.aligned.small.progress{ data: { percent: ((transactions.sum(&:first) / @total_expenses).round(2) * 100.0).to_s } }
                       %div.bar.blue
                   %div.ui.four.wide.column
                     %div.ui.grid
