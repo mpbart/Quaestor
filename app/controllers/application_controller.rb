@@ -13,8 +13,13 @@ class ApplicationController < ActionController::Base
   }.freeze
 
   PROGRESS_BAR_COLORS = %w[
-    #173d89
-    #d17389
+    #3ad081
+    #fdd643
+    #5d7ce8
+    #f85c6a
+    #c6d533
+    #00d8d6
+    #f5c8d8
   ].freeze
 
   def short_format_date(date)

@@ -158,25 +158,51 @@
                       %div.cozy.column
                         %strong
                           ="% of Total"
-            - @calcs.expenses_by_source.sort_by{ |k, v| v.sum(&:first) }.reverse.each do |name, transactions|
+            - @calcs.expenses_by_source.sort_by{ |k, v| v.sum(&:first) }.reverse.each_with_index do |(name, transactions), idx|
+              - color = progress_bar_colors[idx % progress_bar_colors.length + 1]
               %div.ui.divider
-              %div.ui.grid
-                %div.ui.row
-                  %div.ui.four.wide.column
-                    %strong
-                      = name.humanize
-                  %div.ui.eight.wide.column
-                    %div.ui.middle.aligned.small.progress{ data: { percent: ((transactions.sum(&:first) / @total_expenses).round(2) * 100.0).to_s } }
-                      %div.bar.blue
-                  %div.ui.four.wide.column
+              %div.ui.fluid.accordion
+                %div.ui.grid.title
+                  %div.ui.row
+                    %div.ui.four.wide.column
+                      %i.dropdown.icon
+                      %strong
+                        = name.humanize
+                    %div.ui.eight.wide.column
+                      %div.ui.middle.aligned.small.progress{ data: { percent: ((transactions.sum(&:first) / @total_expenses).round(2) * 100.0).to_s } }
+                        %div.bar{ style: "background-color: #{color}" }
+                    %div.ui.four.wide.column
+                      %div.ui.grid
+                        %div.two.column.row.consistent
+                          %div.cozy.column
+                            %strong
+                              = BigDecimal(transactions.sum(&:first), 8).to_digits
+                          %div.cozy.column
+                            %strong
+                              = "#{(BigDecimal(transactions.sum(&:first), 8) / BigDecimal(@total_expenses, 8)).round(2) * 100.0} %"
+                %div.content
+                  - transactions.group_by{ |t| t.third }.sort_by{ |k, v| v.sum(&:first) }.reverse.each do |sub_name, sub_transactions|
+                    %div.ui.divider
                     %div.ui.grid
-                      %div.two.column.row.consistent
-                        %div.cozy.column
-                          %strong
-                            = BigDecimal(transactions.sum(&:first), 8).to_digits
-                        %div.cozy.column
-                          %strong
-                            = "#{(BigDecimal(transactions.sum(&:first), 8) / BigDecimal(@total_expenses, 8)).round(2) * 100.0} %"
+                      %div.ui.row
+                        %div.ui.four.wide.column
+                          %div.vertical-aligned
+                            = inline_svg('angle_icon.svg')
+                            = inline_svg('dash-icon.svg')
+                            %strong
+                              = sub_name[sub_transactions[0][1].length + 1..].humanize
+                        %div.ui.eight.wide.column
+                          %div.ui.middle.aligned.small.progress{ data: { percent: ((sub_transactions.sum(&:first) / @total_expenses).round(2) * 100.0).to_s } }
+                            %div.bar{ style: "background-color: #{color}" }
+                        %div.ui.four.wide.column
+                          %div.ui.grid
+                            %div.two.column.row.consistent
+                              %div.cozy.column
+                                %strong
+                                  = BigDecimal(sub_transactions.sum(&:first), 8).to_digits
+                              %div.cozy.column
+                                %strong
+                                  = "#{(BigDecimal(sub_transactions.sum(&:first), 8) / BigDecimal(@total_expenses, 8)).round(2) * 100.0} %"
               
       %div.four.wide.column
         %div.ui.grid
