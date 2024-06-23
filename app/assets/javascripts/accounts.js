@@ -67,5 +67,6 @@ $(function() {
     setAccountSubTypeMenu(accountType);
   });
 
-  makeListItemClickable()
+  makeListItemClickable();
+  $('.progress').progress({showActivity: false});
 });

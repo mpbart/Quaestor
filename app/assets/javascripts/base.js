@@ -101,5 +101,7 @@ $(function() {
   if (HEADER_TABS.includes(`${getUrl()}-tab`)) {
     activateTab($(`#${getUrl()}-tab`), $('.active'));
   }
+  $('.progress').popup();
+  $('.progress .bar').popup();
 
 });

@@ -5,7 +5,7 @@ require 'securerandom'
 require 'bigdecimal'
 
 module FinanceManager
-  class Transaction
+  module Transaction
     class UnknownAccountError < StandardError; end
     class UnknownTransactionError < StandardError; end
     class BadParametersError < StandardError; end
@@ -124,22 +124,6 @@ module FinanceManager
         group.transactions << original_transaction
       end
       group.transactions << new_transaction
-    end
-
-    def self.income_by_source(user)
-      user.transactions.joins(:plaid_category)
-          .within_days(30)
-          .pluck(:amount, :primary_category, :detailed_category)
-          .filter { |t| t[1] == 'INCOME' }
-          .group_by { |t| t[2] }
-    end
-
-    def self.expenses_by_source(user)
-      user.transactions.joins(:plaid_category)
-          .within_days(30)
-          .pluck(:amount, :primary_category, :detailed_category)
-          .filter { |t| t[1] != 'INCOME' && !PlaidCategory::EXCLUDED_CATEGORIES.include?(t[2]) }
-          .group_by { |t| t[2] }
     end
 
     def self.generate_transaction_id

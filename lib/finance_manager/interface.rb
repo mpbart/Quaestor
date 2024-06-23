@@ -20,7 +20,7 @@ module FinanceManager
     # TODO: Refactor into a separate plaid object to handle all plaid-related things
     def create_plaid_client
       plaid_config = Plaid::Configuration.new
-      plaid_config.server_index = Plaid::Configuration::Environment['development']
+      plaid_config.server_index = Plaid::Configuration::Environment['production']
       plaid_config.api_key['PLAID-CLIENT-ID'] = ENV.fetch('PLAID_CLIENT_ID')
       plaid_config.api_key['PLAID-SECRET'] = ENV.fetch('PLAID_SECRET_ID')
 

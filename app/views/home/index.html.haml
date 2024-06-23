@@ -4,6 +4,7 @@
   %body
     %div.ui.padded.grid
       = render "shared/dimmer"
+      %div.one.wide.column
       %div.three.wide.column
         = render partial: "shared/account_refresh_error"
         %div.ui.fluid.card
@@ -32,8 +33,8 @@
                               = inline_svg('angle_icon.svg')
                               = inline_svg('dash-icon.svg')
                               = account.name
-                            %div.right.floated.vertical-aligned{ style: "color: #767676;" }
-                              %b
+                            %div.right.floated.vertical-aligned
+                              %b{ style: "color: #767676" }
                                 = number_to_currency(account.balances.last&.amount.round(2))
               %div.ui.divider
               %div.ui.grid
@@ -48,7 +49,7 @@
           %div.content
             %h3.ui.center.aligned.header
               Monthly Summary
-            %div.meta
+            %div.center.aligned.meta
               = "#{Date.current.strftime('%b %d')} - #{(Date.current - 30.days).strftime('%b %d')}"
             %div.ui.divider
             %h4.ui.center.aligned.header
@@ -61,19 +62,17 @@
                     Total Income
                 %span
                   %strong.green-text
-                    = number_to_currency(@income_by_source.sum{ |_k, v| v.sum(&:first) }.abs.round(2))
+                    = number_to_currency(@total_income)
               %div.content
                 %div.ui.list.padded
-                  - @income_by_source.each do |income_type, transactions|
-                    %div.item
-                      %div.content
-                        %div.left.floated.vertical-aligned
-                          = inline_svg('angle_icon.svg')
-                          = inline_svg('dash-icon.svg')
-                          = income_type[transactions[0][1].length + 1..].humanize
-                        %div.right.floated.vertical-aligned
-                          %b.green-text
-                            = number_to_currency(transactions.sum(&:first).abs.round(2))
+                  = render partial: "dropdown_list_item",
+                    locals: { label: "Recurring",
+                              value: number_to_currency(@calcs.total_amount(@calcs.recurring(@calcs.income_by_source))),
+                              value_klass: "green-text"}
+                  = render partial: "dropdown_list_item",
+                    locals: { label: "Non-Recurring",
+                              value: number_to_currency(@calcs.total_amount(@calcs.non_recurring(@calcs.income_by_source))),
+                              value_klass: "green-text"}
             %div.ui.divider
             %h4.ui.center.aligned.header
               Expenses
@@ -85,19 +84,15 @@
                     Total Expenses
                 %span
                   %strong
-                    = number_to_currency(@expenses_by_source.sum{ |_k, v| v.sum(&:first) }.round(2))
+                    = number_to_currency(@total_expenses)
               %div.content
                 %div.ui.list.padded
-                  - @expenses_by_source.each do |expense_type, transactions|
-                    %div.item
-                      %div.content
-                        %div.left.floated.vertical-aligned
-                          = inline_svg('angle_icon.svg')
-                          = inline_svg('dash-icon.svg')
-                          = expense_type[transactions[0][1].length + 1..].humanize
-                        %div.right.floated.vertical-aligned
-                          %b
-                            = number_to_currency(transactions.sum(&:first).round(2))
+                  = render partial: "dropdown_list_item",
+                    locals: { label: "Recurring",
+                              value: number_to_currency(@calcs.total_amount(@calcs.recurring(@calcs.expenses_by_source)))}
+                  = render partial: "dropdown_list_item",
+                    locals: { label: "Non-Recurring",
+                              value: number_to_currency(@calcs.total_amount(@calcs.non_recurring(@calcs.expenses_by_source)))}
             %div.ui.divider
             %div.ui.list.padded
               %div.item
@@ -106,7 +101,7 @@
                     %strong
                       Net Income
                   %div.right.floated.vertical-aligned
-                    - net_income = @income_by_source.sum{ |_k, v| v.sum(&:first) }.abs - @expenses_by_source.sum{ |_k, v| v.sum(&:first) }
+                    - net_income = @total_income - @total_expenses
                     - klass = net_income > 0 ? 'green-text' : 'red-text'
                     %strong{ class: klass }
                       = number_to_currency(net_income)
@@ -119,15 +114,104 @@
                       Savings Rate
                   %div.right.floated.vertical-aligned
                     %strong.green-text
-                      = ((net_income / @income_by_source.sum{ |_k, v| v.sum(&:first) }.abs) * 100.0).round(2)
-      %div.five.wide.column
-      %div.five.wide.column
+                      = "#{((net_income / @total_income) * 100.0).round(2)}%"
+      %div.eight.wide.column
+        %div.ui.fluid.card
+          %div.content
+            %h3.ui.center.aligned.header
+              Spending Breakdown
+            %div.ui.divider
+            %div.title.split-title
+              %span
+                %strong
+                  INCOME
+              %span
+                %strong.green-text
+                  = number_to_currency(@total_income)
+            %div#income-progress.ui.progress.full{ data: { percent: "100", content: 'abc', position: 'top center'} }
+              %div.bar{ style: "background-color: #179d89 !important" }
+            %div.title.split-title
+              %span
+                %strong
+                  EXPENSES
+              %span
+                %strong
+                  = number_to_currency(@total_expenses)
+
+            - amounts = @calcs.expenses_by_source.map{ |k, v| [k, v.sum(&:first)] }.to_h
+            - percentages = amounts.map{ |k, v| [k, ((v / @total_income) * 100).to_i] }.to_h
+            %div#expense-progress.ui.multiple.progress{ data: { percent: percentages.values.map(&:to_i).sort.reverse.join(",") } }
+              - percentages.sort_by{ |k, v| v }.reverse.each_with_index do |(name, percent), idx|
+                - color = progress_bar_colors[idx % progress_bar_colors.length + 1]
+                %div.bar{ style: "background-color: #{color} !important", data: { content: name, position: "top center" } }
+            %div.ui.grid
+              %div.ui.row
+                %div.ui.four.wide.column
+                  %strong{ style: "color: #767676" }
+                    EXPENSES
+                %div.ui.eight.wide.column
+                %div.ui.four.wide.column
+                  %div.ui.grid
+                    %div.two.column.row.consistent
+                      %div.cozy.column
+                        %strong
+                          Total Spent
+                      %div.cozy.column
+                        %strong
+                          ="% of Total"
+            - @calcs.expenses_by_source.sort_by{ |k, v| v.sum(&:first) }.reverse.each_with_index do |(name, transactions), idx|
+              - color = progress_bar_colors[idx % progress_bar_colors.length + 1]
+              %div.ui.divider
+              %div.ui.fluid.accordion
+                %div.ui.grid.title
+                  %div.ui.row
+                    %div.ui.four.wide.column
+                      %i.dropdown.icon
+                      %strong
+                        = name.humanize
+                    %div.ui.eight.wide.column
+                      %div.ui.middle.aligned.small.progress{ data: { percent: ((transactions.sum(&:first) / @total_expenses).round(2) * 100.0).to_s } }
+                        %div.bar{ style: "background-color: #{color}" }
+                    %div.ui.four.wide.column
+                      %div.ui.grid
+                        %div.two.column.row.consistent
+                          %div.cozy.column
+                            %strong
+                              = BigDecimal(transactions.sum(&:first), 8).to_digits
+                          %div.cozy.column
+                            %strong
+                              = "#{(BigDecimal(transactions.sum(&:first), 8) / BigDecimal(@total_expenses, 8)).round(2) * 100.0} %"
+                %div.content
+                  - transactions.group_by{ |t| t.third }.sort_by{ |k, v| v.sum(&:first) }.reverse.each do |sub_name, sub_transactions|
+                    %div.ui.divider
+                    %div.ui.grid
+                      %div.ui.row
+                        %div.ui.four.wide.column
+                          %div.vertical-aligned
+                            = inline_svg('angle_icon.svg')
+                            = inline_svg('dash-icon.svg')
+                            %strong
+                              = sub_name[sub_transactions[0][1].length + 1..].humanize
+                        %div.ui.eight.wide.column
+                          %div.ui.middle.aligned.small.progress{ data: { percent: ((sub_transactions.sum(&:first) / @total_expenses).round(2) * 100.0).to_s } }
+                            %div.bar{ style: "background-color: #{color}" }
+                        %div.ui.four.wide.column
+                          %div.ui.grid
+                            %div.two.column.row.consistent
+                              %div.cozy.column
+                                %strong
+                                  = BigDecimal(sub_transactions.sum(&:first), 8).to_digits
+                              %div.cozy.column
+                                %strong
+                                  = "#{(BigDecimal(sub_transactions.sum(&:first), 8) / BigDecimal(@total_expenses, 8)).round(2) * 100.0} %"
+              
+      %div.four.wide.column
         %div.ui.grid
-          %div.two.column.row
+          %div.ui.row
             %div.left.floated.column
               %div#add-account-button.ui.accordion.button
                 %div.active.title
-                  %strong>
+                  %strong
                     Add New Account
                 %div.content
                   %div#create-account-form.ui.form
@@ -155,7 +239,8 @@
                           Save Account
                         %i#successIconAccount.green.check.icon
                         %i#failureIconAccount.red.times.icon
-            %div.right.floated.right.aligned.column
+          %div.ui.row
+            %div.left.floated.column
               %div#add-account-button.ui.accordion.button
                 %div.active.title
                   %strong
