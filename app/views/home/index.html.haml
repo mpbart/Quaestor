@@ -115,7 +115,7 @@
                   %div.right.floated.vertical-aligned
                     %strong.green-text
                       = "#{((net_income / @total_income) * 100.0).round(2)}%"
-      %div.seven.wide.column
+      %div.eight.wide.column
         %div.ui.fluid.card
           %div.content
             %h3.ui.center.aligned.header
@@ -207,7 +207,7 @@
               
       %div.four.wide.column
         %div.ui.grid
-          %div.two.column.row
+          %div.ui.row
             %div.left.floated.column
               %div#add-account-button.ui.accordion.button
                 %div.active.title
@@ -239,7 +239,8 @@
                           Save Account
                         %i#successIconAccount.green.check.icon
                         %i#failureIconAccount.red.times.icon
-            %div.right.floated.right.aligned.column
+          %div.ui.row
+            %div.left.floated.column
               %div#add-account-button.ui.accordion.button
                 %div.active.title
                   %strong
