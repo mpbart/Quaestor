@@ -32,14 +32,14 @@ module FinanceManager
       end
 
       def recurring(grouped_transactions)
-        grouped_transactions.filter do |k, _v|
-          PlaidCategory::RECURRING_CATEGORIES.include?(k)
+        grouped_transactions.map do |k, v|
+          [k, v.filter{ |arr| PlaidCategory::RECURRING_CATEGORIES.include?(arr[2]) } ]
         end
       end
 
       def non_recurring(grouped_transactions)
-        grouped_transactions.except do |k, _v|
-          PlaidCategory::RECURRING_CATEGORIES.include?(k)
+        grouped_transactions.map do |k, v|
+          [k, v.filter{ |arr| !PlaidCategory::RECURRING_CATEGORIES.include?(arr[2]) } ]
         end
       end
     end
