@@ -39,6 +39,94 @@ class Account < ActiveRecord::Base
     SELECT assets.sum - debts.sum AS net_worth FROM assets, debts
   SQL
 
+  NET_WORTH_OVER_TIME_SQL = <<-SQL
+    WITH debts AS (
+      SELECT SUM(p_balances.amount), DATE_TRUNC('MONTH', p_balances.created_at) AS balance_date FROM accounts
+      JOIN (SELECT *, ROW_NUMBER() OVER (PARTITION BY account_id, DATE_TRUNC('MONTH', balances.created_at) ORDER BY balances.created_at DESC)
+            FROM balances) AS p_balances
+      ON p_balances.account_id = accounts.id
+      WHERE row_number = 1 AND accounts.account_type IN ('loan', 'credit')
+      AND accounts.user_id = 2
+      GROUP BY DATE_TRUNC('MONTH', p_balances.created_at)
+    ),
+    assets AS (
+      SELECT SUM(balances.amount), DATE_TRUNC('MONTH', balances.created_at) AS balance_date FROM accounts
+      JOIN (SELECT *, ROW_NUMBER() OVER (PARTITION BY account_id, DATE_TRUNC('MONTH', balances.created_at) ORDER BY balances.created_at DESC) FROM balances)
+      AS balances ON balances.account_id = accounts.id
+      WHERE row_number = 1 AND accounts.account_type IN ('depository', 'investment')
+      AND accounts.user_id = 2
+      GROUP BY DATE_TRUNC('MONTH', balances.created_at)
+    )
+    SELECT a.sum - d.sum AS net_worth, a.balance_date FROM
+    assets a
+    JOIN debts d
+    ON a.balance_date = d.balance_date
+  SQL
+
+  BALANCES_BY_MONTH_SQL = <<-SQL
+    WITH RECURSIVE months AS (
+      SELECT DATE_TRUNC('month', NOW()) AS month
+      UNION ALL
+      SELECT month - INTERVAL '1 month'
+      FROM months
+      WHERE month > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
+    ),
+    account_months AS (
+      SELECT accounts.id AS account_id, months.month
+      FROM accounts
+      CROSS JOIN months
+      WHERE accounts.user_id = ?
+    ),
+    monthly_balances AS (
+      SELECT
+        account_id,
+        DATE_TRUNC('month', created_at) as month,
+        amount,
+        created_at,
+        ROW_NUMBER() OVER (PARTITION BY account_id, DATE_TRUNC('month', created_at) ORDER BY created_at DESC) AS row_num
+      FROM
+        balances
+      WHERE
+        created_at >= (SELECT MIN(created_at) FROM balances) - INTERVAL '12 months'
+    ),
+    latest_balances AS (
+      SELECT
+        account_id,
+        DATE_TRUNC('month', created_at) AS month,
+        amount
+      FROM
+        monthly_balances
+      WHERE
+        row_num = 1
+    ),
+    filled_balances AS (
+      SELECT
+        am.account_id,
+        am.month,
+        COALESCE(lb.amount, LAST_VALUE(lb.amount) OVER (
+          PARTITION BY am.account_id
+          ORDER BY am.month
+          ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        )) AS amount
+      FROM
+        account_months am
+      LEFT JOIN latest_balances lb
+        ON am.account_id = lb.account_id
+        AND am.month = lb.month
+    )
+    SELECT
+      account_id,
+      account_type,
+      month,
+      coalesce(amount, 0.0) AS amount
+    FROM
+      filled_balances fb JOIN accounts a
+      ON fb.account_id = a.id
+    ORDER BY
+      account_id,
+      month;
+  SQL
+
   BALANCE_SQL = <<-SQL
     SELECT SUM(balances.amount) AS balance FROM accounts
     JOIN (SELECT *, ROW_NUMBER() OVER (PARTITION BY account_id ORDER BY created_at DESC) FROM balances)
@@ -57,5 +145,11 @@ class Account < ActiveRecord::Base
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
                                             [BALANCE_SQL, user_id, account_ids])
     ActiveRecord::Base.connection.execute(sanitized_sql).first['balance']
+  end
+
+  # TODO: Make configurable over a given time period instead of hardcoding to 12 months?
+  def self.balances_by_month(user_id)
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [BALANCES_BY_MONTH_SQL, user_id])
+    ActiveRecord::Base.connection.execute(sanitized_sql)
   end
 end

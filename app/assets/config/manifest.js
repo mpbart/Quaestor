@@ -6,3 +6,4 @@
 //= link transactions.js
 //= link plaid.js
 //= link base.js
+//= link analytics.js

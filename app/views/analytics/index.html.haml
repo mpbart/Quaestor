@@ -3,13 +3,12 @@
 %body
   %div.ui.divided.padded.grid
     = render "shared/dimmer"
-    %div.five.wide.column
-    %div.six.wide.column
-      %h3.ui.center.aligned.header
+    %div.four.wide.column
+    %div.nine.wide.column
+      %h2.ui.center.aligned.header
         Analytics
       %div
-        %canvas#acquisitions
-
-    %div.five.wide.column
+        %canvas#analytics
 
 = javascript_include_tag "plaid"
+= javascript_include_tag "analytics"
