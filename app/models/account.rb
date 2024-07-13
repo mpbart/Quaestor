@@ -39,30 +39,6 @@ class Account < ActiveRecord::Base
     SELECT assets.sum - debts.sum AS net_worth FROM assets, debts
   SQL
 
-  NET_WORTH_OVER_TIME_SQL = <<-SQL
-    WITH debts AS (
-      SELECT SUM(p_balances.amount), DATE_TRUNC('MONTH', p_balances.created_at) AS balance_date FROM accounts
-      JOIN (SELECT *, ROW_NUMBER() OVER (PARTITION BY account_id, DATE_TRUNC('MONTH', balances.created_at) ORDER BY balances.created_at DESC)
-            FROM balances) AS p_balances
-      ON p_balances.account_id = accounts.id
-      WHERE row_number = 1 AND accounts.account_type IN ('loan', 'credit')
-      AND accounts.user_id = 2
-      GROUP BY DATE_TRUNC('MONTH', p_balances.created_at)
-    ),
-    assets AS (
-      SELECT SUM(balances.amount), DATE_TRUNC('MONTH', balances.created_at) AS balance_date FROM accounts
-      JOIN (SELECT *, ROW_NUMBER() OVER (PARTITION BY account_id, DATE_TRUNC('MONTH', balances.created_at) ORDER BY balances.created_at DESC) FROM balances)
-      AS balances ON balances.account_id = accounts.id
-      WHERE row_number = 1 AND accounts.account_type IN ('depository', 'investment')
-      AND accounts.user_id = 2
-      GROUP BY DATE_TRUNC('MONTH', balances.created_at)
-    )
-    SELECT a.sum - d.sum AS net_worth, a.balance_date FROM
-    assets a
-    JOIN debts d
-    ON a.balance_date = d.balance_date
-  SQL
-
   BALANCES_BY_MONTH_SQL = <<-SQL
     WITH RECURSIVE months AS (
       SELECT DATE_TRUNC('month', NOW()) AS month
