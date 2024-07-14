@@ -44,3 +44,9 @@ Metrics/BlockLength:
 
 Metrics/ModuleLength:
   Enabled: false
+
+Style/HashTransformValues:
+  Enabled: false
+
+Style/StringConcatenation:
+  Enabled: false

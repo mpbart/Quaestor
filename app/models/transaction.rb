@@ -80,7 +80,6 @@ optional: true
     GROUP BY DATE_TRUNC('MONTH', t.date);
   SQL
 
-
   def grouped_transactions
     transaction_group&.transactions&.where&.not(id: id) || []
   end
@@ -95,13 +94,13 @@ optional: true
   end
 
   def self.total_spending_over_time(user_id)
-    sql_statement = TOTAL_PER_MONTH_SQL % ['<>']
+    sql_statement = format(TOTAL_PER_MONTH_SQL, '<>')
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [sql_statement, user_id])
     ActiveRecord::Base.connection.execute(sanitized_sql)
   end
 
   def self.total_income_over_time(user_id)
-    sql_statement = TOTAL_PER_MONTH_SQL % ['=']
+    sql_statement = format(TOTAL_PER_MONTH_SQL, '=')
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [sql_statement, user_id])
     ActiveRecord::Base.connection.execute(sanitized_sql)
   end
@@ -112,17 +111,21 @@ optional: true
   end
 
   def self.primary_category_spending_over_time(category_id, user_id)
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [PRIMARY_CATEGORY_PER_MONTH_SQL, user_id, category_id])
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
+                                            [PRIMARY_CATEGORY_PER_MONTH_SQL, user_id, category_id])
     ActiveRecord::Base.connection.execute(sanitized_sql)
   end
 
   def self.detailed_category_spending_over_time(category_id, user_id)
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [DETAILED_CATEGORY_PER_MONTH_SQL, user_id, category_id])
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
+                                            [DETAILED_CATEGORY_PER_MONTH_SQL, user_id, category_id])
     ActiveRecord::Base.connection.execute(sanitized_sql)
   end
 
   def self.merchant_spending_over_time(merchant_name, user_id)
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [MERCHANT_PER_MONTH_SQL, user_id, '%' + merchant_name + '%'])
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
+                                            [MERCHANT_PER_MONTH_SQL, user_id,
+                                             '%' + merchant_name + '%'])
     ActiveRecord::Base.connection.execute(sanitized_sql)
   end
 end
