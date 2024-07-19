@@ -22,13 +22,12 @@ Rails.application.routes.draw do
   resources :split_transactions, only: [:index, :show]
   resources :accounts, only: [:create, :show]
   resources :balances, only: [:create]
-  get '/search_transaction', to: 'transactions#search'
+  resources :analytics, only: [:index]
 
+  get '/search_transaction', to: 'transactions#search'
   get 'accounts/subtypes/:subtype', to: 'accounts#subtypes'
   post '/split_transactions', to: 'transactions#split_transactions'
-
-  # Analytics
-  get 'analytics',    to: 'analytics#index'
+  get '/chart_data/:dataset', to: 'analytics#chart_data'
 
   # Budgets
   get 'budgets',      to: 'budgets#index'

@@ -114,7 +114,10 @@
                       Savings Rate
                   %div.right.floated.vertical-aligned
                     %strong.green-text
-                      = "#{((net_income / @total_income) * 100.0).round(2)}%"
+                      - if @total_income == 0
+                        = "0%"
+                      - else
+                        = "#{((net_income / @total_income) * 100.0).round(2)}%"
       %div.eight.wide.column
         %div.ui.fluid.card
           %div.content

@@ -8,20 +8,31 @@ $(function() {
     { year: 2015, count: 30 },
     { year: 2016, count: 28 },
   ];
+  getData = async function() {
+    const response = await fetch('/chart_data/net_worth_over_timeframe', { method: 'GET' });
+    return await response.json();
+  }
 
-  new Chart(
-    $('#analytics'),
-    {
-      type: 'bar',
-      data: {
-        labels: data.map(row => row.year),
-        datasets: [
-          {
-            label: 'Acquisitions by year',
-            data: data.map(row => row.count)
-          }
-        ]
+  getData().then(data => {
+    console.log(data);
+    new Chart(
+      $('#analytics'),
+      {
+        type: 'bar',
+        data: {
+          labels: data.map(row => row.month),
+          datasets: [
+            {
+              label: 'Assets',
+              data: data.map(row => row.assets)
+            },
+            {
+              label: 'Debts',
+              data: data.map(row => row.debts)
+            }
+          ]
+        }
       }
-    }
-  );
+    );
+  });
 });

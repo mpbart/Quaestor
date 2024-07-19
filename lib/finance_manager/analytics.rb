@@ -8,14 +8,14 @@ module FinanceManager
     # TODO: overlay the Mint data with this to get a full
     # snapshot of net worth going back to the beginning
     def self.net_worth_over_timeframe(_timeframe, user_id)
-      Account.balances_by_month(user_id)
-             .group_by { |row| row['month'] }
-             .to_h { |k, v| [k, amounts_by_account_type(v)] }
+      ::Account.balances_by_month(user_id)
+        .group_by { |row| row['month'] }
+        .map{ |k, v| {'month' => k.strftime('%B %Y')}.merge(amounts_by_account_type(v)) }
     end
 
     def self.amounts_by_account_type(rows)
       rows.each_with_object({ 'assets' => 0, 'debts' => 0 }) do |row, acc|
-        if Account::DEBT_ACCOUNT_TYPES.include?(row['account_type'])
+        if ::Account::DEBT_ACCOUNT_TYPES.include?(row['account_type'])
           acc['debts'] += row['amount']
         else
           acc['assets'] += row['amount']
@@ -27,41 +27,41 @@ module FinanceManager
     # within the passed in timeframe
     # TODO: currently hardcoded to 1 year
     def self.spending_on_primary_category_over_timeframe(category_name, _timeframe, user_id)
-      Transaction.primary_category_spending_over_time(category_name, user_id)
+      ::Transaction.primary_category_spending_over_time(category_name, user_id)
     end
 
     # Return JSON array of amounts spent by month on the category_name
     # within the passed in timeframe
     # TODO: currently hardcoded to 1 year
     def self.spending_on_detailed_category_over_timeframe(category_name, _timeframe, user_id)
-      Transaction.detailed_category_spending_over_time(category_name, user_id)
+      ::Transaction.detailed_category_spending_over_time(category_name, user_id)
     end
 
     # Return JSON array of amounts spent by month on the merchant_name within
     # the passed in timeframe
     # TODO: currently hardcoded to 1 year
     def self.spending_on_merchant_over_timeframe(merchant_name, _timeframe, user_id)
-      Transaction.merchant_spending_over_time(merchant_name, user_id)
+      ::Transaction.merchant_spending_over_time(merchant_name, user_id)
     end
 
     # Return JSON array tallying the total amounts spent on each category
     # within the given timeframe
     # TODO: currently hardcoded to 1 year
     def self.total_spending_on_all_categories_over_timeframe(_timeframe, user_id)
-      Transaction.category_totals(user_id)
+      ::Transaction.category_totals(user_id)
     end
 
     # Return JSON array of spending amounts over the given timeframe
     # in months
     # TODO: currently hardcoded to 1 year
     def self.spending_over_timeframe(_timeframe, user_id)
-      Transaction.total_spending_over_time(user_id)
+      ::Transaction.total_spending_over_time(user_id)
     end
 
     # Return JSON array of income amounts over the given timeframe in months
     # TODO: currently hardcoded to 1 year
     def self.income_over_timeframe(_timeframe, user_id)
-      Transaction.total_income_over_time(user_id)
+      ::Transaction.total_income_over_time(user_id)
     end
   end
 end
