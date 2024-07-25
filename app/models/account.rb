@@ -40,67 +40,26 @@ class Account < ActiveRecord::Base
   SQL
 
   BALANCES_BY_MONTH_SQL = <<-SQL
-    WITH RECURSIVE months AS (
-      SELECT DATE_TRUNC('month', NOW()) AS month
-      UNION ALL
-      SELECT month - INTERVAL '1 month'
-      FROM months
-      WHERE month > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
-    ),
-    account_months AS (
-      SELECT accounts.id AS account_id, months.month
-      FROM accounts
-      CROSS JOIN months
-      WHERE accounts.user_id = ?
-    ),
-    monthly_balances AS (
+    WITH monthly_balances AS (
       SELECT
-        account_id,
-        DATE_TRUNC('month', created_at) as month,
-        amount,
-        created_at,
-        ROW_NUMBER() OVER (PARTITION BY account_id, DATE_TRUNC('month', created_at) ORDER BY created_at DESC) AS row_num
-      FROM
-        balances
-      WHERE
-        created_at >= (SELECT MIN(created_at) FROM balances) - INTERVAL '12 months'
-    ),
-    latest_balances AS (
-      SELECT
-        account_id,
-        DATE_TRUNC('month', created_at) AS month,
-        amount
-      FROM
-        monthly_balances
-      WHERE
-        row_num = 1
-    ),
-    filled_balances AS (
-      SELECT
-        am.account_id,
-        am.month,
-        COALESCE(lb.amount, LAST_VALUE(lb.amount) OVER (
-          PARTITION BY am.account_id
-          ORDER BY am.month
-          ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-        )) AS amount
-      FROM
-        account_months am
-      LEFT JOIN latest_balances lb
-        ON am.account_id = lb.account_id
-        AND am.month = lb.month
+          a.id AS account_id,
+          a.account_type,
+          b.amount,
+          b.created_at,
+          DATE_TRUNC('month', b.created_at) AS month
+      FROM accounts a
+      JOIN balances b ON a.id = b.account_id
+      JOIN users u ON u.id = a.user_id
+      WHERE b.created_at >= NOW() - INTERVAL '12 months'
+      AND u.id = ?
     )
-    SELECT
-      account_id,
-      account_type,
-      month,
-      coalesce(amount, 0.0) AS amount
-    FROM
-      filled_balances fb JOIN accounts a
-      ON fb.account_id = a.id
-    ORDER BY
-      account_id,
-      month;
+    SELECT DISTINCT ON (account_id, month)
+        account_id,
+        account_type,
+        amount,
+        month
+    FROM monthly_balances
+    ORDER BY account_id, month, created_at DESC;
   SQL
 
   BALANCE_SQL = <<-SQL
