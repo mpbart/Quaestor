@@ -1,13 +1,4 @@
 $(function() {
-  const data = [
-    { year: 2010, count: 10 },
-    { year: 2011, count: 20 },
-    { year: 2012, count: 15 },
-    { year: 2013, count: 25 },
-    { year: 2014, count: 22 },
-    { year: 2015, count: 30 },
-    { year: 2016, count: 28 },
-  ];
   getData = async function() {
     const response = await fetch('/chart_data/net_worth_over_timeframe', { method: 'GET' });
     return await response.json();
@@ -19,16 +10,39 @@ $(function() {
       $('#analytics'),
       {
         type: 'bar',
+        options: {
+          plugins: {
+            title: {
+              display: true,
+              text: 'Net Worth Over Time',
+              font: {
+                size: 16
+              }
+            }
+          }
+        },
         data: {
           labels: data.map(row => row.month),
           datasets: [
             {
-              label: 'Assets',
-              data: data.map(row => row.assets)
+              type: 'line',
+              label: 'Net Worth',
+              data: data.map(row => row.assets - row.debts),
+              backgroundColor: '#000000',
+              borderColor: 'rgba(0, 0, 0, 0.7)',
+              tension: 0.1
             },
             {
+              type: 'bar',
+              label: 'Assets',
+              data: data.map(row => row.assets),
+              backgroundColor: '#179d89'
+            },
+            {
+              type: 'bar',
               label: 'Debts',
-              data: data.map(row => row.debts)
+              data: data.map(row => row.debts),
+              backgroundColor: '#9d172b'
             }
           ]
         }

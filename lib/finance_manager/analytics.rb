@@ -2,20 +2,63 @@
 
 module FinanceManager
   class Analytics
+    MINT_DEBT_TYPE = 'DEBT'
     # Return JSON array of both debts and assets over the
     # given timeframe in months.
     # TODO: currently hardcoded to 1 year
-    # TODO: overlay the Mint data with this to get a full
-    # snapshot of net worth going back to the beginning
     def self.net_worth_over_timeframe(_timeframe, user_id)
       ::Account.balances_by_month(user_id)
-        .group_by { |row| row['month'] }
-        .map{ |k, v| {'month' => k.strftime('%B %Y')}.merge(amounts_by_account_type(v)) }
+               .group_by { |row| row['month'] }
+               .map do |k, v|
+        {
+          'month'     => k.strftime('%B %Y'),
+          'sort_date' => k
+        }.merge(
+          amounts_by_account_type(
+            v,
+            proc { |row| ::Account::DEBT_ACCOUNT_TYPES.include?(row['account_type']) }
+          )
+        )
+      end
+        .reject { |row| row['assets'] == 0.0 && row['debts'] == 0.0 }
+               .concat(mint_data('mint_data/net_worth.json'))
+               .sort_by { |h| h['sort_date'] }
+               .last(12)
     end
 
-    def self.amounts_by_account_type(rows)
+    def self.amounts_by_account_type(rows, is_debit_lambda)
       rows.each_with_object({ 'assets' => 0, 'debts' => 0 }) do |row, acc|
-        if ::Account::DEBT_ACCOUNT_TYPES.include?(row['account_type'])
+        if is_debit_lambda.call(row)
+          acc['debts'] += row['amount']
+        else
+          acc['assets'] += row['amount']
+        end
+      end
+    end
+
+    def self.mint_data(filename)
+      return [] unless File.exist?(filename)
+
+      raw = File.read(filename)
+      parsed = JSON.parse(raw)
+      parsed['net_worth'].group_by { |row| row['date'] }
+                         .map do |k, v|
+        date_obj = Date.strptime(k, '%Y-%m-%d')
+        {
+          'month'     => date_obj.strftime('%B %Y'),
+          'sort_date' => date_obj
+        }.merge(
+          amounts_by_account_type(
+            v,
+            proc { |row| row['type'] == MINT_DEBT_TYPE }
+          )
+        )
+      end
+    end
+
+    def self.mint_account_data_summarizer(rows)
+      rows.each_with_object({ 'assets' => 0, 'debts' => 0 }) do |row, acc|
+        if row['type'] == 'DEBT'
           acc['debts'] += row['amount']
         else
           acc['assets'] += row['amount']

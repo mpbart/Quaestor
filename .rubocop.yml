@@ -50,3 +50,6 @@ Style/HashTransformValues:
 
 Style/StringConcatenation:
   Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
