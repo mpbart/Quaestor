@@ -13,6 +13,73 @@ optional: true
   scope :by_date, -> { order('transactions.date DESC').order('transactions.description DESC') }
   scope :within_days, ->(days) { where('transactions.date >= ?', Date.current - days.days) }
 
+  TOTAL_PER_MONTH_SQL = <<-SQL
+    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
+    FROM transactions t
+    JOIN accounts a
+    ON t.account_id = a.id
+    JOIN plaid_categories pc
+    ON t.plaid_category_id = pc.id
+    WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
+    AND a.user_id = ?
+    AND pc.primary_category %s 'INCOME'
+    AND t.deleted_at IS NULL
+    GROUP BY DATE_TRUNC('MONTH', t.date);
+  SQL
+
+  CUMULATIVE_TOTALS_SQL = <<-SQL
+    SELECT SUM(amount) as total, primary_category
+    FROM transactions t
+    JOIN accounts a
+    ON t.account_id = a.id
+    JOIN plaid_categories pc
+    ON t.plaid_category_id = pc.id
+    WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
+    AND a.user_id = ?
+    AND t.deleted_at IS NULL
+    GROUP BY primary_category
+  SQL
+
+  PRIMARY_CATEGORY_PER_MONTH_SQL = <<-SQL
+    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
+    FROM transactions t
+    JOIN accounts a
+    ON t.account_id = a.id
+    JOIN plaid_categories pc
+    ON t.plaid_category_id = pc.id
+    WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
+    AND a.user_id = ?
+    AND pc.primary_category = ?
+    AND t.deleted_at IS NULL
+    GROUP BY DATE_TRUNC('MONTH', t.date);
+  SQL
+
+  DETAILED_CATEGORY_PER_MONTH_SQL = <<-SQL
+    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
+    FROM transactions t
+    JOIN accounts a
+    ON t.account_id = a.id
+    JOIN plaid_categories pc
+    ON t.plaid_category_id = pc.id
+    WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
+    AND a.user_id = ?
+    AND pc.detailed_category = ?
+    AND t.deleted_at IS NULL
+    GROUP BY DATE_TRUNC('MONTH', t.date);
+  SQL
+
+  MERCHANT_PER_MONTH_SQL = <<-SQL
+    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
+    FROM transactions t
+    JOIN accounts a
+    ON t.account_id = a.id
+    WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
+    AND a.user_id = ?
+    AND t.merchant_name ILIKE ?
+    AND t.deleted_at IS NULL
+    GROUP BY DATE_TRUNC('MONTH', t.date);
+  SQL
+
   def grouped_transactions
     transaction_group&.transactions&.where&.not(id: id) || []
   end
@@ -24,5 +91,41 @@ optional: true
                   .by_date
                   .paginate(page: page_num, per_page: 50)
                   .includes(:account, :plaid_category)
+  end
+
+  def self.total_spending_over_time(user_id)
+    sql_statement = format(TOTAL_PER_MONTH_SQL, '<>')
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [sql_statement, user_id])
+    ActiveRecord::Base.connection.execute(sanitized_sql)
+  end
+
+  def self.total_income_over_time(user_id)
+    sql_statement = format(TOTAL_PER_MONTH_SQL, '=')
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [sql_statement, user_id])
+    ActiveRecord::Base.connection.execute(sanitized_sql)
+  end
+
+  def self.category_totals(user_id)
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [CUMULATIVE_TOTALS_SQL, user_id])
+    ActiveRecord::Base.connection.execute(sanitized_sql)
+  end
+
+  def self.primary_category_spending_over_time(category_id, user_id)
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
+                                            [PRIMARY_CATEGORY_PER_MONTH_SQL, user_id, category_id])
+    ActiveRecord::Base.connection.execute(sanitized_sql)
+  end
+
+  def self.detailed_category_spending_over_time(category_id, user_id)
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
+                                            [DETAILED_CATEGORY_PER_MONTH_SQL, user_id, category_id])
+    ActiveRecord::Base.connection.execute(sanitized_sql)
+  end
+
+  def self.merchant_spending_over_time(merchant_name, user_id)
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
+                                            [MERCHANT_PER_MONTH_SQL, user_id,
+                                             '%' + merchant_name + '%'])
+    ActiveRecord::Base.connection.execute(sanitized_sql)
   end
 end

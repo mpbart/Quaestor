@@ -1,0 +1,12 @@
+= stylesheet_link_tag "application", media: "all"
+
+%body
+  %div.ui.divided.padded.grid
+    = render "shared/dimmer"
+    %div.four.wide.column
+    %div.nine.wide.column
+      %div
+        %canvas#analytics
+
+= javascript_include_tag "plaid"
+= javascript_include_tag "analytics"

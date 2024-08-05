@@ -39,6 +39,29 @@ class Account < ActiveRecord::Base
     SELECT assets.sum - debts.sum AS net_worth FROM assets, debts
   SQL
 
+  BALANCES_BY_MONTH_SQL = <<-SQL
+    WITH monthly_balances AS (
+      SELECT
+          a.id AS account_id,
+          a.account_type,
+          b.amount,
+          b.created_at,
+          DATE_TRUNC('month', b.created_at) AS month
+      FROM accounts a
+      JOIN balances b ON a.id = b.account_id
+      JOIN users u ON u.id = a.user_id
+      WHERE b.created_at >= NOW() - INTERVAL '12 months'
+      AND u.id = ?
+    )
+    SELECT DISTINCT ON (account_id, month)
+        account_id,
+        account_type,
+        amount,
+        month
+    FROM monthly_balances
+    ORDER BY account_id, month, created_at DESC;
+  SQL
+
   BALANCE_SQL = <<-SQL
     SELECT SUM(balances.amount) AS balance FROM accounts
     JOIN (SELECT *, ROW_NUMBER() OVER (PARTITION BY account_id ORDER BY created_at DESC) FROM balances)
@@ -57,5 +80,11 @@ class Account < ActiveRecord::Base
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
                                             [BALANCE_SQL, user_id, account_ids])
     ActiveRecord::Base.connection.execute(sanitized_sql).first['balance']
+  end
+
+  # TODO: Make configurable over a given time period instead of hardcoding to 12 months?
+  def self.balances_by_month(user_id)
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [BALANCES_BY_MONTH_SQL, user_id])
+    ActiveRecord::Base.connection.execute(sanitized_sql)
   end
 end
