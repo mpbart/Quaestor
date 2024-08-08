@@ -20,6 +20,8 @@ module FinanceManager
           )
         )
       end
+        # Remove months where both debts and assets are 0 so that we do not have duplicate months
+        # where one of them has all 0s
         .reject { |row| row['assets'] == 0.0 && row['debts'] == 0.0 }
                .concat(mint_data('mint_data/net_worth.json'))
                .sort_by { |h| h['sort_date'] }
@@ -53,16 +55,6 @@ module FinanceManager
             proc { |row| row['type'] == MINT_DEBT_TYPE }
           )
         )
-      end
-    end
-
-    def self.mint_account_data_summarizer(rows)
-      rows.each_with_object({ 'assets' => 0, 'debts' => 0 }) do |row, acc|
-        if row['type'] == 'DEBT'
-          acc['debts'] += row['amount']
-        else
-          acc['assets'] += row['amount']
-        end
       end
     end
 
