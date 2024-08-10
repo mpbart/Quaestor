@@ -60,8 +60,33 @@ const createChart = (data) => ({
         {
           type: 'bar',
           label: 'Spending',
-          data: data.map(row => row.debts),
-          backgroundColor: '#9d172b'
+          data: data.map(row => row.total),
+          backgroundColor: '#0982aa'
+        },
+      ]
+    }
+  },
+  'spending_on_category_over_timeframe': {
+    type: 'bar',
+    options: {
+      plugins: {
+        title: {
+          display: true,
+          text: 'Merchant Spending over Time',
+          font: {
+            size: 16
+          }
+        }
+      }
+    },
+    data: {
+      labels: data.map(row => row.month),
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Spending',
+          data: data.map(row => row.total),
+          backgroundColor: '#0982aa'
         },
       ]
     }
@@ -70,34 +95,20 @@ const createChart = (data) => ({
 
 let analyticsChart = null;
 
+renderChart = function(form) {
+  let formData = new FormData(form);
+  let params = new URLSearchParams();
+  var chart_type = null;
 
-$(function() {
-  $('#reportType').change(function() {
-    var selectedOption = $(this).val();
-    $('#merchantField').hide();
-    $('#categoryField').hide();
-
-    if (selectedOption === 'spending_on_merchant_over_timeframe') {
-      $('#merchantField').show();
-    } else if (selectedOption === 'spending_by_category') {
-      $('#categoryField').show();
+  for (const pair of formData.entries()) {
+    if (pair[1] !== '' && pair[0] !== 'chart_type') {
+      params.append(pair[0], pair[1])
+    } else if (pair[0] == 'chart_type') {
+      chart_type = pair[1] || 'net_worth_over_timeframe';
     }
-  });
-
-  $('#chartForm').submit(function(event) {
-    event.preventDefault();
-    renderChart();
-  });
-
-  renderChart();
-});
-
-renderChart = function() {
-  const chart_type = $('#reportType').val() || 'net_worth_over_timeframe';
+  }
   getData = async function() {
-    // TODO: Send the parameters from the form as part of the GET call to the
-    // backend
-    const response = await fetch(`/chart_data/${chart_type}`, { method: 'GET' });
+    const response = await fetch(`/chart_data/${chart_type}?${params.toString()}`, { method: 'GET' });
     return await response.json();
   }
 
@@ -110,3 +121,35 @@ renderChart = function() {
     analyticsChart = new Chart($('#analytics'), chart);
   });
 }
+
+$(function() {
+  // TODO:
+  // 1. Clear the category or merchant name when it becomes not selected anymore
+  // 2. Think about adding a chart under the graph showing numbers with an average
+  // 3. Figure out how to fix the errors that occur when reloading the page
+  // 4. Finish implementing other chart types
+  // 5. Investigate supporting time ranges instead of hardcoding to 12 months
+  // IDEAS:
+  // 1. Add chart for showing spending by tag
+  // 2. Add chart for showing spending on top 3 categories per month
+  // 3. Add a sankey diagram for showing flows of money?
+  $('#chartType').change(function() {
+    var selectedOption = $(this).val();
+    $('#merchantField').hide();
+    $('#categoryField').hide();
+
+    if (selectedOption === 'spending_on_merchant_over_timeframe') {
+      $('#merchantField').show();
+    } else if (selectedOption === 'spending_on_category_over_timeframe') {
+      $('#categoryField').show();
+    }
+  });
+
+  $('#chartForm').submit(function(event) {
+    event.preventDefault();
+    renderChart(this);
+  });
+
+  renderChart($('#chartForm')[0]);
+});
+

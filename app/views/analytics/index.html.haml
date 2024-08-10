@@ -7,26 +7,26 @@
       %form.ui.form#chartForm
         %div.field
           %label Select a View
-          %select#reportType.ui.dropdown
+          %select#chartType.ui.dropdown{ name: "chart_type" }
             %option{ value: "" } Choose an option
             %option{ value: "net_worth_over_timeframe" } Net Worth Over Time
-            %option{ value: "spending_by_category" } Spending by Category
+            %option{ value: "spending_on_category_over_timeframe" } Spending by Category
             %option{ value: "spending_on_merchant_over_timeframe" } Spending by Merchant
             %option{ value: "total_spending_over_time" } Total Spending Over Time
             %option{ value: "income_over_time" } Income Over Time
         %div.field#merchantField{ style: "display:none;" }
           %label Enter Merchant Name
-          %input{ type: "text", placeholder: "Merchant Name" }
+          %input{ type: "text", placeholder: "Merchant Name", name: "merchant_name" }
         %div.field#categoryField{ style: "display:none;" }
           %label Select a Category
-          %select#categoryDropdown.ui.dropdown
+          %select#categoryDropdown.ui.dropdown{ name: "category" }
             %option{ value: "" } Select Category
             - PlaidCategory.all.each do |category|
-              %option{ value: category }
+              %option{ value: category.detailed_category }
                 = humanized_category(category)
         %div.field
           %label Select a Time Range
-          %select.ui.dropdown
+          %select.ui.dropdown{ name: "timeframe" }
             %option{ value: "last_12_months" } Last 12 Months
             %option{ value: "year_to_date" } Year to Date
             %option{ value: "all_time" } All Time
