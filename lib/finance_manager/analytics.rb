@@ -94,13 +94,17 @@ module FinanceManager
     # in months
     # TODO: currently hardcoded to 1 year
     def self.spending_over_timeframe(_timeframe, user_id)
-      ::Transaction.total_spending_over_time(user_id)
+      ::Transaction.total_spending_over_time(user_id).map do |spending|
+        { total: spending['total'], month: spending['month'].strftime('%B %Y') }
+      end
     end
 
     # Return JSON array of income amounts over the given timeframe in months
     # TODO: currently hardcoded to 1 year
     def self.income_over_timeframe(_timeframe, user_id)
-      ::Transaction.total_income_over_time(user_id)
+      ::Transaction.total_income_over_time(user_id).map do |income|
+        { total: income['total'].abs, month: income['month'].strftime('%B %Y') }
+      end
     end
   end
 end

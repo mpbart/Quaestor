@@ -23,6 +23,7 @@ optional: true
     WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
     AND a.user_id = ?
     AND pc.primary_category %s 'INCOME'
+    AND pc.detailed_category NOT IN (#{::PlaidCategory::EXCLUDED_CATEGORIES.map{ |i| "'#{i}'" }.join(', ')})
     AND t.deleted_at IS NULL
     GROUP BY DATE_TRUNC('MONTH', t.date);
   SQL

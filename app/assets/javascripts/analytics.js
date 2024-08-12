@@ -90,6 +90,56 @@ const createChart = (data) => ({
         },
       ]
     }
+  },
+  'spending_over_timeframe': {
+    type: 'bar',
+    options: {
+      plugins: {
+        title: {
+          display: true,
+          text: 'Total Spending over Time',
+          font: {
+            size: 16
+          }
+        }
+      }
+    },
+    data: {
+      labels: data.map(row => row.month),
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Spending',
+          data: data.map(row => row.total),
+          backgroundColor: '#0982aa'
+        },
+      ]
+    }
+  },
+  'income_over_timeframe': {
+    type: 'bar',
+    options: {
+      plugins: {
+        title: {
+          display: true,
+          text: 'Total Income over Time',
+          font: {
+            size: 16
+          }
+        }
+      }
+    },
+    data: {
+      labels: data.map(row => row.month),
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Income',
+          data: data.map(row => row.total),
+          backgroundColor: '#179d89'
+        },
+      ]
+    }
   }
 });
 
