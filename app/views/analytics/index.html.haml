@@ -16,7 +16,7 @@
             %option{ value: "income_over_timeframe" } Income Over Time
         %div.field#merchantField{ style: "display:none;" }
           %label Enter Merchant Name
-          %input{ type: "text", placeholder: "Merchant Name", name: "merchant_name" }
+          %input#merchantInput{ type: "text", placeholder: "Merchant Name", name: "merchant_name" }
         %div.field#categoryField{ style: "display:none;" }
           %label Select a Category
           %select#categoryDropdown.ui.dropdown{ name: "category" }

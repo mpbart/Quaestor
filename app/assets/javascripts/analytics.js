@@ -174,11 +174,9 @@ renderChart = function(form) {
 
 $(function() {
   // TODO:
-  // 1. Clear the category or merchant name when it becomes not selected anymore
-  // 2. Think about adding a chart under the graph showing numbers with an average
-  // 3. Figure out how to fix the errors that occur when reloading the page
-  // 4. Finish implementing other chart types
-  // 5. Investigate supporting time ranges instead of hardcoding to 12 months
+  // 1. Think about adding a chart under the graph showing numbers with an average
+  // 2. Figure out how to fix the errors that occur when reloading the page
+  // 3. Investigate supporting time ranges instead of hardcoding to 12 months
   // IDEAS:
   // 1. Add chart for showing spending by tag
   // 2. Add chart for showing spending on top 3 categories per month
@@ -190,8 +188,10 @@ $(function() {
 
     if (selectedOption === 'spending_on_merchant_over_timeframe') {
       $('#merchantField').show();
+      $('#categoryDropdown').dropdown('clear');
     } else if (selectedOption === 'spending_on_category_over_timeframe') {
       $('#categoryField').show();
+      $('#merchantInput').val('');
     }
   });
 
