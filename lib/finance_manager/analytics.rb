@@ -70,7 +70,7 @@ module FinanceManager
     # TODO: currently hardcoded to 1 year
     def self.spending_on_detailed_category_over_timeframe(category_name, _timeframe, user_id)
       ::Transaction.detailed_category_spending_over_time(category_name, user_id).map do |spending|
-        { total: spending['total'], month: spending['month'].strftime('%B %Y') }
+        { total: spending['total'].abs, month: spending['month'].strftime('%B %Y') }
       end
     end
 
@@ -79,7 +79,7 @@ module FinanceManager
     # TODO: currently hardcoded to 1 year
     def self.spending_on_merchant_over_timeframe(merchant_name, _timeframe, user_id)
       ::Transaction.merchant_spending_over_time(merchant_name, user_id).map do |spending|
-        { total: spending['total'], month: spending['month'].strftime('%B %Y') }
+        { total: spending['total'].abs, month: spending['month'].strftime('%B %Y') }
       end
     end
 
