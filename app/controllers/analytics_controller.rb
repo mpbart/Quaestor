@@ -13,7 +13,7 @@ class AnalyticsController < ApplicationController
       category_name: data_set[:category],
       merchant_name: data_set[:merchant_name],
       user_id:       current_user.id,
-      _timeframe:    data_set[:timeframe]
+      timeframe:     data_set[:timeframe]
     }.compact
     results = FinanceManager::Analytics.try(data_set[:dataset], **params)
     render json: results || {}

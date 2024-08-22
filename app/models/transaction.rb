@@ -20,12 +20,12 @@ optional: true
     ON t.account_id = a.id
     JOIN plaid_categories pc
     ON t.plaid_category_id = pc.id
-    WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
     AND a.user_id = ?
     AND pc.primary_category %s 'INCOME'
     AND pc.detailed_category NOT IN (#{::PlaidCategory::EXCLUDED_CATEGORIES.map { |i| "'#{i}'" }.join(', ')})
     AND t.deleted_at IS NULL
-    GROUP BY DATE_TRUNC('MONTH', t.date);
+    GROUP BY DATE_TRUNC('MONTH', t.date)
+    ORDER BY month ASC
   SQL
 
   CUMULATIVE_TOTALS_SQL = <<-SQL
@@ -35,7 +35,6 @@ optional: true
     ON t.account_id = a.id
     JOIN plaid_categories pc
     ON t.plaid_category_id = pc.id
-    WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
     AND a.user_id = ?
     AND t.deleted_at IS NULL
     GROUP BY primary_category
@@ -48,11 +47,11 @@ optional: true
     ON t.account_id = a.id
     JOIN plaid_categories pc
     ON t.plaid_category_id = pc.id
-    WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
     AND a.user_id = ?
     AND pc.primary_category = ?
     AND t.deleted_at IS NULL
-    GROUP BY DATE_TRUNC('MONTH', t.date);
+    GROUP BY DATE_TRUNC('MONTH', t.date)
+    ORDER BY month ASC
   SQL
 
   DETAILED_CATEGORY_PER_MONTH_SQL = <<-SQL
@@ -62,11 +61,11 @@ optional: true
     ON t.account_id = a.id
     JOIN plaid_categories pc
     ON t.plaid_category_id = pc.id
-    WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
     AND a.user_id = ?
     AND pc.detailed_category = ?
     AND t.deleted_at IS NULL
-    GROUP BY DATE_TRUNC('MONTH', t.date);
+    GROUP BY DATE_TRUNC('MONTH', t.date)
+    ORDER BY month ASC
   SQL
 
   MERCHANT_PER_MONTH_SQL = <<-SQL
@@ -74,11 +73,11 @@ optional: true
     FROM transactions t
     JOIN accounts a
     ON t.account_id = a.id
-    WHERE DATE_TRUNC('MONTH', t.date) > DATE_TRUNC('month', NOW()) - INTERVAL '12 months'
     AND a.user_id = ?
     AND t.merchant_name ILIKE ?
     AND t.deleted_at IS NULL
-    GROUP BY DATE_TRUNC('MONTH', t.date);
+    GROUP BY DATE_TRUNC('MONTH', t.date)
+    ORDER BY month ASC
   SQL
 
   def grouped_transactions
