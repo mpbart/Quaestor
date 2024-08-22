@@ -100,7 +100,7 @@ module FinanceManager
     end
 
     def self.present_as_hash(records)
-      records.map{ |rec| { total: rec['total'].abs, month: rec['month'].strftime('%B %Y') } }
+      records.map { |rec| { total: rec['total'].abs, month: rec['month'].strftime('%B %Y') } }
     end
   end
 end
