@@ -6,7 +6,7 @@ module FinanceManager
     # Return JSON array of both debts and assets over the
     # given timeframe in months.
     # TODO: currently hardcoded to 1 year
-    def self.net_worth_over_timeframe(_timeframe, user_id)
+    def self.net_worth_over_timeframe(user_id:, _timeframe: nil)
       ::Account.balances_by_month(user_id)
                .group_by { |row| row['month'] }
                .map do |k, v|
@@ -61,41 +61,41 @@ module FinanceManager
     # Return JSON array of amounts spent by month on the category_name
     # within the passed in timeframe
     # TODO: currently hardcoded to 1 year
-    def self.spending_on_primary_category_over_timeframe(category_name, _timeframe, user_id)
+    def self.spending_on_primary_category_over_timeframe(category_name:, user_id:, _timeframe: nil)
       present_as_hash(::Transaction.primary_category_spending_over_time(category_name, user_id))
     end
 
     # Return JSON array of amounts spent by month on the category_name
     # within the passed in timeframe
     # TODO: currently hardcoded to 1 year
-    def self.spending_on_detailed_category_over_timeframe(category_name, _timeframe, user_id)
+    def self.spending_on_detailed_category_over_timeframe(category_name:, user_id:, _timeframe: nil)
       present_as_hash(::Transaction.detailed_category_spending_over_time(category_name, user_id))
     end
 
     # Return JSON array of amounts spent by month on the merchant_name within
     # the passed in timeframe
     # TODO: currently hardcoded to 1 year
-    def self.spending_on_merchant_over_timeframe(merchant_name, _timeframe, user_id)
+    def self.spending_on_merchant_over_timeframe(merchant_name:, user_id:, _timeframe: nil)
       present_as_hash(::Transaction.merchant_spending_over_time(merchant_name, user_id))
     end
 
     # Return JSON array tallying the total amounts spent on each category
     # within the given timeframe
     # TODO: currently hardcoded to 1 year
-    def self.total_spending_on_all_categories_over_timeframe(_timeframe, user_id)
+    def self.total_spending_on_all_categories_over_timeframe(user_id:, _timeframe: nil)
       present_as_hash(::Transaction.category_totals(user_id))
     end
 
     # Return JSON array of spending amounts over the given timeframe
     # in months
     # TODO: currently hardcoded to 1 year
-    def self.spending_over_timeframe(_timeframe, user_id)
+    def self.spending_over_timeframe(user_id:, _timeframe: nil)
       present_as_hash(::Transaction.total_spending_over_time(user_id))
     end
 
     # Return JSON array of income amounts over the given timeframe in months
     # TODO: currently hardcoded to 1 year
-    def self.income_over_timeframe(_timeframe, user_id)
+    def self.income_over_timeframe(user_id:, _timeframe: nil)
       present_as_hash(::Transaction.total_income_over_time(user_id))
     end
 

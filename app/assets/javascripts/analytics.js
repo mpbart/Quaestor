@@ -66,7 +66,7 @@ const createChart = (data) => ({
       ]
     }
   },
-  'spending_on_category_over_timeframe': {
+  'spending_on_detailed_category_over_timeframe': {
     type: 'bar',
     options: {
       plugins: {
@@ -189,8 +189,11 @@ $(function() {
     if (selectedOption === 'spending_on_merchant_over_timeframe') {
       $('#merchantField').show();
       $('#categoryDropdown').dropdown('clear');
-    } else if (selectedOption === 'spending_on_category_over_timeframe') {
+    } else if (selectedOption === 'spending_on_detailed_category_over_timeframe') {
       $('#categoryField').show();
+      $('#merchantInput').val('');
+    } else {
+      $('#categoryDropdown').dropdown('clear');
       $('#merchantInput').val('');
     }
   });
