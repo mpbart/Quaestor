@@ -13,7 +13,7 @@ module FinanceManager
                .map do |k, v|
         {
           'month'     => k.strftime('%B %Y'),
-          'sort_date' => k
+          'sort_date' => k.to_date
         }.merge(
           amounts_by_account_type(
             v,
@@ -36,6 +36,9 @@ module FinanceManager
         else
           acc['assets'] += row['amount']
         end
+      end.tap do |row|
+        row['debts'] = row['debts'].round(2)
+        row['assets'] = row['assets'].round(2)
       end
     end
 
@@ -114,7 +117,9 @@ module FinanceManager
     end
 
     def self.present_as_hash(records)
-      records.map { |rec| { total: rec['total'].abs, month: rec['month'].strftime('%B %Y') } }
+      records.map do |rec|
+        { amount: rec['total'].abs.round(2), month: rec['month'].strftime('%B %Y') }
+      end
     end
 
     def self.filter_for_timeframe(timeframe, records)

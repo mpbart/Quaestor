@@ -74,7 +74,7 @@ optional: true
     JOIN accounts a
     ON t.account_id = a.id
     AND a.user_id = ?
-    AND t.merchant_name ILIKE ?
+    AND (t.merchant_name ILIKE ? OR t.description ILIKE ?)
     AND t.deleted_at IS NULL
     GROUP BY DATE_TRUNC('MONTH', t.date)
     ORDER BY month ASC
@@ -124,7 +124,9 @@ optional: true
 
   def self.merchant_spending_over_time(merchant_name, user_id)
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
-                                            [MERCHANT_PER_MONTH_SQL, user_id,
+                                            [MERCHANT_PER_MONTH_SQL,
+                                             user_id,
+                                             '%' + merchant_name + '%',
                                              '%' + merchant_name + '%'])
     ActiveRecord::Base.connection.execute(sanitized_sql)
   end

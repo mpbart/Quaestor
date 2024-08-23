@@ -148,3 +148,8 @@ h4.ui.center.aligned {
   vertical-align: bottom;
   text-align: end;
 }
+
+#graph_data_table th {
+  width: 100%;
+  table-layout: fixed;
+}
