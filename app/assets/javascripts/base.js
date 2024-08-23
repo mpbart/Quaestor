@@ -42,7 +42,6 @@ unDimPage = function() {
 
 addAccountsToWarningBanner = function(accounts) {
   elt = $('#account_refresh_failure_banner > ul')
-  console.log(accounts);
   for (const account of accounts) {
     elt.append("<li>" + account + "</li>");
   }

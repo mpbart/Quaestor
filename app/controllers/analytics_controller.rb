@@ -8,8 +8,14 @@ class AnalyticsController < ApplicationController
   def index; end
 
   def chart_data
-    data_set = params.permit(:dataset)[:dataset]
-    results = FinanceManager::Analytics.try(data_set, nil, current_user.id)
+    data_set = params.permit(:dataset, :timeframe, :category, :merchant_name)
+    params = {
+      category_name: data_set[:category],
+      merchant_name: data_set[:merchant_name],
+      user_id:       current_user.id,
+      timeframe:     data_set[:timeframe]
+    }.compact
+    results = FinanceManager::Analytics.try(data_set[:dataset], **params)
     render json: results || {}
   end
 end
