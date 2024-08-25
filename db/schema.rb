@@ -10,8 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_25_011728) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_25_131629) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "hypopg"
+  enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
@@ -132,6 +134,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_25_011728) do
     t.datetime "deleted_at"
     t.bigint "plaid_category_id"
     t.index ["account_id"], name: "index_transactions_on_account_id"
+    t.index ["date"], name: "index_transactions_on_date"
     t.index ["deleted_at"], name: "index_transactions_on_deleted_at"
     t.index ["id"], name: "index_transactions_on_id"
     t.index ["plaid_category_id"], name: "index_transactions_on_plaid_category_id"
