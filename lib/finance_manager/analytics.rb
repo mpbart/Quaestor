@@ -5,7 +5,6 @@ module FinanceManager
     MINT_DEBT_TYPE = 'DEBT'
     # Return JSON array of both debts and assets over the
     # given timeframe in months.
-    # TODO: currently hardcoded to 1 year
     def self.net_worth_over_timeframe(user_id:, timeframe: nil)
       time_range = range_from_timeframe(timeframe)
       ::Account.balances_by_month(user_id)

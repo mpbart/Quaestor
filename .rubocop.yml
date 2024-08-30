@@ -54,3 +54,6 @@ Style/StringConcatenation:
 
 Style/MultilineBlockChain:
   Enabled: false
+
+Lint/EnsureReturn:
+  Enabled: false
