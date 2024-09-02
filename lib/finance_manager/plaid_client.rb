@@ -10,7 +10,7 @@ module FinanceManager
     TransactionsResponse = Struct.new(:added, :modified, :removed, :cursor,
                                       :failed_institution_name)
 
-    attr_reader :api_client
+    attr_reader :client
 
     def initialize
       plaid_config = Plaid::Configuration.new
@@ -19,14 +19,13 @@ module FinanceManager
       plaid_config.api_key['PLAID-SECRET'] = ENV.fetch('PLAID_SECRET_ID')
 
       api_client = Plaid::ApiClient.new(plaid_config)
-
-      @api_client = Plaid::PlaidApi.new(api_client)
+      @client = Plaid::PlaidApi.new(api_client)
     end
 
     def sync_accounts(plaid_credential)
       return_value = AccountsResponse.new
       request = Plaid::AccountsGetRequest.new({ access_token: plaid_credential.access_token })
-      plaid_response = api_client.accounts_get(request)
+      plaid_response = client.accounts_get(request)
       PlaidResponse.record_accounts_response!(plaid_response.to_hash, plaid_credential)
 
       return_value.accounts = plaid_response.accounts
@@ -53,7 +52,7 @@ module FinanceManager
           access_token: plaid_credential.access_token,
           cursor:       cursor
         )
-        plaid_response = api_client.transactions_sync(request)
+        plaid_response = client.transactions_sync(request)
         PlaidResponse.record_transactions_response!(plaid_response.to_hash, plaid_credential)
 
         added.concat(plaid_response.added)
@@ -82,7 +81,7 @@ module FinanceManager
 
     def get_institution_information!(plaid_credential)
       item_request = Plaid::ItemGetRequest.new({ access_token: plaid_credential.access_token })
-      response = plaid_client.item_get(item_request)
+      response = client.item_get(item_request)
 
       request = Plaid::InstitutionsGetByIdRequest.new(
         {
@@ -90,7 +89,7 @@ module FinanceManager
           country_codes:  ['US']
         }
       )
-      response = plaid_client.institutions_get_by_id(request)
+      response = client.institutions_get_by_id(request)
 
       plaid_credential.update_columns(
         institution_id:   response.institution.institution_id,
@@ -112,7 +111,7 @@ module FinanceManager
           language:      'en'
         }
       )
-      api_client.link_token_create(link_token_create_request)
+      client.link_token_create(link_token_create_request)
     end
 
     private

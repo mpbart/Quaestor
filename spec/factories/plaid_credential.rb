@@ -6,7 +6,7 @@ FactoryBot.define do
     plaid_item_id { SecureRandom.uuid }
     institution_name { 'institution' }
     institution_id { 'id' }
-    cursor { 'cursor' }
+    cursor { 'initial cursor' }
     access_token { 'token' }
   end
 end
