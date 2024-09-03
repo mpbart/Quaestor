@@ -10,17 +10,23 @@ RSpec.describe FinanceManager::Interface do
   let!(:plaid_credential) { create(:plaid_credential, user: user) }
 
   before do
-    allow_any_instance_of(described_class).to receive(:create_plaid_client).and_return(plaid_client)
+    allow(FinanceManager::PlaidClient).to receive(:new).and_return(plaid_client)
   end
 
   describe '#refresh_accounts' do
-    let(:acct_id)            { SecureRandom.uuid }
-    let(:acct_mask)          { '1234' }
-    let(:acct_name)          { 'Test Account' }
-    let(:acct_official_name) { 'Very Official Name' }
-    let(:acct_type)          { Plaid::AccountType::DEPOSITORY }
-    let(:acct_subtype)       { Plaid::AccountSubtype::CHECKING }
-    let(:response)           { Plaid::AccountsGetResponse.new(accounts: accounts) }
+    let(:acct_id)                 { SecureRandom.uuid }
+    let(:acct_mask)               { '1234' }
+    let(:acct_name)               { 'Test Account' }
+    let(:acct_official_name)      { 'Very Official Name' }
+    let(:acct_type)               { Plaid::AccountType::DEPOSITORY }
+    let(:acct_subtype)            { Plaid::AccountSubtype::CHECKING }
+    let(:failed_institution_name) { nil }
+    let(:response) do
+      FinanceManager::PlaidClient::AccountsResponse.new(
+        accounts:                accounts,
+        failed_institution_name: failed_institution_name
+      )
+    end
     let(:accounts) do
       [Plaid::AccountBase.new(
         account_id:    acct_id,
@@ -34,15 +40,10 @@ RSpec.describe FinanceManager::Interface do
     end
 
     before do
-      allow(plaid_client).to receive(:accounts_get).and_return(response)
+      allow(plaid_client).to receive(:sync_accounts).and_return(response)
     end
 
     subject(:refresh_accounts) { instance.refresh_accounts }
-
-    it 'records the raw response from plaid in the database' do
-      expect { refresh_accounts }.to change { PlaidResponse.count }.by(1)
-      expect(PlaidResponse.order('created_at DESC').first.response).to eq(response.to_hash)
-    end
 
     context 'when the account is new' do
       it 'creates a new account' do
@@ -81,25 +82,26 @@ RSpec.describe FinanceManager::Interface do
   end
 
   describe '#refresh_transactions' do
-    let!(:category)   { create(:plaid_category) }
-    let(:added)       { [] }
-    let(:modified)    { [] }
-    let(:removed)     { [] }
-    let(:next_cursor) { 'next_cursor' }
-    let(:has_more)    { false }
-    let(:account)     { create(:account, user: user) }
+    let!(:category)               { create(:plaid_category) }
+    let(:added)                   { [] }
+    let(:modified)                { [] }
+    let(:removed)                 { [] }
+    let(:cursor)                  { 'cursor' }
+    let(:has_more)                { false }
+    let(:account)                 { create(:account, user: user) }
+    let(:failed_institution_name) { nil }
     let(:response) do
-      Plaid::TransactionsSyncResponse.new(
-        added:       added,
-        modified:    modified,
-        removed:     removed,
-        next_cursor: next_cursor,
-        has_more:    has_more
+      FinanceManager::PlaidClient::TransactionsResponse.new(
+        added:                   added,
+        modified:                modified,
+        removed:                 removed,
+        cursor:                  cursor,
+        failed_institution_name: failed_institution_name
       )
     end
 
     before do
-      allow(plaid_client).to receive(:transactions_sync).and_return(response)
+      allow(plaid_client).to receive(:sync_transactions).and_return(response)
     end
 
     subject(:refresh_transactions) { instance.refresh_transactions }
@@ -197,18 +199,14 @@ RSpec.describe FinanceManager::Interface do
                                            }
           .and change { Transaction.count }.by(0)
           .and change { PlaidResponse.count }.by(0)
-        expect(plaid_credential.reload.cursor).not_to eq(next_cursor)
+        expect(plaid_credential.reload.cursor).not_to eq(cursor)
       end
-    end
-
-    it 'records the raw plaid response to the database' do
-      expect { refresh_transactions }.to change { PlaidResponse.count }.by(1)
     end
 
     it 'updates the cursor' do
       refresh_transactions
 
-      expect(plaid_credential.reload.cursor).to eq(next_cursor)
+      expect(plaid_credential.reload.cursor).to eq(cursor)
     end
   end
 
@@ -259,30 +257,6 @@ RSpec.describe FinanceManager::Interface do
       it 'returns false' do
         expect(split_transaction).to eq(false)
       end
-    end
-  end
-
-  describe '#add_institution_information' do
-    let(:inst_id)       { 999 }
-    let(:inst_name)     { 'new institution name' }
-    let(:institution)   { Plaid::Institution.new(institution_id: inst_id, name: inst_name) }
-    let(:response)      { Plaid::InstitutionsGetByIdResponse.new(institution: institution) }
-    let(:item_response) do
-      Plaid::ItemGetResponse.new(item: Plaid::Item.new(institution_id: inst_id))
-    end
-
-    before do
-      allow(plaid_client).to receive(:item_get).and_return(item_response)
-      allow(plaid_client).to receive(:institutions_get_by_id).and_return(response)
-    end
-
-    subject(:add_institution_information) { instance.add_institution_information(plaid_credential) }
-
-    it "updates the plaid credential's name and id" do
-      add_institution_information
-
-      expect(plaid_credential.reload.institution_id).to eq(inst_id.to_s)
-      expect(plaid_credential.reload.institution_name).to eq(inst_name)
     end
   end
 end

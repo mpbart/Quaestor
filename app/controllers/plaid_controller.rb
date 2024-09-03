@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+require 'cache_manager'
 require 'finance_manager/interface'
+require 'finance_manager/plaid_client'
 
 class PlaidController < ActionController::Base
   before_action :authenticate_user!
@@ -9,6 +11,7 @@ class PlaidController < ActionController::Base
 
   # rubocop:disable Naming/AccessorMethodName
   # Add accounts from new financial institution for user
+  # TODO: Move logic to plaid client?
   def get_access_token
     params.permit(:public_token)
     public_token = params[:public_token]
@@ -36,27 +39,12 @@ class PlaidController < ActionController::Base
   end
 
   def create_link_token
-    link_token_create_request = Plaid::LinkTokenCreateRequest.new(
-      {
-        user:          { client_user_id: current_user.id.to_s },
-        client_name:   'personal-dash',
-        # Might need to only have transactions since it expects the linked institution to
-        # have accounts with all types listed below
-        products:      %w[
-          transactions
-        ],
-        country_codes: ['US'],
-        language:      'en'
-      }
-    )
+    link_token = CacheManager.get(:plaid_link_token, current_user.id)
 
-    link_token_response = finance_manager.plaid_client.link_token_create(
-      link_token_create_request
-    )
-
-    render json: { link_token: link_token_response.link_token }
+    render json: { link_token: link_token }
   end
 
+  # TODO: Move this logic to cache manager and plaid client
   def fix_account_connection
     access_token = PlaidCredential.find_by(
       institution_name: Account.find(params[:account_id]).institution_name
@@ -72,7 +60,7 @@ class PlaidController < ActionController::Base
       }
     )
 
-    link_token_response = finance_manager.plaid_client.link_token_create(
+    link_token_response = plaid_client.api_client.link_token_create(
       link_token_create_request
     )
 
@@ -83,6 +71,12 @@ class PlaidController < ActionController::Base
 
   def finance_manager
     @finance_manager ||= FinanceManager::Interface.new(current_user)
+  end
+
+  # TODO: Eventually refactor this out but leave for now to keep the number of
+  # changes under control
+  def plaid_client
+    @plaid_client ||= FinanceManager::PlaidClient.new
   end
 
   def valid_public_token?(token)
