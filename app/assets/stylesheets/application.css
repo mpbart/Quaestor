@@ -153,3 +153,7 @@ h4.ui.center.aligned {
   width: 100%;
   table-layout: fixed;
 }
+
+.ui.card:nth-child(2) {
+  margin-top: 0 !important;
+}
