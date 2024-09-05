@@ -9,22 +9,20 @@ module FinanceManager
         @user = user
       end
 
-      def income_by_source
-        @income_by_source ||=
-          user.transactions.joins(:plaid_category)
-              .within_days(30)
-              .pluck(:amount, :primary_category, :detailed_category)
-              .filter { |t| t[1] == 'INCOME' }
-              .group_by { |t| t[1] }
+      def income_by_source(start_date, end_date)
+        user.transactions.joins(:plaid_category)
+            .within_days(start_date, end_date)
+            .pluck(:amount, :primary_category, :detailed_category)
+            .filter { |t| t[1] == 'INCOME' && !PlaidCategory::EXCLUDED_CATEGORIES.include?(t[2]) }
+            .group_by { |t| t[1] }
       end
 
-      def expenses_by_source
-        @expenses_by_source ||=
-          user.transactions.joins(:plaid_category)
-              .within_days(30)
-              .pluck(:amount, :primary_category, :detailed_category)
-              .filter { |t| t[1] != 'INCOME' && !PlaidCategory::EXCLUDED_CATEGORIES.include?(t[2]) }
-              .group_by { |t| t[1] }
+      def expenses_by_source(start_date, end_date)
+        user.transactions.joins(:plaid_category)
+            .within_days(start_date, end_date)
+            .pluck(:amount, :primary_category, :detailed_category)
+            .filter { |t| t[1] != 'INCOME' && !PlaidCategory::EXCLUDED_CATEGORIES.include?(t[2]) }
+            .group_by { |t| t[1] }
       end
 
       def total_amount(grouped_transactions)

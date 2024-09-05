@@ -11,7 +11,9 @@ optional: true
   has_and_belongs_to_many :labels
 
   scope :by_date, -> { order('transactions.date DESC').order('transactions.description DESC') }
-  scope :within_days, ->(days) { where('transactions.date >= ?', Date.current - days.days) }
+  scope :within_days, lambda { |start_date, end_date|
+                        where('transactions.date BETWEEN ? AND ?', start_date, end_date)
+                      }
 
   TOTAL_PER_MONTH_SQL = <<-SQL.freeze
     SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
