@@ -65,7 +65,7 @@
             %h3.ui.center.aligned.header
               Monthly Summary
             %div.center.aligned.meta
-              = "#{Date.current.strftime('%b %d')} - #{(Date.current - 30.days).strftime('%b %d')}"
+              = "#{@start_date.to_date.strftime('%b %d')} - #{@end_date.to_date.strftime('%b %d')}"
             %div.ui.divider
             %h4.ui.center.aligned.header
               Income

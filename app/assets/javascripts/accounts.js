@@ -39,7 +39,7 @@ makeListItemClickable = function() {
   })
 }
 
-$(function() {
+initHomepageElements = function() {
   $('#successIconAccount').hide();
   $('#failureIconAccount').hide();
   $('#successIconBalance').hide();
@@ -50,6 +50,11 @@ $(function() {
 
   setAccountSubTypeMenu($('#account_type').val());
 
+  makeListItemClickable();
+  $('.progress').progress({showActivity: false});
+}
+
+$(function() {
   // Add event handlers
   $('#add-account-button').click(function() {
     const button = $('#add-account-button');
@@ -60,13 +65,17 @@ $(function() {
     }
   });
 
-
   $('#account_type').change(function() {
     const accountType = $(this).val();
 
     setAccountSubTypeMenu(accountType);
   });
 
-  makeListItemClickable();
-  $('.progress').progress({showActivity: false});
+  initHomepageElements();
+
+  $('turbo-frame#home').on('turbo:frame-load', function(event) {
+    initHomepageElements();
+    $('.ui.dropdown').dropdown();
+    $('.ui.accordion').accordion();
+  });
 });

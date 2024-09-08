@@ -1,149 +1,4 @@
-const createChart = (data) => ({
-  'net_worth_over_timeframe': {
-    type: 'bar',
-    options: {
-      plugins: {
-        title: {
-          display: true,
-          text: 'Net Worth Over Time',
-          font: {
-            size: 16
-          }
-        }
-      }
-    },
-    data: {
-      labels: data.map(row => row.month),
-      datasets: [
-        {
-          type: 'line',
-          label: 'Net Worth',
-          data: data.map(row => row.assets - row.debts),
-          backgroundColor: '#000000',
-          borderColor: 'rgba(0, 0, 0, 0.7)',
-          tension: 0.1
-        },
-        {
-          type: 'bar',
-          label: 'Debts',
-          data: data.map(row => row.debts),
-          backgroundColor: '#9d172b'
-        },
-        {
-          type: 'bar',
-          label: 'Assets',
-          data: data.map(row => row.assets),
-          backgroundColor: '#179d89'
-        }
-      ]
-    },
-    options: {
-      scales: { x: { stacked: true }, y: { stacked: true } }
-    }
-  },
-  'spending_on_merchant_over_timeframe': {
-    type: 'bar',
-    options: {
-      plugins: {
-        title: {
-          display: true,
-          text: 'Merchant Spending over Time',
-          font: {
-            size: 16
-          }
-        }
-      }
-    },
-    data: {
-      labels: data.map(row => row.month),
-      datasets: [
-        {
-          type: 'bar',
-          label: 'Spending',
-          data: data.map(row => row.amount),
-          backgroundColor: '#0982aa'
-        },
-      ]
-    }
-  },
-  'spending_on_detailed_category_over_timeframe': {
-    type: 'bar',
-    options: {
-      plugins: {
-        title: {
-          display: true,
-          text: 'Merchant Spending over Time',
-          font: {
-            size: 16
-          }
-        }
-      }
-    },
-    data: {
-      labels: data.map(row => row.month),
-      datasets: [
-        {
-          type: 'bar',
-          label: 'Spending',
-          data: data.map(row => row.amount),
-          backgroundColor: '#0982aa'
-        },
-      ]
-    }
-  },
-  'spending_over_timeframe': {
-    type: 'bar',
-    options: {
-      plugins: {
-        title: {
-          display: true,
-          text: 'Total Spending over Time',
-          font: {
-            size: 16
-          }
-        }
-      }
-    },
-    data: {
-      labels: data.map(row => row.month),
-      datasets: [
-        {
-          type: 'bar',
-          label: 'Spending',
-          data: data.map(row => row.amount),
-          backgroundColor: '#0982aa'
-        },
-      ]
-    }
-  },
-  'income_over_timeframe': {
-    type: 'bar',
-    options: {
-      plugins: {
-        title: {
-          display: true,
-          text: 'Total Income over Time',
-          font: {
-            size: 16
-          }
-        }
-      }
-    },
-    data: {
-      labels: data.map(row => row.month),
-      datasets: [
-        {
-          type: 'bar',
-          label: 'Income',
-          data: data.map(row => row.amount),
-          backgroundColor: '#179d89'
-        },
-      ]
-    }
-  }
-});
-
-let analyticsChart = null;
+var analyticsChart = null;
 
 renderTable = function(tableData, sumValues, averageValues) {
   const table = document.getElementById('graph_data_table');
@@ -213,7 +68,7 @@ renderTable = function(tableData, sumValues, averageValues) {
   table.appendChild(tableBody);
 }
 
-renderChart = function(form) {
+renderChart = function(form, chartCreator) {
   let formData = new FormData(form);
   let params = new URLSearchParams();
   var chartType = null;
@@ -235,7 +90,7 @@ renderChart = function(form) {
       analyticsChart.destroy();
     }
 
-    const chart = createChart(data)[chartType];
+    const chart = chartCreator(data)[chartType];
     analyticsChart = new Chart($('#analytics'), chart);
 
     let averageValues = false;
@@ -256,6 +111,152 @@ $(function() {
   // 1. Add chart for showing spending by tag
   // 2. Add chart for showing spending on top 3 categories per month
   // 3. Add a sankey diagram for showing flows of money?
+
+  const createChart = (data) => ({
+    'net_worth_over_timeframe': {
+      type: 'bar',
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Net Worth Over Time',
+            font: {
+              size: 16
+            }
+          }
+        }
+      },
+      data: {
+        labels: data.map(row => row.month),
+        datasets: [
+          {
+            type: 'line',
+            label: 'Net Worth',
+            data: data.map(row => row.assets - row.debts),
+            backgroundColor: '#000000',
+            borderColor: 'rgba(0, 0, 0, 0.7)',
+            tension: 0.1
+          },
+          {
+            type: 'bar',
+            label: 'Debts',
+            data: data.map(row => row.debts),
+            backgroundColor: '#9d172b'
+          },
+          {
+            type: 'bar',
+            label: 'Assets',
+            data: data.map(row => row.assets),
+            backgroundColor: '#179d89'
+          }
+        ]
+      },
+      options: {
+        scales: { x: { stacked: true }, y: { stacked: true } }
+      }
+    },
+    'spending_on_merchant_over_timeframe': {
+      type: 'bar',
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Merchant Spending over Time',
+            font: {
+              size: 16
+            }
+          }
+        }
+      },
+      data: {
+        labels: data.map(row => row.month),
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Spending',
+            data: data.map(row => row.amount),
+            backgroundColor: '#0982aa'
+          },
+        ]
+      }
+    },
+    'spending_on_detailed_category_over_timeframe': {
+      type: 'bar',
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Merchant Spending over Time',
+            font: {
+              size: 16
+            }
+          }
+        }
+      },
+      data: {
+        labels: data.map(row => row.month),
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Spending',
+            data: data.map(row => row.amount),
+            backgroundColor: '#0982aa'
+          },
+        ]
+      }
+    },
+    'spending_over_timeframe': {
+      type: 'bar',
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Total Spending over Time',
+            font: {
+              size: 16
+            }
+          }
+        }
+      },
+      data: {
+        labels: data.map(row => row.month),
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Spending',
+            data: data.map(row => row.amount),
+            backgroundColor: '#0982aa'
+          },
+        ]
+      }
+    },
+    'income_over_timeframe': {
+      type: 'bar',
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Total Income over Time',
+            font: {
+              size: 16
+            }
+          }
+        }
+      },
+      data: {
+        labels: data.map(row => row.month),
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Income',
+            data: data.map(row => row.amount),
+            backgroundColor: '#179d89'
+          },
+        ]
+      }
+    }
+  });
+
   $('#chartType').change(function() {
     var selectedOption = $(this).val();
     $('#merchantField').hide();
@@ -275,9 +276,8 @@ $(function() {
 
   $('#chartForm').submit(function(event) {
     event.preventDefault();
-    renderChart(this);
+    renderChart(this, createChart);
   });
 
-  renderChart($('#chartForm')[0]);
+  renderChart($('#chartForm')[0], createChart);
 });
-
