@@ -10,6 +10,21 @@
         %div.ui.fluid.card
           %div.content
             %h3.ui.center.aligned.header
+              Selected Time Period
+            %div.ui.divider
+            = form_with url: '/', method: :get, class: 'ui form' do |form|
+              %div.two.fields
+                %div.field
+                  = form.label :start_date
+                  = form.date_field :start_date, value: Date.current - 30.days
+                %div.field
+                  = form.label :end_date
+                  = form.date_field :end_date, value: Date.current
+              %div.field
+                = form.submit "Submit", class: 'ui fluid primary button'
+        %div.ui.fluid.card
+          %div.content
+            %h3.ui.center.aligned.header
               Accounts Overview
             %div.ui.divider
             %div#accounts
@@ -50,7 +65,7 @@
             %h3.ui.center.aligned.header
               Monthly Summary
             %div.center.aligned.meta
-              = "#{Date.current.strftime('%b %d')} - #{(Date.current - 30.days).strftime('%b %d')}"
+              = "#{@start_date.to_date.strftime('%b %d')} - #{@end_date.to_date.strftime('%b %d')}"
             %div.ui.divider
             %h4.ui.center.aligned.header
               Income
@@ -67,11 +82,11 @@
                 %div.ui.list.padded
                   = render partial: "dropdown_list_item",
                     locals: { label: "Recurring",
-                              value: number_to_currency(@calcs.total_amount(@calcs.recurring(@calcs.income_by_source))),
+                              value: number_to_currency(@calcs.total_amount(@calcs.recurring(@calcs.income_by_source(@start_date, @end_date)))),
                               value_klass: "green-text"}
                   = render partial: "dropdown_list_item",
                     locals: { label: "Non-Recurring",
-                              value: number_to_currency(@calcs.total_amount(@calcs.non_recurring(@calcs.income_by_source))),
+                              value: number_to_currency(@calcs.total_amount(@calcs.non_recurring(@calcs.income_by_source(@start_date, @end_date)))),
                               value_klass: "green-text"}
             %div.ui.divider
             %h4.ui.center.aligned.header
@@ -89,10 +104,10 @@
                 %div.ui.list.padded
                   = render partial: "dropdown_list_item",
                     locals: { label: "Recurring",
-                              value: number_to_currency(@calcs.total_amount(@calcs.recurring(@calcs.expenses_by_source)))}
+                              value: number_to_currency(@calcs.total_amount(@calcs.recurring(@calcs.expenses_by_source(@start_date, @end_date))))}
                   = render partial: "dropdown_list_item",
                     locals: { label: "Non-Recurring",
-                              value: number_to_currency(@calcs.total_amount(@calcs.non_recurring(@calcs.expenses_by_source)))}
+                              value: number_to_currency(@calcs.total_amount(@calcs.non_recurring(@calcs.expenses_by_source(@start_date, @end_date))))}
             %div.ui.divider
             %div.ui.list.padded
               %div.item
@@ -141,7 +156,7 @@
                 %strong
                   = number_to_currency(@total_expenses)
 
-            - amounts = @calcs.expenses_by_source.map{ |k, v| [k, v.sum(&:first)] }.to_h
+            - amounts = @calcs.expenses_by_source(@start_date, @end_date).map{ |k, v| [k, v.sum(&:first)] }.to_h
             - percentages = amounts.map{ |k, v| [k, ((v / @total_income) * 100).to_i] }.to_h
             %div#expense-progress.ui.multiple.progress{ data: { percent: percentages.values.map(&:to_i).sort.reverse.join(",") } }
               - percentages.sort_by{ |k, v| v }.reverse.each_with_index do |(name, percent), idx|
@@ -162,7 +177,7 @@
                       %div.cozy.column
                         %strong
                           ="% of Total"
-            - @calcs.expenses_by_source.sort_by{ |k, v| v.sum(&:first) }.reverse.each_with_index do |(name, transactions), idx|
+            - @calcs.expenses_by_source(@start_date, @end_date).sort_by{ |k, v| v.sum(&:first) }.reverse.each_with_index do |(name, transactions), idx|
               - color = progress_bar_colors[idx % progress_bar_colors.length + 1]
               %div.ui.divider
               %div.ui.fluid.accordion

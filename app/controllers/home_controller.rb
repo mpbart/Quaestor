@@ -6,12 +6,13 @@ class HomeController < ApplicationController
   before_action :authenticate_user!
 
   def index
+    filtered_params = params.permit(:start_date, :end_date)
+    @start_date = filtered_params[:start_date] || 30.days.ago.to_date
+    @end_date = filtered_params[:end_date] || Date.current
     @accounts = current_user.accounts
-    @transactions = current_user.paginated_transactions(page_num: params[:page]&.to_i || 1)
-                                .includes(:account, :plaid_category)
     @net_worth = Account.net_worth(current_user.id)
     @calcs = FinanceManager::Transaction::Calculations.new(current_user)
-    @total_income = @calcs.total_amount(@calcs.income_by_source)
-    @total_expenses = @calcs.total_amount(@calcs.expenses_by_source)
+    @total_income = @calcs.total_amount(@calcs.income_by_source(@start_date, @end_date))
+    @total_expenses = @calcs.total_amount(@calcs.expenses_by_source(@start_date, @end_date))
   end
 end
