@@ -108,13 +108,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_03_171332) do
   end
 
   create_table "rule_criteria", force: :cascade do |t|
-    t.bigint "transaction_rules_id"
+    t.bigint "transaction_rule_id"
     t.string "field_name"
     t.string "field_qualifier"
     t.string "value_comparator"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["transaction_rules_id"], name: "index_rule_criteria_on_transaction_rules_id"
+    t.index ["transaction_rule_id"], name: "index_rule_criteria_on_transaction_rule_id"
   end
 
   create_table "transaction_groups", primary_key: "uuid", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
