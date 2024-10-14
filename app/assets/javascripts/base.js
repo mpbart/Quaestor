@@ -1,4 +1,4 @@
-HEADER_TABS = ["home-tab", "transactions-tab", "analytics-tab", "budgets-tab"]
+HEADER_TABS = ["home-tab", "transactions-tab", "analytics-tab", "rules-tab"]
 
 
 // helper methods

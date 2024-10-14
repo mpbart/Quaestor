@@ -30,5 +30,5 @@ Rails.application.routes.draw do
   get '/chart_data/:dataset', to: 'analytics#chart_data'
 
   # Budgets
-  get 'budgets',      to: 'budgets#index'
+  get 'rules',      to: 'rules#index'
 end

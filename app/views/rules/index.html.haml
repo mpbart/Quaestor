@@ -1,0 +1,12 @@
+= stylesheet_link_tag "application", media: "all"
+= turbo_frame_tag 'rules' do
+  %body
+    %div.ui.padded.grid
+      = render "shared/dimmer"
+      %div.five.wide.column
+      %div.six.wide.column
+        %h3.ui.center.aligned.header
+          Transaction Rules
+        %div.five.wide.column
+
+= javascript_include_tag "plaid"
