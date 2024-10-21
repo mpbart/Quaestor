@@ -3,5 +3,7 @@
 class RulesController < ApplicationController
   before_action :authenticate_user!
 
-  def index; end
+  def index
+    @transaction_rules = TransactionRule.all.to_a
+  end
 end

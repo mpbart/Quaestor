@@ -7,6 +7,18 @@
       %div.six.wide.column
         %h3.ui.center.aligned.header
           Transaction Rules
+        %table.ui.table.celled
+          %tbody
+            - @transaction_rules.each do |rule|
+              %tr
+                %td.left-cell
+                  - rule.rule_criteria.each do |criteria|
+                    != "#{criteria.field_name.humanize} #{criteria.field_qualifier} <div class='basic ui label'>#{criteria.value_comparator}</div><br>"
+                    
+                %td.arrow-cell
+                  →
+                %td.right-cell
+                  != "Set #{rule.field_name_to_replace.humanize} to <div class='ui basic label'>#{rule.replacement_value}</div><br>"
         %div.five.wide.column
 
 = javascript_include_tag "plaid"
