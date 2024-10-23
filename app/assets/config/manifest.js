@@ -7,3 +7,4 @@
 //= link plaid.js
 //= link base.js
 //= link analytics.js
+//= link rules.js

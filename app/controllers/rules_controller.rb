@@ -6,4 +6,8 @@ class RulesController < ApplicationController
   def index
     @transaction_rules = TransactionRule.all.to_a
   end
+
+  def create
+    puts params
+  end
 end
