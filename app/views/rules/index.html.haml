@@ -14,12 +14,13 @@
               %tr
                 %td.left-cell
                   - rule.rule_criteria.each do |criteria|
-                    != "#{criteria.field_name.humanize} #{criteria.field_qualifier} <div class='basic ui label'>#{criteria.value_comparator}</div><br>"
+                    != "#{criteria.field_name.humanize} <div class='ui basic label'>#{criteria.field_qualifier}</div><div class='basic ui label'>#{criteria.value_comparator}</div><br>"
                     
                 %td.arrow-cell
                   →
                 %td.right-cell
-                  != "Set #{rule.field_name_to_replace.humanize} to <div class='ui basic label'>#{rule.replacement_value}</div><br>"
+                  - rule.field_replacement_mappings.each do |k, v|
+                    != "Set #{k.humanize} to <div class='ui basic label'>#{v}</div><br>"
         %div.five.wide.column
 
 = javascript_include_tag "plaid"
