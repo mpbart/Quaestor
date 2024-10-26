@@ -1,4 +1,4 @@
-$(document).ready(function() {
+initializeCheckboxes = function() {
   $('input[name="matches-amount"]').on('change', function() {
     $('.amount-inputs').toggleClass('hidden', !$(this).is(':checked'));
   });
@@ -23,9 +23,16 @@ $(document).ready(function() {
     $('.category-set-inputs').toggleClass('hidden', !$(this).is(':checked'));
   });
 
-  $('input[name="set-tag"]').on('change', function() {
-    $('.tag-set-inputs').toggleClass('hidden', !$(this).is(':checked'));
+  $('input[name="set-label"]').on('change', function() {
+    $('.label-set-inputs').toggleClass('hidden', !$(this).is(':checked'));
   });
+}
 
+$(function() {
   $('.ui.dropdown').dropdown();
+  initializeCheckboxes();
+});
+
+$('turbo-frame#rules').on('turbo:frame-load', function(event) {
+  initializeCheckboxes();
 });
