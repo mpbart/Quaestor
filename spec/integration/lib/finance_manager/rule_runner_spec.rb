@@ -27,14 +27,13 @@ RSpec.describe FinanceManager::RuleRunner::Transaction do
   let(:rule1) do
     create(
       :transaction_rule,
-      field_name_to_replace: 'description',
-      replacement_value:     'New Description'
+      field_replacement_mappings: { description: 'New Description' }
     )
   end
   let!(:rule_criteria1) do
     create(
       :rule_criteria,
-      transaction_rule: rule_1,
+      transaction_rule: rule1,
       field_name:       'amount',
       field_qualifier:  '<',
       value_comparator: 100
@@ -43,7 +42,7 @@ RSpec.describe FinanceManager::RuleRunner::Transaction do
   let!(:rule_criteria2) do
     create(
       :rule_criteria,
-      transaction_rule: rule_1,
+      transaction_rule: rule1,
       field_name:       'plaid_category_id',
       field_qualifier:  '==',
       value_comparator: rule_criteria_plaid_category_id

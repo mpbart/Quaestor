@@ -3,7 +3,7 @@
 class ApplicationController < ActionController::Base
   helper_method :short_format_date, :amount_class
   helper_method :humanized_category, :label_id_to_color
-  helper_method :progress_bar_colors
+  helper_method :progress_bar_colors, :make_value_readable
 
   IDX_TO_COLOR = {
     1 => 'blue',
@@ -36,5 +36,18 @@ class ApplicationController < ActionController::Base
 
   def progress_bar_colors
     PROGRESS_BAR_COLORS
+  end
+
+  def make_value_readable(val, field_name)
+    case field_name
+    when 'account_id'
+      Account.find(val).name
+    when 'label_id'
+      Label.find(val).name
+    when 'plaid_category_id'
+      humanized_category(PlaidCategory.find(val))
+    else
+      val
+    end
   end
 end
