@@ -57,3 +57,6 @@ Style/MultilineBlockChain:
 
 Lint/EnsureReturn:
   Enabled: false
+
+Style/DocumentDynamicEvalDefinition:
+  Enabled: false

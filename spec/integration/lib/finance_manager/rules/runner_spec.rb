@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'finance_manager/rule_runner'
+require 'finance_manager/rules/runner'
 
-RSpec.describe FinanceManager::RuleRunner::Transaction do
+RSpec.describe FinanceManager::Rules::Runner do
   let(:user) { create(:user) }
   let(:account) { create(:account, user: user) }
   let(:plaid_category) do
@@ -13,6 +13,7 @@ RSpec.describe FinanceManager::RuleRunner::Transaction do
       detailed_category: 'original category detailed'
     )
   end
+  let(:other_plaid_category) { create(:plaid_category) }
   let(:transaction) do
     create(
       :transaction,
@@ -22,6 +23,16 @@ RSpec.describe FinanceManager::RuleRunner::Transaction do
       amount:         90.0,
       merchant_name:  'merchant name',
       plaid_category: plaid_category
+    )
+  end
+  let(:transaction) do
+    Plaid::Transaction.build_from_hash(
+      name:                      'venmo',
+      amount:                    90.0,
+      merchant_name:             'merchant name',
+      personal_finance_category: {
+        detailed: plaid_category.detailed_category
+      }
     )
   end
   let(:rule1) do
@@ -53,16 +64,33 @@ RSpec.describe FinanceManager::RuleRunner::Transaction do
   subject(:run_rules) { described_class.run_all_rules(transaction) }
 
   context 'when all rule criteria are true' do
-    it 'updates the transaction' do
-      expect(run_rules.description).to eq('New Description')
+    context 'and updating a simple scalar field' do
+      it 'updates the transaction' do
+        expect(run_rules.name).to eq('New Description')
+      end
+    end
+
+    context 'and updating a more complex mapped field' do
+      let(:new_category) { create(:plaid_category, detailed_category: 'MY NEW CATEGORY') }
+      let(:rule1) do
+        create(
+          :transaction_rule,
+          field_replacement_mappings: { plaid_category_id: new_category.id }
+        )
+      end
+      let(:rule_criteria2) { nil }
+
+      it 'updates the transaction' do
+        expect(run_rules.personal_finance_category.detailed).to eq(new_category.detailed_category)
+      end
     end
   end
 
   context 'when not all rule criteria are true' do
-    let(:rule_criteria_plaid_category_id) { plaid_category.id + 1 }
+    let(:rule_criteria_plaid_category_id) { other_plaid_category.id }
 
     it 'does not update the transaction' do
-      expect(run_rules.description).to eq('venmo')
+      expect(run_rules.name).to eq('venmo')
     end
   end
 end
