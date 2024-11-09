@@ -1,0 +1,84 @@
+= turbo_frame_tag 'rules' do
+  %div.ui.container
+    = form_for :rule, url: rules_path, class: 'ui form' do |form|
+      %div.ui.three.column.grid
+        %div.column
+          %div.ui.fluid.card
+            %div.content
+              %h3.ui.header
+                If a transaction meets these criteria
+              %div.ui.divider
+              %div.field
+                %div.ui.toggle.checkbox
+                  %input{type: "checkbox", name: "matches-account"}
+                  %label
+                    %strong
+                      From Account
+              %div.field.transition.hidden.account-inputs
+                = form.select :account_id, Account.all.map{ |a| [a.name, a.id] }, {include_blank: true}, {class: 'ui dropdown'}
+              %div.field
+                %div.ui.toggle.checkbox
+                  %input{type: "checkbox", name: "matches-description"}
+                  %label
+                    %strong
+                      Matches Description
+              %div.field.transition.hidden.description-inputs
+                = form.text_field :description, placeholder: 'Enter description'
+              %div.field
+                %div.ui.toggle.checkbox
+                  %input{type: "checkbox", name: "matches-amount"}
+                  %label
+                    %strong
+                      Matches Amount
+              %div.field.transition.hidden.amount-inputs
+                %div.ui.right.labeled.input
+                  = form.text_field :amount, placeholder: 'Enter amount'
+                  %div.ui.dropdown.label
+                    %div.text
+                      USD
+        %div.one.wide.column
+          = image_tag '/right-arrow.png', size: '32x32'
+        %div.column
+          %div.ui.fluid.card
+            %div.content
+              %h3.ui.header
+                Then apply the following updates
+              %div.ui.divider
+              %div.ui.form
+                %div.field
+                  %div.ui.toggle.checkbox
+                    %input{type: "checkbox", name: "rename-merchant"}
+                    %label
+                      %strong
+                        Rename Merchant
+                %div.field.transition.hidden.merchant-rename-inputs
+                  = form.text_field :updated_merchant, placeholder: 'Enter new merchant name'
+                %div.field
+                  %div.ui.toggle.checkbox
+                    %input{type: "checkbox", name: "set-description"}
+                    %label
+                      %strong
+                        Set Description
+                %div.field.transition.hidden.description-set-inputs
+                  = form.text_field :updated_description, placeholder: 'Enter new description'
+                %div.field
+                  %div.ui.toggle.checkbox
+                    %input{type: "checkbox", name: "set-category"}
+                    %label
+                      %strong
+                        Set Category
+                %div.field.transition.hidden.category-set-inputs
+                  = form.select :updated_category_id, PlaidCategory.all.map{ |p| [humanized_category(p), p.id] }, {include_blank: true}, {class: 'ui search dropdown'}
+                %div.field
+                  %div.ui.toggle.checkbox
+                    %input{type: "checkbox", name: "set-label"}
+                    %label
+                      %strong
+                        Set Label
+                %div.field.transition.hidden.label-set-inputs
+                  = form.select :updated_label_id, Label.all.map{ |l| [l.name, l.id] }, {include_blank: true}, {class: 'ui dropdown'}
+                %div.field
+                  = form.submit "Create Rule", class: "ui fluid primary button"
+
+= javascript_include_tag "plaid"
+= javascript_include_tag "rules"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_25_131629) do
+ActiveRecord::Schema[7.1].define(version: 2024_10_26_125549) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -107,9 +107,25 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_25_131629) do
     t.index ["plaid_credential_id"], name: "index_plaid_responses_on_plaid_credential_id"
   end
 
+  create_table "rule_criteria", force: :cascade do |t|
+    t.bigint "transaction_rule_id"
+    t.string "field_name"
+    t.string "field_qualifier"
+    t.string "value_comparator"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["transaction_rule_id"], name: "index_rule_criteria_on_transaction_rule_id"
+  end
+
   create_table "transaction_groups", primary_key: "uuid", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "transaction_rules", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "field_replacement_mappings"
   end
 
   create_table "transactions", id: :string, force: :cascade do |t|

@@ -2,6 +2,7 @@
 
 require 'csv_import/importer'
 require 'finance_manager/plaid_client'
+require 'finance_manager/rules/runner'
 require_relative 'account'
 require_relative 'transaction'
 
@@ -46,8 +47,14 @@ module FinanceManager
             next
           end
 
-          result.added.each { |transaction| FinanceManager::Transaction.create(transaction) }
-          result.modified.each { |transaction| FinanceManager::Transaction.update(transaction) }
+          result.added.each do |raw_transaction|
+            transaction = FinanceManager::Rules::Runner.run_all_rules(raw_transaction)
+            FinanceManager::Transaction.create(transaction)
+          end
+          result.modified.each do |raw_transaction|
+            transaction = FinanceManager::Rules::Runner.run_all_rules(raw_transaction)
+            FinanceManager::Transaction.update(transaction)
+          end
           result.removed.each { |transaction| FinanceManager::Transaction.remove(transaction) }
           credential.update_columns(cursor: result.cursor)
         end

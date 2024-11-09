@@ -157,3 +157,7 @@ h4.ui.center.aligned {
 .ui.card:nth-child(2) {
   margin-top: 0 !important;
 }
+
+.ui.label.criteria-label {
+  background-color: #e8e8e8;
+}

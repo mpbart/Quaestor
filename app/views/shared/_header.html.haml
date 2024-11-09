@@ -3,8 +3,8 @@
     Home
   = link_to "Transactions", transactions_path, data: {turbo_frame: "transactions", turbo_action: "advance"}, class: "item", id: "transactions-tab"
   = link_to "Analytics", analytics_path, data: {turbo_prefetch: false}, class: "item", id: "analytics-tab"
-  %a#budgets-tab.item{ href: "/budgets" }
-    Budgets
+  %a#rules-tab.item{ href: "/rules" }
+    Rules
   %div.right.item
     %div#account-options.ui.dropdown.link
       %span.text

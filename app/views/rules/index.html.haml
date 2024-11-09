@@ -1,0 +1,27 @@
+= stylesheet_link_tag "application", media: "all"
+= turbo_frame_tag 'rules' do
+  %body
+    %div.ui.padded.grid
+      = render "shared/dimmer"
+      %div.five.wide.column
+        = link_to 'Create New Rule', new_rule_path, data: {turbo_action: "advance"}
+      %div.six.wide.column
+        %h3.ui.center.aligned.header
+          Transaction Rules
+        %table.ui.table.celled.selectable
+          %tbody
+            - @transaction_rules.each do |rule|
+              %tr
+                %td.left-cell
+                  - rule.rule_criteria.each do |criteria|
+                    != "#{criteria.field_name.humanize} <div class='ui basic label criteria-label'>#{criteria.field_qualifier}</div><div class='basic ui label criteria-label'>#{make_value_readable(criteria.value_comparator, criteria.field_name)}</div><br>"
+                    
+                %td.arrow-cell
+                  →
+                %td.right-cell
+                  - rule.field_replacement_mappings.each do |k, v|
+                    != "Set #{k.humanize} to <div class='ui basic label criteria-label'>#{make_value_readable(v, k)}</div><br>"
+        %div.five.wide.column
+
+= javascript_include_tag "plaid"
+= javascript_include_tag "rules"
