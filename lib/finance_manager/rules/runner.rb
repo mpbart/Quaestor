@@ -9,9 +9,10 @@ module FinanceManager
       extend FinanceManager::Rules::Repository
 
       register_rule_field 'description',       FinanceManager::Rules::Scalar::Description
-      register_rule_field 'plaid_category_id', FinanceManager::Rules::Scalar::CategoryId
+      register_rule_field 'plaid_category_id', FinanceManager::Rules::Scalar::Category
       register_rule_field 'amount',            FinanceManager::Rules::Scalar::Amount
       register_rule_field 'merchant_name',     FinanceManager::Rules::Scalar::MerchantName
+      register_rule_field 'account_id',        FinanceManager::Rules::Scalar::Account
 
       def self.run_all_rules(transaction)
         TransactionRule.all.each do |rule|

@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   resources :split_transactions, only: [:index, :show]
   resources :accounts, only: [:create, :show]
   resources :balances, only: [:create]
+  resources :labels, only: [:create]
   resources :analytics, only: [:index]
   resources :rules, only: [:index, :create, :new]
 

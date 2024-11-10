@@ -31,7 +31,7 @@ module FinanceManager
         end
       end
 
-      class CategoryId < Base
+      class Category < Base
         def self.passes_rule?(transaction, criteria)
           transaction.personal_finance_category.detailed.send(
             criteria.field_qualifier,
@@ -71,6 +71,23 @@ module FinanceManager
 
         def self.transaction_field
           'merchant_name'
+        end
+      end
+
+      class Account < Base
+        def self.passes_rule?(transaction, criteria)
+          transaction.account_id.send(
+            criteria.field_qualifier,
+            map_value(criteria.value_comparator)
+          )
+        end
+
+        def self.transaction_field
+          'account_id'
+        end
+
+        def self.map_value(value)
+          ::Account.find_by(plaid_identifier: value)&.id
         end
       end
     end

@@ -3,8 +3,6 @@
 class BalancesController < ApplicationController
   def create
     account = ::Account.find(params[:balance][:account_id])
-    # TODO: Refactor this when adding a repository/persistence layer
-    # Ignore available balance and limit when manually creating balances
     balance = FinanceManager::Account::BalanceStruct.new(
       BigDecimal(params[:balance][:balance]),
       0,
