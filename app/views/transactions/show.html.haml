@@ -26,13 +26,12 @@
                 %div.field.four.wide
                   %label
                     Labels:
-                  %input{ type: "hidden", name: "transaction[label_ids][]", value: "" }
-                  %select#transaction-labels.ui.dropdown{ name: "transaction[label_ids][]", multiple: ""}
+                  %select#transaction-labels.ui.clearable.multiple.selection.dropdown{ name: "transaction[label_ids][]", multiple: ""}
                     %option{ value: "" }
                       Select Tags
                     - Label.all.each do |label|
                       - if @label_ids.include?(label.id)
-                        %option{ value: label.id, data: {selected: "true"} }
+                        %option{ value: label.id, selected: true }
                           = label.name
                       - else
                         %option{ value: label.id }
