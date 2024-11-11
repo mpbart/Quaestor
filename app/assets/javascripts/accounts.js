@@ -33,6 +33,15 @@ showCreateBalanceIcon = function(event) {
   }
 }
 
+showCreateLabelIcon = function(event) {
+  if (event.detail.success) {
+    $('#successIconLabel').show();
+  } else {
+    console.log(event.detail);
+    $('#failureIconLabel').show();
+  }
+}
+
 makeListItemClickable = function() {
   $('.clickable-list-item').click(function(obj) {
       Turbo.visit($(this).data('url'), {action: 'advance'});
@@ -44,8 +53,11 @@ initHomepageElements = function() {
   $('#failureIconAccount').hide();
   $('#successIconBalance').hide();
   $('#failureIconBalance').hide();
+  $('#successIconLabel').hide();
+  $('#failureIconLabel').hide();
   $('#create-account-form').on('turbo:submit-end', showCreateAccountIcon);
   $('#create-balance-form').on('turbo:submit-end', showCreateBalanceIcon);
+  $('#create-label-form').on('turbo:submit-end', showCreateLabelIcon);
   $('#account-options').dropdown({action: 'hide'});
 
   setAccountSubTypeMenu($('#account_type').val());

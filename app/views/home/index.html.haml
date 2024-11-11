@@ -259,7 +259,7 @@
                         %i#failureIconAccount.red.times.icon
           %div.ui.row
             %div.left.floated.column
-              %div#add-account-button.ui.accordion.button
+              %div#add-balance-button.ui.accordion.button
                 %div.active.title
                   %strong
                     Record Balance
@@ -281,6 +281,24 @@
                           Save Balance
                         %i#successIconBalance.green.check.icon
                         %i#failureIconBalance.red.times.icon
+          %div.ui.row
+            %div.left.floated.column
+              %div#add-label-button.ui.accordion.button
+                %div.active.title
+                  %strong
+                    Create Label
+                %div.content
+                  %div#create-label-form.ui.form
+                    = form_for :label, url: labels_path do |form|
+                      = hidden_field_tag :authenticity_token, form_authenticity_token
+                      %div.field
+                        = form.label :label_name
+                        = form.text_field :name
+                      %span>
+                        %button.ui.button{ type: "submit" }
+                          Save Label
+                        %i#successIconLabel.green.check.icon
+                        %i#failureIconLabel.red.times.icon
 
 = javascript_include_tag "plaid"
 = javascript_include_tag "accounts"
