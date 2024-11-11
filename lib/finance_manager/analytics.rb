@@ -115,6 +115,15 @@ module FinanceManager
       )
     end
 
+    def self.spending_on_label_over_timeframe(user_id:, label_id:, timeframe: nil)
+      present_as_hash(
+        filter_for_timeframe(
+          timeframe,
+          ::Transaction.label_spending_over_time(label_id, user_id)
+        )
+      )
+    end
+
     def self.present_as_hash(records)
       records.map do |rec|
         { amount: rec['total'].abs.round(2), month: rec['month'].strftime('%B %Y') }

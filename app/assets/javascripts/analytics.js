@@ -180,6 +180,31 @@ $(function() {
         ]
       }
     },
+    'spending_on_label_over_timeframe': {
+      type: 'bar',
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Spending over Time on label',
+            font: {
+              size: 16
+            }
+          }
+        }
+      },
+      data: {
+        labels: data.map(row => row.month),
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Spending',
+            data: data.map(row => row.amount),
+            backgroundColor: '#0982aa'
+          },
+        ]
+      }
+    },
     'spending_on_detailed_category_over_timeframe': {
       type: 'bar',
       options: {
@@ -261,14 +286,23 @@ $(function() {
     var selectedOption = $(this).val();
     $('#merchantField').hide();
     $('#categoryField').hide();
+    $('#labelField').hide();
 
     if (selectedOption === 'spending_on_merchant_over_timeframe') {
       $('#merchantField').show();
       $('#categoryDropdown').dropdown('clear');
+      $('#merchantInput').val('');
+      $('#labelDropdown').val('');
     } else if (selectedOption === 'spending_on_detailed_category_over_timeframe') {
       $('#categoryField').show();
       $('#merchantInput').val('');
+      $('#labelDropdown').val('');
+    } else if (selectedOption === 'spending_on_label_over_timeframe') {
+      $('#labelField').show();
+      $('#merchantInput').val('');
+      $('#categoryDropdown').dropdown('clear');
     } else {
+      $('#labelDropdown').val('');
       $('#categoryDropdown').dropdown('clear');
       $('#merchantInput').val('');
     }
