@@ -28,8 +28,8 @@ getTransactionPageNum = function() {
   return parseInt(page) || 1;
 }
 
-getSearchParams = function() {
-  return new URL(document.URL).searchParams.get('q');
+getQueryParams = function() {
+  return new URL(document.URL).searchParams
 }
 
 dimPage = function() {

@@ -82,13 +82,13 @@ optional: true
     ORDER BY month ASC
   SQL
 
-  LABEL_PER_MONTH_SQL = <<-SQL
+  LABEL_PER_MONTH_SQL = <<-SQL.freeze
     SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
     FROM transactions t
     JOIN accounts a
     ON t.account_id = a.id
     JOIN labels_transactions lt
-    ON lt.transaction_id = t.id 
+    ON lt.transaction_id = t.id#{' '}
     JOIN labels l
     ON lt.label_id = l.id
     WHERE a.user_id = ?

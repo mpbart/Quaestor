@@ -72,6 +72,10 @@
                   %td
                     = humanized_category(transaction.plaid_category)
                   %td
+                    - # TODO: if a label filter is applied this will only show that single
+                    - # label and no others because the associations are eager-loaded into
+                    - # memory in the query_builder to avoid N+1 query problems. Think about
+                    - # how to fix this
                     - transaction.labels.pluck(:id, :name).sort.each do |id, name|
                       - color = label_id_to_color(id)
                       %a{ href: "/transactions?label_id=#{id}", class: "ui #{color} label"}
