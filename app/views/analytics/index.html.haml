@@ -12,11 +12,19 @@
             %option{ value: "net_worth_over_timeframe" } Net Worth Over Time
             %option{ value: "spending_on_detailed_category_over_timeframe" } Spending by Category
             %option{ value: "spending_on_merchant_over_timeframe" } Spending by Merchant
+            %option{ value: "spending_on_label_over_timeframe" } Spending by Label
             %option{ value: "spending_over_timeframe" } Total Spending Over Time
             %option{ value: "income_over_timeframe" } Income Over Time
         %div.field#merchantField{ style: "display:none;" }
           %label Enter Merchant Name
           %input#merchantInput{ type: "text", placeholder: "Merchant Name", name: "merchant_name" }
+        %div.field#labelField{ style: "display:none;" }
+          %label Select a Label
+          %select#labelDropdown.ui.dropdown{ name: "label_id" }
+            %option{ value: "" } Select Label
+            - Label.all.each do |label|
+              %option{ value: label.id }
+                = label.name
         %div.field#categoryField{ style: "display:none;" }
           %label Select a Category
           %select#categoryDropdown.ui.dropdown{ name: "category" }

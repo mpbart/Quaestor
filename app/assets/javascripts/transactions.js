@@ -30,9 +30,9 @@ initializePreviousPageButton = function() {
   $('#previous-page-button').click(function() {
     const currentPage = getTransactionPageNum();                                                          if (currentPage > 1) {
       const newPage = currentPage - 1;
-      const searchParams = getSearchParams();
+      const searchParams = getQueryParams();
       if (searchParams) {
-        Turbo.visit(`/transactions?page=${newPage}&q=${searchParams}`, {action: 'replace'});
+        Turbo.visit(`/transactions?page=${newPage}&q=${searchParams.toString()}`, {action: 'replace'});
       } else {
         Turbo.visit(`/transactions?page=${newPage}`, {action: 'replace'});
       }
@@ -43,9 +43,9 @@ initializePreviousPageButton = function() {
 initializeNextPageButton = function() {
   $('#next-page-button').click(function() {
     const newPage = getTransactionPageNum() + 1;
-    const searchParams = getSearchParams();
+    const searchParams = getQueryParams();
     if (searchParams) {
-      Turbo.visit(`/transactions?page=${newPage}&q=${searchParams}`, {action: 'replace'});
+      Turbo.visit(`/transactions?page=${newPage}&${searchParams.toString()}`, {action: 'replace'});
     } else {
       Turbo.visit(`/transactions?page=${newPage}`, {action: 'replace'});
     }
