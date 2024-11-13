@@ -5,8 +5,8 @@ module FinanceManager
     MINT_DEBT_TYPE = 'DEBT'
     # Return JSON array of both debts and assets over the
     # given timeframe in months.
-    def self.net_worth_over_timeframe(user_id:, timeframe: nil)
-      time_range = range_from_timeframe(timeframe)
+    def self.net_worth_over_timeframe(user_id:, start_date:, end_date:)
+      time_range = range_from_timeframe(start_date, end_date)
       ::Account.balances_by_month(user_id)
                .group_by { |row| row['month'] }
                .map do |k, v|
@@ -61,64 +61,77 @@ module FinanceManager
       end
     end
 
-    def self.spending_on_primary_category_over_timeframe(category_name:, user_id:, timeframe: nil)
+    def self.spending_on_primary_category_over_timeframe(category_name:,
+                                                         user_id:,
+                                                         start_date:,
+                                                         end_date:)
       present_as_hash(
         filter_for_timeframe(
-          timeframe,
+          start_date,
+          end_date,
           ::Transaction.primary_category_spending_over_time(category_name, user_id)
         )
       )
     end
 
-    def self.spending_on_detailed_category_over_timeframe(category_name:, user_id:, timeframe: nil)
+    def self.spending_on_detailed_category_over_timeframe(category_name:,
+                                                          user_id:,
+                                                          start_date:,
+                                                          end_date:)
       present_as_hash(
         filter_for_timeframe(
-          timeframe,
+          start_date,
+          end_date,
           ::Transaction.detailed_category_spending_over_time(category_name, user_id)
         )
       )
     end
 
-    def self.spending_on_merchant_over_timeframe(merchant_name:, user_id:, timeframe: nil)
+    def self.spending_on_merchant_over_timeframe(merchant_name:, user_id:, start_date:, end_date:)
       present_as_hash(
         filter_for_timeframe(
-          timeframe,
+          start_date,
+          end_date,
           ::Transaction.merchant_spending_over_time(merchant_name, user_id)
         )
       )
     end
 
-    def self.total_spending_on_all_categories_over_timeframe(user_id:, timeframe: nil)
+    def self.total_spending_on_all_categories_over_timeframe(user_id:, start_date:, end_date:)
       present_as_hash(
         filter_for_timeframe(
-          timeframe,
+          start_date,
+          end_date,
           ::Transaction.category_totals(user_id)
         )
       )
     end
 
-    def self.spending_over_timeframe(user_id:, timeframe: nil)
+    def self.spending_over_timeframe(user_id:, start_date:, end_date:)
       present_as_hash(
         filter_for_timeframe(
-          timeframe,
+          start_date,
+          end_date,
           ::Transaction.total_spending_over_time(user_id)
         )
       )
     end
 
-    def self.income_over_timeframe(user_id:, timeframe: nil)
+    def self.income_over_timeframe(user_id:, start_date:, end_date:)
       present_as_hash(
         filter_for_timeframe(
-          timeframe,
+          start_date,
+          end_date,
           ::Transaction.total_income_over_time(user_id)
         )
       )
     end
 
-    def self.spending_on_label_over_timeframe(user_id:, label_id:, timeframe: nil)
+    def self.spending_on_label_over_timeframe(user_id:, label_id:, start_date:, end_date:)
       present_as_hash(
         filter_for_timeframe(
-          timeframe,
+          start_date,
+          end_date,
           ::Transaction.label_spending_over_time(label_id, user_id)
         )
       )
@@ -130,22 +143,13 @@ module FinanceManager
       end
     end
 
-    def self.filter_for_timeframe(timeframe, records)
-      time_range = range_from_timeframe(timeframe)
+    def self.filter_for_timeframe(start_date, end_date, records)
+      time_range = range_from_timeframe(start_date, end_date)
       records.filter { |record| time_range.cover?(record['month']) }
     end
 
-    def self.range_from_timeframe(timeframe)
-      case timeframe
-      when 'last_12_months'
-        (12.months.ago..Date.current)
-      when 'year_to_date'
-        (Date.new(Date.current.year, 1, 1)..Date.current)
-      when 'all_time'
-        (Date.new(1900, 1, 1)..Date.current)
-      else
-        raise StandardError, "Unknown timeframe for analytics query: #{timeframe}"
-      end
+    def self.range_from_timeframe(start_date, end_date)
+      Date.parse(start_date)..Date.parse(end_date)
     end
   end
 end
