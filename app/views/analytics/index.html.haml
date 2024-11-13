@@ -25,7 +25,7 @@
             - Label.all.each do |label|
               %option{ value: label.id }
                 = label.name
-        %div.field#categoryField{ style: "display:none;" }
+        %div.field#categoryField{ style: "display: none;" }
           %label Select a Category
           %select#categoryDropdown.ui.dropdown{ name: "category" }
             %option{ value: "" } Select Category
@@ -34,10 +34,17 @@
                 = humanized_category(category)
         %div.field
           %label Select a Time Range
-          %select.ui.dropdown{ name: "timeframe" }
+          %select.ui.dropdown#timeframeField{ name: "timeframe" }
             %option{ value: "last_12_months" } Last 12 Months
             %option{ value: "year_to_date" } Year to Date
             %option{ value: "all_time" } All Time
+            %option{ value: "custom" } Custom
+        %div.field#startDateField{ style: "display: none;" }
+          %label Select a Start Date
+          %input#startDateInput{ type: 'date', name: 'start_date' }
+        %div.field#endDateField{ style: "display: none;" }
+          %label Select an End Date
+          %input#endDateInput{ type: 'date', name: 'end_date' }
         %button.ui.primary.button{ type: "submit" } Submit
     %div.nine.wide.column
       %div

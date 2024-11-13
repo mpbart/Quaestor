@@ -106,11 +106,10 @@ renderChart = function(form, chartCreator) {
 
 $(function() {
   // TODO:
-  // 2. Figure out how to fix the errors that occur when reloading the page
+  // 1. Figure out how to fix the errors that occur when reloading the page
   // IDEAS:
-  // 1. Add chart for showing spending by tag
-  // 2. Add chart for showing spending on top 3 categories per month
-  // 3. Add a sankey diagram for showing flows of money?
+  // 1. Add chart for showing spending on top 3 categories per month
+  // 2. Add a sankey diagram for showing flows of money?
 
   const createChart = (data) => ({
     'net_worth_over_timeframe': {
@@ -287,6 +286,8 @@ $(function() {
     $('#merchantField').hide();
     $('#categoryField').hide();
     $('#labelField').hide();
+    $('#startDateField').hide();
+    $('#endDateField').hide();
 
     if (selectedOption === 'spending_on_merchant_over_timeframe') {
       $('#merchantField').show();
@@ -308,6 +309,32 @@ $(function() {
     }
   });
 
+  $('#timeframeField').change(function() {
+    var selectedOption = $(this).val();
+    console.log(selectedOption);
+    $('#startDateField').hide();
+    $('#endDateField').hide();
+
+    if (selectedOption === 'custom') {
+      $('#startDateField').show();
+      $('#endDateField').show();
+    } else if(selectedOption === 'last_12_months') {
+      $('#startDateInput').val(oneYearAgoMonthlyDate());
+      $('#endDateInput').val(currentDate());
+    } else if(selectedOption === 'year_to_date') {
+      $('#startDateInput').val(beginningOfCurrentYearDate());
+      $('#endDateInput').val(currentDate());
+    } else if(selectedOption === 'all_time') {
+      $('#startDateInput').val('2000-01-01');
+      $('#endDateInput').val(currentDate());
+    }
+  });
+
+  if ($('#timeframeField').val() === 'custom') {
+    $('#startDateField').show();
+    $('#endDateField').show();
+  }
+
   $('#chartForm').submit(function(event) {
     event.preventDefault();
     renderChart(this, createChart);
@@ -315,3 +342,24 @@ $(function() {
 
   renderChart($('#chartForm')[0], createChart);
 });
+
+currentDate = function() {
+  const date = new Date(Date.now());
+  const day = date.getDate();
+  const month = date.getMonth();
+  const year = date.getFullYear();
+  return `${year}-${month + 1}-${day}`;
+}
+
+oneYearAgoMonthlyDate = function() {
+  const date = new Date(Date.now());
+  const month = date.getMonth();
+  const year = date.getFullYear();
+  return `${year - 1}-${month + 1}-01`;
+}
+
+beginningOfCurrentYearDate = function() {
+  const date = new Date(Date.now());
+  const year = date.getFullYear();
+  return `${year}-01-01`;
+}

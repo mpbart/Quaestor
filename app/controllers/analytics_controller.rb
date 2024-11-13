@@ -8,13 +8,16 @@ class AnalyticsController < ApplicationController
   def index; end
 
   def chart_data
-    data_set = params.permit(:dataset, :timeframe, :category, :label_id, :merchant_name)
+    data_set = params.permit(
+      :dataset, :start_date, :end_date, :category, :label_id, :merchant_name
+    )
     params = {
       category_name: data_set[:category],
       merchant_name: data_set[:merchant_name],
       user_id:       current_user.id,
       label_id:      data_set[:label_id],
-      timeframe:     data_set[:timeframe]
+      start_date:    data_set[:start_date],
+      end_date:      data_set[:end_date],
     }.compact
     results = FinanceManager::Analytics.try(data_set[:dataset], **params)
     render json: results || {}
