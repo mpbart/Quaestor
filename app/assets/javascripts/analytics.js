@@ -106,9 +106,12 @@ renderChart = function(form, chartCreator) {
 
 currentDate = function() {
   const date = new Date(Date.now());
-  const day = date.getDate();
+  let day = date.getDate();
   const month = date.getMonth();
   const year = date.getFullYear();
+  if (day < 10) {
+    day = `0${day}`
+  }
   return `${year}-${month + 1}-${day}`;
 }
 
