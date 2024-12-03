@@ -13,7 +13,7 @@
                   %input{type: "checkbox", name: "matches-account"}
                   %label
                     %strong
-                      From Account
+                      Account
               %div.field.transition.hidden.account-inputs
                 = form.select :account_id, Account.all.map{ |a| [a.name, a.id] }, {include_blank: true}, {class: 'ui dropdown'}
               %div.field

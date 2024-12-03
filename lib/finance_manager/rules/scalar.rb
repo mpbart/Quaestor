@@ -76,9 +76,9 @@ module FinanceManager
 
       class Account < Base
         def self.passes_rule?(transaction, criteria)
-          transaction.account_id.send(
+          map_value(transaction.account_id).send(
             criteria.field_qualifier,
-            map_value(criteria.value_comparator)
+            criteria.value_comparator.to_i
           )
         end
 

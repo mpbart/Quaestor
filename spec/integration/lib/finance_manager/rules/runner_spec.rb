@@ -30,6 +30,7 @@ RSpec.describe FinanceManager::Rules::Runner do
       name:                      'venmo',
       amount:                    90.0,
       merchant_name:             'merchant name',
+      account_id:                account.plaid_identifier,
       personal_finance_category: {
         detailed: plaid_category.detailed_category
       }
@@ -91,6 +92,25 @@ RSpec.describe FinanceManager::Rules::Runner do
 
     it 'does not update the transaction' do
       expect(run_rules.name).to eq('venmo')
+    end
+  end
+
+  context 'when matching by account' do
+    let(:rule_criteria1) do
+      create(
+        :rule_criteria,
+        transaction_rule: rule1,
+        field_name:       'account_id',
+        field_qualifier:  '==',
+        value_comparator: account.id
+      )
+    end
+    let(:rule_criteria2) { nil }
+
+    context 'and the criteria matches' do
+      it 'updates the transaction' do
+        expect(run_rules.name).to eq('New Description')
+      end
     end
   end
 end
