@@ -17,7 +17,7 @@ class AnalyticsController < ApplicationController
       user_id:       current_user.id,
       label_id:      data_set[:label_id],
       start_date:    data_set[:start_date],
-      end_date:      data_set[:end_date],
+      end_date:      data_set[:end_date]
     }.compact
     results = FinanceManager::Analytics.try(data_set[:dataset], **params)
     render json: results || {}
