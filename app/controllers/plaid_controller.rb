@@ -60,7 +60,7 @@ class PlaidController < ActionController::Base
       }
     )
 
-    link_token_response = plaid_client.api_client.link_token_create(
+    link_token_response = plaid_client.client.link_token_create(
       link_token_create_request
     )
 
