@@ -20,31 +20,27 @@ module FinanceManager
 
       class Description < Base
         def self.passes_rule?(transaction, criteria)
-          transaction.name.downcase.send(
+          transaction.description.downcase.send(
             map_qualifier(criteria.field_qualifier),
             criteria.value_comparator.to_s.downcase
           )
         end
 
         def self.transaction_field
-          'name'
+          'description'
         end
       end
 
       class Category < Base
         def self.passes_rule?(transaction, criteria)
-          transaction.personal_finance_category.detailed.send(
+          transaction.plaid_category.detailed_category.send(
             criteria.field_qualifier,
             map_value(criteria.value_comparator)
           )
         end
 
         def self.transaction_field
-          'personal_finance_category.detailed'
-        end
-
-        def self.map_value(value)
-          PlaidCategory.find(value).detailed_category
+          'plaid_category_id'
         end
       end
 
@@ -83,7 +79,7 @@ module FinanceManager
         end
 
         def self.transaction_field
-          'account_id'
+          'account.id'
         end
 
         def self.map_value(value)
