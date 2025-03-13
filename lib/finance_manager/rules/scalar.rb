@@ -86,6 +86,21 @@ module FinanceManager
           ::Account.find_by(plaid_identifier: value)&.id
         end
       end
+
+      class Label < Base
+        # Labels are not used as rule criteria
+        def self.passes_rule?(_transaction, _criteria)
+          false
+        end
+
+        def self.transaction_field
+          'label_ids'
+        end
+
+        def self.map_value(value)
+          [::Label.find(value).id]
+        end
+      end
     end
   end
 end
