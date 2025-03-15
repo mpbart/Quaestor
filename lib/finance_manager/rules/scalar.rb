@@ -22,7 +22,7 @@ module FinanceManager
         def self.passes_rule?(transaction, criteria)
           transaction.description.downcase.send(
             map_qualifier(criteria.field_qualifier),
-            criteria.value_comparator.to_s.downcase
+            map_value(criteria.value_comparator.to_s.downcase)
           )
         end
 
@@ -33,9 +33,9 @@ module FinanceManager
 
       class Category < Base
         def self.passes_rule?(transaction, criteria)
-          transaction.plaid_category.detailed_category.send(
-            criteria.field_qualifier,
-            map_value(criteria.value_comparator)
+          transaction.plaid_category_id.send(
+            map_qualifier(criteria.field_qualifier),
+            map_value(criteria.value_comparator.to_i)
           )
         end
 
@@ -47,8 +47,8 @@ module FinanceManager
       class Amount < Base
         def self.passes_rule?(transaction, criteria)
           transaction.amount.send(
-            criteria.field_qualifier,
-            criteria.value_comparator.to_f
+            map_qualifier(criteria.field_qualifier),
+            map_value(criteria.value_comparator.to_f)
           )
         end
 
@@ -61,7 +61,7 @@ module FinanceManager
         def self.passes_rule?(transaction, criteria)
           transaction.merchant_name.downcase.send(
             map_qualifier(criteria.field_qualifier),
-            criteria.value_comparator.to_s.downcase
+            map_value(criteria.value_comparator.to_s.downcase)
           )
         end
 
@@ -72,18 +72,14 @@ module FinanceManager
 
       class Account < Base
         def self.passes_rule?(transaction, criteria)
-          map_value(transaction.account_id).send(
-            criteria.field_qualifier,
-            criteria.value_comparator.to_i
+          transaction.account_id.send(
+            map_qualifier(criteria.field_qualifier),
+            map_value(criteria.value_comparator.to_i)
           )
         end
 
         def self.transaction_field
-          'account.id'
-        end
-
-        def self.map_value(value)
-          ::Account.find_by(plaid_identifier: value)&.id
+          'account_id'
         end
       end
 
