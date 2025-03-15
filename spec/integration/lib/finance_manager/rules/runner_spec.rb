@@ -25,17 +25,6 @@ RSpec.describe FinanceManager::Rules::Runner do
       plaid_category: plaid_category
     )
   end
-  let(:transaction) do
-    Plaid::Transaction.build_from_hash(
-      name:                      'venmo',
-      amount:                    90.0,
-      merchant_name:             'merchant name',
-      account_id:                account.plaid_identifier,
-      personal_finance_category: {
-        detailed: plaid_category.detailed_category
-      }
-    )
-  end
   let(:rule1) do
     create(
       :transaction_rule,
@@ -67,7 +56,7 @@ RSpec.describe FinanceManager::Rules::Runner do
   context 'when all rule criteria are true' do
     context 'and updating a simple scalar field' do
       it 'updates the transaction' do
-        expect(run_rules.name).to eq('New Description')
+        expect(run_rules.description).to eq('New Description')
       end
     end
 
@@ -82,7 +71,7 @@ RSpec.describe FinanceManager::Rules::Runner do
       let(:rule_criteria2) { nil }
 
       it 'updates the transaction' do
-        expect(run_rules.personal_finance_category.detailed).to eq(new_category.detailed_category)
+        expect(run_rules.plaid_category.detailed_category).to eq(new_category.detailed_category)
       end
     end
   end
@@ -91,7 +80,7 @@ RSpec.describe FinanceManager::Rules::Runner do
     let(:rule_criteria_plaid_category_id) { other_plaid_category.id }
 
     it 'does not update the transaction' do
-      expect(run_rules.name).to eq('venmo')
+      expect(run_rules.description).to eq('venmo')
     end
   end
 
@@ -109,7 +98,7 @@ RSpec.describe FinanceManager::Rules::Runner do
 
     context 'and the criteria matches' do
       it 'updates the transaction' do
-        expect(run_rules.name).to eq('New Description')
+        expect(run_rules.description).to eq('New Description')
       end
     end
   end

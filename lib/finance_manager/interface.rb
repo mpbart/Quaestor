@@ -47,15 +47,20 @@ module FinanceManager
             next
           end
 
-          result.added.each do |raw_transaction|
-            transaction = FinanceManager::Rules::Runner.run_all_rules(raw_transaction)
-            FinanceManager::Transaction.create(transaction)
-          end
-          result.modified.each do |raw_transaction|
-            transaction = FinanceManager::Rules::Runner.run_all_rules(raw_transaction)
-            FinanceManager::Transaction.update(transaction)
-          end
+          result.added
+                .map { |transaction| FinanceManager::Transaction.create(transaction) }
+                .map { |transaction| FinanceManager::Rules::Runner.run_all_rules(transaction) }
+                .compact
+                .each(&:save!)
+
+          result.modified
+                .map { |transaction| FinanceManager::Transaction.update(transaction) }
+                .map { |transaction| FinanceManager::Rules::Runner.run_all_rules(transaction) }
+                .compact
+                .each(&:save!)
+
           result.removed.each { |transaction| FinanceManager::Transaction.remove(transaction) }
+
           credential.update_columns(cursor: result.cursor)
         end
       end

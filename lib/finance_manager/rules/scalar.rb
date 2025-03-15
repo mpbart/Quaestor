@@ -20,39 +20,35 @@ module FinanceManager
 
       class Description < Base
         def self.passes_rule?(transaction, criteria)
-          transaction.name.downcase.send(
+          transaction.description.downcase.send(
             map_qualifier(criteria.field_qualifier),
-            criteria.value_comparator.to_s.downcase
+            map_value(criteria.value_comparator.to_s.downcase)
           )
         end
 
         def self.transaction_field
-          'name'
+          'description'
         end
       end
 
       class Category < Base
         def self.passes_rule?(transaction, criteria)
-          transaction.personal_finance_category.detailed.send(
-            criteria.field_qualifier,
-            map_value(criteria.value_comparator)
+          transaction.plaid_category_id.send(
+            map_qualifier(criteria.field_qualifier),
+            map_value(criteria.value_comparator.to_i)
           )
         end
 
         def self.transaction_field
-          'personal_finance_category.detailed'
-        end
-
-        def self.map_value(value)
-          PlaidCategory.find(value).detailed_category
+          'plaid_category_id'
         end
       end
 
       class Amount < Base
         def self.passes_rule?(transaction, criteria)
           transaction.amount.send(
-            criteria.field_qualifier,
-            criteria.value_comparator.to_f
+            map_qualifier(criteria.field_qualifier),
+            map_value(criteria.value_comparator.to_f)
           )
         end
 
@@ -65,7 +61,7 @@ module FinanceManager
         def self.passes_rule?(transaction, criteria)
           transaction.merchant_name.downcase.send(
             map_qualifier(criteria.field_qualifier),
-            criteria.value_comparator.to_s.downcase
+            map_value(criteria.value_comparator.to_s.downcase)
           )
         end
 
@@ -76,18 +72,29 @@ module FinanceManager
 
       class Account < Base
         def self.passes_rule?(transaction, criteria)
-          map_value(transaction.account_id).send(
-            criteria.field_qualifier,
-            criteria.value_comparator.to_i
+          transaction.account_id.send(
+            map_qualifier(criteria.field_qualifier),
+            map_value(criteria.value_comparator.to_i)
           )
         end
 
         def self.transaction_field
           'account_id'
         end
+      end
+
+      class Label < Base
+        # Labels are not used as rule criteria
+        def self.passes_rule?(_transaction, _criteria)
+          false
+        end
+
+        def self.transaction_field
+          'label_ids'
+        end
 
         def self.map_value(value)
-          ::Account.find_by(plaid_identifier: value)&.id
+          [::Label.find(value).id]
         end
       end
     end

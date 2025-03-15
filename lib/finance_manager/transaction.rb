@@ -27,7 +27,7 @@ module FinanceManager
         return
       end
 
-      ::Transaction.create!(
+      ::Transaction.build(
         account:                account,
         user:                   account.user,
         id:                     transaction.transaction_id,
@@ -52,6 +52,7 @@ module FinanceManager
         Rails.logger.warn(
           "Could not find transaction to update with id #{transaction.transaction_id}"
         )
+        return
       end
 
       category = ::PlaidCategory.find_by(
@@ -73,7 +74,7 @@ module FinanceManager
       existing.pending_transaction_id = transaction.pending_transaction_id
       existing.account_owner          = transaction.account_owner
 
-      existing.save! if existing.changed?
+      existing
     end
 
     def self.remove(transaction)
