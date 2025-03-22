@@ -41,6 +41,10 @@ gem 'sidekiq', '~> 7.2'
 
 gem 'haml', '~> 6.3'
 
+gem 'google-api-client', '~> 0.53.0'
+
+gem 'googleauth', '~> 1.14.0'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'database_cleaner-active_record'
