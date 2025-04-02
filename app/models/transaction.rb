@@ -31,7 +31,7 @@ optional: true
   SQL
 
   CUMULATIVE_TOTALS_SQL = <<-SQL
-    SELECT SUM(amount) as total, primary_category
+    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month, primary_category
     FROM transactions t
     JOIN accounts a
     ON t.account_id = a.id
@@ -39,7 +39,7 @@ optional: true
     ON t.plaid_category_id = pc.id
     AND a.user_id = ?
     AND t.deleted_at IS NULL
-    GROUP BY primary_category
+    GROUP BY DATE_TRUNC('MONTH', t.date), primary_category
   SQL
 
   PRIMARY_CATEGORY_PER_MONTH_SQL = <<-SQL

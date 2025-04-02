@@ -103,7 +103,8 @@ module FinanceManager
           start_date,
           end_date,
           ::Transaction.category_totals(user_id)
-        )
+        ).group_by { |i| i['primary_category'] }
+         .transform_values { |v| v.sum { |h| h['total'] } }
       )
     end
 
