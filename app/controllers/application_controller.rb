@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   helper_method :humanized_category, :label_id_to_color
   helper_method :progress_bar_colors, :make_value_readable
 
+  CURRENT_YEAR = Date.current.year.freeze
+
   IDX_TO_COLOR = {
     1 => 'blue',
     2 => 'brown',
@@ -23,7 +25,11 @@ class ApplicationController < ActionController::Base
   ].freeze
 
   def short_format_date(date)
-    date.strftime('%b %e')
+    if date.year == CURRENT_YEAR
+      date.strftime('%b %e')
+    else
+      date.strftime('%b %e, %Y')
+    end
   end
 
   def humanized_category(plaid_category)
