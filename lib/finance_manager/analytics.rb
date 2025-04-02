@@ -2,7 +2,32 @@
 
 module FinanceManager
   class Analytics
+    class InvalidAnalyticTypeError < StandardError; end
     MINT_DEBT_TYPE = 'DEBT'
+
+    def self.compute_analytics(analytic_type, params)
+      case analytic_type
+      when 'net_worth_over_timeframe'
+        net_worth_over_timeframe(**params)
+      when 'spending_on_primary_category_over_timeframe'
+        spending_on_primary_category_over_timeframe(**params)
+      when 'spending_on_detailed_category_over_timeframe'
+        spending_on_detailed_category_over_timeframe(**params)
+      when 'spending_on_merchant_over_timeframe'
+        spending_on_merchant_over_timeframe(**params)
+      when 'spending_on_label_over_timeframe'
+        spending_on_label_over_timeframe(**params)
+      when 'spending_over_timeframe'
+        spending_over_timeframe(**params)
+      when 'income_over_timeframe'
+        income_over_timeframe(**params)
+      when 'total_spending_on_all_categories_over_timeframe'
+        total_spending_on_all_categories_over_timeframe(**params)
+      else
+        raise InvalidAnalyticTypeError, "Analytic type #{analytic_type} not allowed"
+      end
+    end
+
     # Return JSON array of both debts and assets over the
     # given timeframe in months.
     def self.net_worth_over_timeframe(user_id:, start_date:, end_date:)
