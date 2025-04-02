@@ -107,19 +107,25 @@ renderChart = function(form, chartCreator) {
 currentDate = function() {
   const date = new Date(Date.now());
   let day = date.getDate();
-  const month = date.getMonth();
+  let month = date.getMonth();
   const year = date.getFullYear();
   if (day < 10) {
     day = `0${day}`
   }
-  return `${year}-${month + 1}-${day}`;
+  if (month < 10) {
+    month = `0${month + 1}`
+  }
+  return `${year}-${month}-${day}`;
 }
 
 oneYearAgoMonthlyDate = function() {
   const date = new Date(Date.now());
-  const month = date.getMonth();
+  let month = date.getMonth();
   const year = date.getFullYear();
-  return `${year - 1}-${month + 1}-01`;
+  if (month < 10) {
+    month = `0${month + 1}`
+  }
+  return `${year - 1}-${month}-01`;
 }
 
 beginningOfCurrentYearDate = function() {
