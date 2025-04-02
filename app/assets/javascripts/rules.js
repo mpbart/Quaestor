@@ -34,5 +34,6 @@ $(function() {
 });
 
 $('turbo-frame#rules').on('turbo:frame-load', function(event) {
+  $('.ui.dropdown').dropdown();
   initializeCheckboxes();
 });
