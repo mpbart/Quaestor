@@ -19,7 +19,7 @@ class AnalyticsController < ApplicationController
       start_date:    data_set[:start_date],
       end_date:      data_set[:end_date]
     }.compact
-    results = FinanceManager::Analytics.try(data_set[:dataset], **params)
+    results = FinanceManager::Analytics.compute_analytics(data_set[:dataset], params)
     render json: results || {}
   end
 end
