@@ -5,6 +5,7 @@ require 'google/apis/drive_v3'
 
 module FinanceManager
   module GoogleApiClient
+    OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
     CREDENTIALS_PATH = Rails.root.join('oauth_google_creds.json').freeze
     TOKEN_PATH = Rails.root.join('config', 'google_drive_token.yaml').freeze
     SCOPE = Google::Apis::DriveV3::AUTH_DRIVE
