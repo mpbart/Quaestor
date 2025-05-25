@@ -50,7 +50,6 @@ class Account < ActiveRecord::Base
       FROM accounts a
       JOIN balances b ON a.id = b.account_id
       JOIN users u ON u.id = a.user_id
-      WHERE b.created_at >= NOW() - INTERVAL '12 months'
       AND u.id = ?
     )
     SELECT DISTINCT ON (account_id, month)

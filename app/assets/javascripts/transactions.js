@@ -28,11 +28,14 @@ getUrl = function() {
 initializePreviousPageButton = function() {
   // Add behavior to the next and previous page buttons on the transactions INDEX
   $('#previous-page-button').click(function() {
-    const currentPage = getTransactionPageNum();                                                          if (currentPage > 1) {
+    const currentPage = getTransactionPageNum();
+    if (currentPage > 1) {
       const newPage = currentPage - 1;
       const searchParams = getQueryParams();
       if (searchParams) {
-        Turbo.visit(`/transactions?page=${newPage}&q=${searchParams.toString()}`, {action: 'replace'});
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('page', newPage);
+        Turbo.visit(`/transactions?${newParams.toString()}`, {action: 'replace'});
       } else {
         Turbo.visit(`/transactions?page=${newPage}`, {action: 'replace'});
       }
@@ -44,8 +47,10 @@ initializeNextPageButton = function() {
   $('#next-page-button').click(function() {
     const newPage = getTransactionPageNum() + 1;
     const searchParams = getQueryParams();
-    if (searchParams) {
-      Turbo.visit(`/transactions?page=${newPage}&${searchParams.toString()}`, {action: 'replace'});
+    if (searchParams != null) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('page', newPage);
+      Turbo.visit(`/transactions?${newParams.toString()}`, {action: 'replace'});
     } else {
       Turbo.visit(`/transactions?page=${newPage}`, {action: 'replace'});
     }
