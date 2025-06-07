@@ -19,7 +19,6 @@ module QueryBuilder
       current_user.transactions
                   .joins(:account)
                   .joins(:plaid_category)
-                  .left_joins(:labels)
                   .by_date
                   .paginate(page: params['page']&.to_i || 1, per_page: 50)
                   .includes(:account, :plaid_category, :labels)
