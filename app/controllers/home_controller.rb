@@ -14,5 +14,6 @@ class HomeController < ApplicationController
     @calcs = FinanceManager::Transaction::Calculations.new(current_user)
     @total_income = @calcs.total_amount(@calcs.income_by_source(@start_date, @end_date))
     @total_expenses = @calcs.total_amount(@calcs.expenses_by_source(@start_date, @end_date))
+    @primary_categories = PlaidCategory.pluck(:primary_category).uniq.sort
   end
 end

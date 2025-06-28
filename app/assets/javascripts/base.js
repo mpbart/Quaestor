@@ -57,7 +57,7 @@ $(function() {
   * Semantic init
   */
   getHeaderTabs().tab();  
-  $('.ui.dropdown').dropdown();
+  $('.ui.dropdown:not(#primary-category-dropdown)').dropdown();
   $('.ui.accordion').accordion();
 
  /*

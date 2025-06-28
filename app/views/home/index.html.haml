@@ -283,6 +283,34 @@
                         %i#failureIconBalance.red.times.icon
           %div.ui.row
             %div.left.floated.column
+              %div#add-category-button.ui.accordion.button
+                %div.active.title
+                  %strong Create Category
+                %div.content
+                  %div#create-category-form.ui.form
+                    = form_for :plaid_category, url: categories_path do |form|
+                      = hidden_field_tag :authenticity_token, form_authenticity_token
+
+                      %div.field
+                        = form.label :primary_category
+                        = form.select :primary_category, options_for_select(@primary_categories), {}, { class: 'ui search selection dropdown', id: 'primary-category-dropdown' }
+
+                      %div.field
+                        = form.label :detailed_category
+                        = form.text_field :detailed_category
+
+                      %div.field
+                        = form.label :description
+                        = form.text_field :description
+
+                      %span
+                        %button.ui.button{ type: "submit" }
+                          Save Category
+                        %i#successIconCategory.green.check.icon
+                        %i#failureIconCategory.red.times.icon
+
+          %div.ui.row
+            %div.left.floated.column
               %div#add-label-button.ui.accordion.button
                 %div.active.title
                   %strong

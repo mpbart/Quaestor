@@ -23,6 +23,7 @@ Rails.application.routes.draw do
   resources :accounts, only: [:create, :show]
   resources :balances, only: [:create]
   resources :labels, only: [:create]
+  resources :categories, only: [:create]
   resources :analytics, only: [:index]
   resources :rules, only: [:index, :create, :new]
 

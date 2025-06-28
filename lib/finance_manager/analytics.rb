@@ -41,14 +41,24 @@ module FinanceManager
         }.merge(
           amounts_by_account_type(
             v,
-            proc { |row| ::Account::DEBT_ACCOUNT_TYPES.include?(row['account_type']) }
+            proc { |row|
+              ::Account::DEBT_ACCOUNT_TYPES.include?(row['account_type'])
+            }
           )
         )
       end
-        # Remove months where both debts and assets are 0 so that we do not have duplicate months
-        # where one of them has all 0s
+        # Remove months where both debts and assets are 0 which is an artifact of loading
+        # some months from a file
         .reject { |row| row['assets'] == 0.0 && row['debts'] == 0.0 }
                .concat(mint_data('mint_data/net_worth.json'))
+               .group_by { |h| h['month'] }
+               .map do |_month, values|
+        values.reduce do |memo, value|
+          memo['assets'] += value['assets']
+          memo['debts'] += value['debts']
+          memo
+        end
+      end
                .sort_by { |h| h['sort_date'] }
                .filter { |h| time_range.cover?(h['sort_date']) }
     end
