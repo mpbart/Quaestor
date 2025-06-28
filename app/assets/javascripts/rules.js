@@ -29,11 +29,11 @@ initializeCheckboxes = function() {
 }
 
 $(function() {
-  $('.ui.dropdown').dropdown();
+  $('.ui.dropdown:not(#primary-category-dropdown)').dropdown();
   initializeCheckboxes();
 });
 
 $('turbo-frame#rules').on('turbo:frame-load', function(event) {
-  $('.ui.dropdown').dropdown();
+  $('.ui.dropdown:not(#primary-category-dropdown)').dropdown();
   initializeCheckboxes();
 });
