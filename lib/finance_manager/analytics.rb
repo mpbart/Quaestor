@@ -172,6 +172,17 @@ module FinanceManager
       )
     end
 
+    def self.account_balance_history(user_id:, account_id:, start_date:, end_date:)
+      time_range = range_from_timeframe(start_date, end_date)
+      ::Account.balances_by_month(user_id, account_id)
+               .filter { |row| time_range.cover?(row['month']) }
+               .map do |row|
+        { month:   row['month'].strftime('%B %Y'),
+          balance: row['amount'].round(2) }
+      end
+               .sort_by { |h| Date.strptime(h[:month], '%B %Y') }
+    end
+
     def self.present_as_hash(records)
       records.map do |rec|
         { amount: rec['total'].abs.round(2), month: rec['month'].strftime('%B %Y') }

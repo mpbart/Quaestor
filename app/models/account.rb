@@ -50,7 +50,7 @@ class Account < ActiveRecord::Base
       FROM accounts a
       JOIN balances b ON a.id = b.account_id
       JOIN users u ON u.id = a.user_id
-      AND u.id = ?
+      %s
     )
     SELECT DISTINCT ON (account_id, month)
         account_id,
@@ -82,8 +82,17 @@ class Account < ActiveRecord::Base
   end
 
   # TODO: Make configurable over a given time period instead of hardcoding to 12 months?
-  def self.balances_by_month(user_id)
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [BALANCES_BY_MONTH_SQL, user_id])
+  def self.balances_by_month(user_id, account_id = nil)
+    bindings = [user_id]
+    where_clause = 'AND u.id = ?'
+
+    if account_id.present?
+      where_clause += ' AND a.id = ?'
+      bindings << account_id
+    end
+
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
+                                            [BALANCES_BY_MONTH_SQL % where_clause, *bindings])
     ActiveRecord::Base.connection.execute(sanitized_sql)
   end
 end

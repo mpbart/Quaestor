@@ -10,7 +10,7 @@
         %div.ui.list
           %div.item
             %b
-              Account ID: 
+              Account ID:
             = @account.mask || 'XXXX'
           %div.item
             %b
@@ -22,5 +22,13 @@
             = @account.account_sub_type
     %div#fix-account-button.ui.button
       Fix Broken Account Connection
+
+    %div{id: "account-id-data", data: { account_id: @account.id }, style: "display:none;"}
+
+    %div.nine.wide.column
+      %div.ui.segment
+        %h3 Balance History
+        %div{style: "height: 200px;"}
+          %canvas#balanceChart
 
 = javascript_include_tag "plaid"

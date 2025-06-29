@@ -20,7 +20,11 @@ Rails.application.routes.draw do
     post '/hard_delete', to: 'transactions#hard_delete'
   end
   resources :split_transactions, only: [:index, :show]
-  resources :accounts, only: [:create, :show]
+  resources :accounts, only: [:create, :show] do
+    member do
+      get 'balance_history'
+    end
+  end
   resources :balances, only: [:create]
   resources :labels, only: [:create]
   resources :categories, only: [:create]
