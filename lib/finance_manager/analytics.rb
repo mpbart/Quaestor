@@ -21,8 +21,8 @@ module FinanceManager
         spending_over_timeframe(**params)
       when 'income_over_timeframe'
         income_over_timeframe(**params)
-      when 'total_spending_on_all_categories_over_timeframe'
-        total_spending_on_all_categories_over_timeframe(**params)
+      when 'account_balance_history'
+        account_balance_history(**params)
       else
         raise InvalidAnalyticTypeError, "Analytic type #{analytic_type} not allowed"
       end
@@ -132,16 +132,6 @@ module FinanceManager
       )
     end
 
-    def self.total_spending_on_all_categories_over_timeframe(user_id:, start_date:, end_date:)
-      present_as_hash(
-        filter_for_timeframe(
-          start_date,
-          end_date,
-          ::Transaction.category_totals(user_id)
-        )
-      )
-    end
-
     def self.spending_over_timeframe(user_id:, start_date:, end_date:)
       present_as_hash(
         filter_for_timeframe(
@@ -191,7 +181,7 @@ module FinanceManager
 
     def self.filter_for_timeframe(start_date, end_date, records)
       time_range = range_from_timeframe(start_date, end_date)
-      records.filter { |record| time_range.cover?(record['month']) }
+      records.filter { |record| time_range.cover?(record['month'].to_date) }
     end
 
     def self.range_from_timeframe(start_date, end_date)
