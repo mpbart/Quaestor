@@ -10,35 +10,41 @@ module FinanceManager
       end
 
       def income_by_source(start_date, end_date)
-        user.transactions.joins(:plaid_category)
-            .within_days(start_date, end_date)
-            .pluck(:amount, :primary_category, :detailed_category)
-            .filter { |t| t[1] == 'INCOME' && !PlaidCategory::EXCLUDED_CATEGORIES.include?(t[2]) }
-            .group_by { |t| t[1] }
+        income_transactions(start_date, end_date)
+          .pluck(:amount, :primary_category, :detailed_category)
+          .group_by { |t| t[1] }
       end
 
       def expenses_by_source(start_date, end_date)
+        expense_transactions(start_date, end_date)
+          .pluck(:amount, :primary_category, :detailed_category)
+          .group_by { |t| t[1] }
+      end
+
+      def income_transactions(start_date, end_date)
         user.transactions.joins(:plaid_category)
             .within_days(start_date, end_date)
-            .pluck(:amount, :primary_category, :detailed_category)
-            .filter { |t| t[1] != 'INCOME' && !PlaidCategory::EXCLUDED_CATEGORIES.include?(t[2]) }
-            .group_by { |t| t[1] }
+            .where("plaid_categories.primary_category = 'INCOME' AND plaid_categories.detailed_category NOT IN (?)", PlaidCategory::EXCLUDED_CATEGORIES)
+      end
+
+      def expense_transactions(start_date, end_date)
+        user.transactions.joins(:plaid_category)
+            .within_days(start_date, end_date)
+            .where("plaid_categories.primary_category != 'INCOME' AND plaid_categories.detailed_category NOT IN (?)", PlaidCategory::EXCLUDED_CATEGORIES)
       end
 
       def total_amount(grouped_transactions)
         grouped_transactions.sum { |_k, v| v.sum(&:first) }.abs.round(2)
       end
 
-      def recurring(grouped_transactions)
-        grouped_transactions.map do |k, v|
-          [k, v.filter { |arr| PlaidCategory::RECURRING_CATEGORIES.include?(arr[2]) }]
-        end
+      def recurring(transactions)
+        transactions.joins(:plaid_category)
+                    .where(plaid_categories: { detailed_category: PlaidCategory::RECURRING_CATEGORIES })
       end
 
-      def non_recurring(grouped_transactions)
-        grouped_transactions.map do |k, v|
-          [k, v.filter { |arr| !PlaidCategory::RECURRING_CATEGORIES.include?(arr[2]) }]
-        end
+      def non_recurring(transactions)
+        transactions.joins(:plaid_category)
+                    .where.not(plaid_categories: { detailed_category: PlaidCategory::RECURRING_CATEGORIES })
       end
     end
   end
