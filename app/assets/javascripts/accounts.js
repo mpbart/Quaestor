@@ -57,6 +57,53 @@ makeListItemClickable = function() {
   })
 }
 
+createTransactionsModal = function() {
+  const transactionModal = document.getElementById('transactionsModal');
+  const transactionsList = document.getElementById('transactionsList');
+
+  document.body.addEventListener('click', async (event) => {
+    const item = event.target.closest('.item[data-type]');
+
+    const type = item.dataset.type;
+    const categoryType = item.dataset.categoryType;
+    const startDate = item.dataset.startDate;
+    const endDate = item.dataset.endDate;
+
+    const url = `/transactions_by_type?type=${type}&category_type=${categoryType}&start_date=${startDate}&end_date=${endDate}`;
+
+    try {
+      const response = await fetch(url);
+      const transactions = await response.json();
+
+      transactionsList.innerHTML = '';
+
+      if (transactions.length > 0) {
+        transactions.forEach(transaction => {
+          const listItem = document.createElement('div');
+          listItem.classList.add('item');
+          listItem.innerHTML = `
+              <div class="content">
+                <div class="header">${transaction.description}</div>
+                <div class="description">
+                  <strong>Amount:</strong> ${transaction.amount.toFixed(2)} | <strong>Date:</strong> ${new Date(transaction.date).toLocaleDateString()} | <strong>Category:</strong> ${transaction.humanized_category}
+               </div>
+              </div>
+            `;
+          transactionsList.appendChild(listItem);
+        });
+      } else {
+        transactionsList.innerHTML = '<div class="item">No transactions found for this category.</div>';
+      }
+
+      $(transactionModal).modal('show');
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      transactionsList.innerHTML = '<div class="item">Error loading transactions.</div>';
+      $(transactionModal).modal('show');
+    }
+  });
+}
+
 initHomepageElements = function() {
   $('#successIconAccount').hide();
   $('#failureIconAccount').hide();
@@ -73,6 +120,7 @@ initHomepageElements = function() {
   $('#account-options').dropdown({action: 'hide'});
 
   setAccountSubTypeMenu($('#account_type').val());
+  createTransactionsModal();
 
   makeListItemClickable();
   $('.progress').progress({showActivity: false});

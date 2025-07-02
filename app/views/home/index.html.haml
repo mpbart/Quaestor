@@ -82,12 +82,14 @@
                 %div.ui.list.padded
                   = render partial: "dropdown_list_item",
                     locals: { label: "Recurring",
-                              value: number_to_currency(@calcs.total_amount(@calcs.recurring(@calcs.income_by_source(@start_date, @end_date)))),
-                              value_klass: "green-text"}
+                              value: number_to_currency(@calcs.recurring(@calcs.income_transactions(@start_date, @end_date)).sum(:amount) || 0),
+                              value_klass: "green-text",
+                              data_attributes: { type: "income", category_type: "recurring", start_date: @start_date, end_date: @end_date }}
                   = render partial: "dropdown_list_item",
                     locals: { label: "Non-Recurring",
-                              value: number_to_currency(@calcs.total_amount(@calcs.non_recurring(@calcs.income_by_source(@start_date, @end_date)))),
-                              value_klass: "green-text"}
+                              value: number_to_currency(@calcs.non_recurring(@calcs.income_transactions(@start_date, @end_date)).sum(:amount) || 0),
+                              value_klass: "green-text",
+                              data_attributes: { type: "income", category_type: "non_recurring", start_date: @start_date, end_date: @end_date }}
             %div.ui.divider
             %h4.ui.center.aligned.header
               Expenses
@@ -104,10 +106,12 @@
                 %div.ui.list.padded
                   = render partial: "dropdown_list_item",
                     locals: { label: "Recurring",
-                              value: number_to_currency(@calcs.total_amount(@calcs.recurring(@calcs.expenses_by_source(@start_date, @end_date))))}
+                              value: number_to_currency(@calcs.recurring(@calcs.expense_transactions(@start_date, @end_date)).sum(:amount) || 0),
+                              data_attributes: { type: "expense", category_type: "recurring", start_date: @start_date, end_date: @end_date }}
                   = render partial: "dropdown_list_item",
                     locals: { label: "Non-Recurring",
-                              value: number_to_currency(@calcs.total_amount(@calcs.non_recurring(@calcs.expenses_by_source(@start_date, @end_date))))}
+                              value: number_to_currency(@calcs.non_recurring(@calcs.expense_transactions(@start_date, @end_date)).sum(:amount) || 0),
+                              data_attributes: { type: "expense", category_type: "non_recurring", start_date: @start_date, end_date: @end_date }}
             %div.ui.divider
             %div.ui.list.padded
               %div.item
@@ -328,5 +332,16 @@
                         %i#successIconLabel.green.check.icon
                         %i#failureIconLabel.red.times.icon
 
+%div.ui.long.modal#transactionsModal
+  %i.close.icon
+  %div.header
+    Associated Transactions
+  %div.scrolling.content
+    %div.ui.relaxed.divided.list#transactionsList
+  %div.actions
+    %div.ui.black.deny.button
+      Close
+
 = javascript_include_tag "plaid"
 = javascript_include_tag "accounts"
+

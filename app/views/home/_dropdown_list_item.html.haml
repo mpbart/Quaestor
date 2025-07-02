@@ -1,4 +1,4 @@
-%div.item
+%div.item{ local_assigns[:data_attributes] ? { data: local_assigns[:data_attributes] } : {} }
   %div.content
     %div.left.floated.vertical-aligned
       = inline_svg('angle_icon.svg')
