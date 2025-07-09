@@ -16,4 +16,26 @@ class HomeController < ApplicationController
     @total_expenses = @calcs.total_amount(@calcs.expenses_by_source(@start_date, @end_date))
     @primary_categories = PlaidCategory.pluck(:primary_category).uniq.sort
   end
+
+  def transactions_by_type
+    start_date = params[:start_date]
+    end_date = params[:end_date]
+    calcs = FinanceManager::Transaction::Calculations.new(current_user)
+    transactions = if params[:type] == 'income'
+                     calcs.income_transactions(start_date, end_date)
+                   else
+                     calcs.expense_transactions(start_date, end_date)
+                   end
+
+    transactions = if params[:category_type] == 'recurring'
+                     calcs.recurring(transactions)
+                   else
+                     calcs.non_recurring(transactions)
+                   end
+
+    render json: transactions.order(amount: :desc).map do |t|
+      t.as_json(include: :plaid_category)
+       .merge(humanized_category: humanized_category(t.plaid_category))
+    end
+  end
 end

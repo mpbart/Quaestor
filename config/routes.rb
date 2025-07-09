@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
   # Home Page
   root 'home#index'
+  get '/transactions_by_type', to: 'home#transactions_by_type'
 
   # Plaid
   post '/get_access_token', to: 'plaid#get_access_token'
