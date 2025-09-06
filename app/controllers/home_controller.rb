@@ -33,9 +33,10 @@ class HomeController < ApplicationController
                      calcs.non_recurring(transactions)
                    end
 
-    render json: transactions.order(amount: :desc).map do |t|
+    transactions_hash = transactions.order(amount: :desc).map do |t|
       t.as_json(include: :plaid_category)
        .merge(humanized_category: humanized_category(t.plaid_category))
     end
+    render json: transactions_hash
   end
 end
