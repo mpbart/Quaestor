@@ -59,9 +59,10 @@
           %h3.ui.center.aligned.header
             Existing Split Transactions
         %div#grouped-transaction-div
-          - @transaction.grouped_transactions.each do |grouped_transaction|
+          - @transaction.grouped_transactions.each_with_index do |grouped_transaction, idx|
             = form_for grouped_transaction, html: { :class => 'ui form', :id => 'edit-transactions-form' } do |f|
               = hidden_field_tag :authenticity_token, form_authenticity_token
+              = f.hidden_field :index, value: idx
               %div.fields
                 %div.field
                   %label
@@ -105,6 +106,9 @@
                               = humanized_category(category)
                     %div.field.six.wide
                       = f.submit :id => 'grouped-transaction-button', :class => 'ui fluid basic primary bottom button'
+                    %div.field
+                      %i.green.check.icon{ id: "successIconTransaction#{idx}" }
+                      %i.red.times.icon{ id: "failureIconTransaction#{idx}" }
 
         %h3.ui.center.aligned.header
           Create New Split Transaction
