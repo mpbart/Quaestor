@@ -11,17 +11,16 @@ module FinanceManager
     SCOPE = Google::Apis::DriveV3::AUTH_DRIVE
     MAX_BACKUPS_TO_KEEP = 5
 
-    def self.drive_service
+    def self.drive_service(user_id)
       service = Google::Apis::DriveV3::DriveService.new
-      service.authorization = authorize
+      service.authorization = auth_with_existing_creds(user_id)
       service
     end
 
-    def self.authorize
+    def self.authorize_application(user_id)
       client_id = Google::Auth::ClientId.from_file(CREDENTIALS_PATH)
       token_store = Google::Auth::Stores::FileTokenStore.new(file: TOKEN_PATH)
       authorizer = Google::Auth::UserAuthorizer.new(client_id, SCOPE, token_store)
-      user_id = 'default'
       credentials = authorizer.get_credentials(user_id)
 
       if credentials.nil?
@@ -34,8 +33,31 @@ module FinanceManager
           user_id: user_id, code: code, base_url: OOB_URI
         )
       end
+      GoogleDriveCredentials.create!(
+        user_id:       user_id,
+        key_hash:      {
+          'installed' => {
+            'client_id'     => credentials.client_id,
+            'client_secret' => credentials.client_secret
+          }
+        },
+        refresh_token: credentials.refresh_token
+      )
+      puts 'Successfully stored new creds for user'
+    end
 
-      credentials
+    def self.auth_with_existing_creds(user_id)
+      saved_creds = User.find(user_id).google_drive_credential
+      client_creds = Google::Auth::ClientId.from_hash(saved_creds.key_hash)
+      refresh_token = saved_creds.refresh_token
+      authorizer = Google::Auth::UserRefreshCredentials.new(
+        client_id:     client_creds.id,
+        client_secret: client_creds.secret,
+        scope:         SCOPE,
+        refresh_token: refresh_token
+      )
+      authorizer.fetch_access_token!
+      authorizer
     end
 
     def self.store_credentials(code, redirect_uri)
@@ -49,8 +71,8 @@ module FinanceManager
       )
     end
 
-    def self.gdrive_folder_id
-      service = drive_service
+    def self.gdrive_folder_id(user_id)
+      service = drive_service(user_id)
       response = service.list_files(
         q: "name='db_backups' and mimeType='application/vnd.google-apps.folder' and trashed=false"
       )
@@ -62,14 +84,14 @@ module FinanceManager
       end
     end
 
-    def self.upload_latest_backup_to_drive
+    def self.upload_latest_backup_to_drive(user_id)
       backup_directory = Rails.root.join('db_backups')
       latest_backup = Dir.glob("#{backup_directory}/*.db").max_by { |f| File.mtime(f) }
 
       return unless latest_backup
 
-      service = drive_service
-      backup_folder_id = gdrive_folder_id
+      service = drive_service(user_id)
+      backup_folder_id = gdrive_folder_id(user_id)
 
       backup_filename = File.basename(latest_backup)
       file_metadata = {
@@ -96,9 +118,9 @@ module FinanceManager
       end
     end
 
-    def self.cleanup_old_backups
-      service = drive_service
-      backup_folder_id = gdrive_folder_id
+    def self.cleanup_old_backups(user_id)
+      service = drive_service(user_id)
+      backup_folder_id = gdrive_folder_id(user_id)
 
       response = service.list_files(
         q:        "'#{backup_folder_id}' in parents and trashed=false",
