@@ -112,8 +112,10 @@ currentDate = function() {
   if (day < 10) {
     day = `0${day}`
   }
-  if (month < 10) {
+  if (month < 9) {
     month = `0${month + 1}`
+  } else {
+    month = `${month + 1}`
   }
   return `${year}-${month}-${day}`;
 }
@@ -122,8 +124,10 @@ oneYearAgoMonthlyDate = function() {
   const date = new Date(Date.now());
   let month = date.getMonth();
   const year = date.getFullYear();
-  if (month < 10) {
+  if (month < 9) {
     month = `0${month + 1}`
+  } else {
+    month = `${month + 1}`
   }
   return `${year - 1}-${month}-01`;
 }

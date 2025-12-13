@@ -7,6 +7,15 @@ showTransactionUpdateIcon = function(event) {
   }
 } 
 
+showSplitTransactionUpdateIcon = function(event) {
+  const transaction_index = $('#transaction_index').val();
+  if (event.detail.success) {
+    $(`#successIconTransaction${transaction_index}`).show()
+  } else {
+    $(`#failureIconTransaction${transaction_index}`).show()
+  }
+}
+
 showTransactionSplitIcon = function(event) {
   if (data.detail[0]['success']) {
     $('#successIconSplit').show();
@@ -62,7 +71,20 @@ $(function() {
   $('#failureIcon').hide();
   $('#successIconSplit').hide();
   $('#failureIconSplit').hide();
+  for(let i = 0; i < 3; i++) {
+    $(`#successIconTransaction${i}`).hide();
+    $(`#failureIconTransaction${i}`).hide();
+  }
   $('#edit-transaction-form').on('turbo:submit-end', showTransactionUpdateIcon);
+  $('#edit-transactions-form').on('turbo:submit-end', showSplitTransactionUpdateIcon);
+  $('#split-transactions-form').on('turbo:submit-end', showTransactionSplitIcon);
+
+  // Set the values for dropdowns on the transactions SHOW page
+  $('#plaid-category-id').dropdown('set selected',
+      $('#plaid-category-id > option').filter($("option[selected='true']")).prop('text'));
+  $('#transaction-labels > option').filter($("option[data-selected='true']")).each(function(_idx, el) {
+      $('#transaction-labels').dropdown('set selected', el.text)
+  });
   $('#split-transactions-form').on('turbo:submit-end', showTransactionSplitIcon);
 
   // Set the values for dropdowns on the transactions SHOW page

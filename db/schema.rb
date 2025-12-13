@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_10_26_125549) do
+ActiveRecord::Schema[7.1].define(version: 2025_10_09_160434) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -60,6 +60,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_26_125549) do
     t.datetime "updated_at", null: false
     t.boolean "interpolated", default: false
     t.index ["account_id"], name: "index_balances_on_account_id"
+  end
+
+  create_table "google_drive_credentials", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "encrypted_key_hash"
+    t.string "encrypted_key_hash_iv"
+    t.string "encrypted_refresh_token"
+    t.string "encrypted_refresh_token_iv"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_google_drive_credentials_on_user_id"
   end
 
   create_table "labels", force: :cascade do |t|

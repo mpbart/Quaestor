@@ -11,6 +11,7 @@ class User < ApplicationRecord
   has_many :transactions
   has_many :plaid_credentials
   has_many_attached :transaction_csvs
+  has_one :google_drive_credential
 
   # Only show 50 transactions at a time
   def paginated_transactions(page_num:, where_clause: '1=1')
