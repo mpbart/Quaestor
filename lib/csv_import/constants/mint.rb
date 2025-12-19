@@ -16,7 +16,6 @@ module CsvImport
 
       def self.mappings
         @mappings ||= begin
-          # rubocop:disable Layout/LineLength
           conversions = {
             'Auto Insurance'             => %w[GENERAL_SERVICES LOAN_PAYMENTS_CAR_PAYMENT],
             'Auto Payment'               => %w[LOAN_PAYMENTS LOAN_PAYMENTS_CAR_PAYMENT],
@@ -196,8 +195,6 @@ module CsvImport
                                                GENERAL_MERCHANDISE_OTHER_GENERAL_MERCHANDISE],
             'Honeymoon'                  => %w[TRAVEL TRAVEL_VACATION]
           }
-          # rubocop:enable Layout/LineLength
-
           conversions.each do |key, value|
             next if value.respond_to?(:call)
 

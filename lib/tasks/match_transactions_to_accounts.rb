@@ -3,7 +3,6 @@
 require 'csv'
 require 'pry'
 
-# rubocop:disable Layout/LineLength
 account_map = Account.all.to_h { |a| [a.name, a] }.merge(Account.all.to_h do |a|
   [a.official_name, a]
 end)
@@ -24,4 +23,3 @@ ActiveRecord::Base.transaction do
     trans.save!
   end
 end
-# rubocop:enable Layout/LineLength

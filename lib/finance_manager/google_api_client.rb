@@ -60,17 +60,6 @@ module FinanceManager
       authorizer
     end
 
-    def self.store_credentials(code, redirect_uri)
-      client_id = Google::Auth::ClientId.from_file(CREDENTIALS_PATH)
-      token_store = Google::Auth::Stores::FileTokenStore.new(file: TOKEN_PATH)
-      authorizer = Google::Auth::UserAuthorizer.new(client_id, SCOPE, token_store)
-      user_id = 'default'
-
-      authorizer.get_and_store_credentials_from_code(
-        user_id: user_id, code: code, base_url: redirect_uri
-      )
-    end
-
     def self.gdrive_folder_id(user_id)
       service = drive_service(user_id)
       response = service.list_files(
