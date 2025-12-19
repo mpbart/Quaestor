@@ -46,4 +46,46 @@ class RulesController < ApplicationController
       'contains'
     end
   end
+
+  def edit
+    @transaction_rule = TransactionRule.find(params[:id])
+    @rule_criteria = @transaction_rule.rule_criteria.index_by(&:field_name)
+    @accounts = Account.all
+    @plaid_categories = PlaidCategory.all
+    @labels = Label.all
+  end
+
+  def update
+    transaction_rule = TransactionRule.find(params[:id])
+    filtered_params = params.require(:rule).permit(
+      :account_id, :description, :amount, :updated_merchant, :updated_description,
+      :updated_category_id, :updated_label_id
+    )
+
+    transaction_rule.update!(
+      field_replacement_mappings: {
+        description:       filtered_params[:updated_description],
+        merchant:          filtered_params[:updated_merchant],
+        plaid_category_id: filtered_params[:updated_category_id],
+        label_id:          filtered_params[:updated_label_id]
+      }.compact_blank
+    )
+
+    transaction_rule.rule_criteria.destroy_all
+
+    [:account_id, :description, :amount].each do |key|
+      value = filtered_params[key]
+      next unless value.present?
+
+      qualifier = map_field_to_qualifier(key)
+      RuleCriteria.create!(
+        field_name:       key,
+        field_qualifier:  qualifier,
+        value_comparator: value,
+        transaction_rule: transaction_rule
+      )
+    end
+
+    redirect_to rules_url
+  end
 end

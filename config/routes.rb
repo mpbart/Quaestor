@@ -25,12 +25,15 @@ Rails.application.routes.draw do
     member do
       get 'balance_history'
     end
+    collection do
+      post 'backup'
+    end
   end
   resources :balances, only: [:create]
   resources :labels, only: [:create]
   resources :categories, only: [:create]
   resources :analytics, only: [:index]
-  resources :rules, only: [:index, :create, :new]
+  resources :rules, only: [:index, :create, :new, :edit, :update]
 
   get '/search_transaction', to: 'transactions#search'
   get 'accounts/subtypes/:subtype', to: 'accounts#subtypes'
