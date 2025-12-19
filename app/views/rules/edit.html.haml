@@ -1,0 +1,84 @@
+= turbo_frame_tag 'rules' do
+  %div.ui.container
+    = form_for :rule, url: rule_path(@transaction_rule), method: :patch, class: 'ui form' do |form|
+      %div.ui.three.column.grid
+        %div.column
+          %div.ui.fluid.card
+            %div.content
+              %h3.ui.header
+                If a transaction meets these criteria
+              %div.ui.divider
+              %div.field
+                %div.ui.toggle.checkbox
+                  %input{type: "checkbox", name: "matches-account", checked: @rule_criteria['account_id'].present?}
+                  %label
+                    %strong
+                      Account
+              %div.field{class: "account-inputs #{@rule_criteria['account_id'].present? ? '' : 'transition hidden'}"}
+                = form.select :account_id, @accounts.map{ |a| [a.name, a.id] }, {include_blank: true, selected: @rule_criteria['account_id']&.value_comparator}, {class: 'ui dropdown'}
+              %div.field
+                %div.ui.toggle.checkbox
+                  %input{type: "checkbox", name: "matches-description", checked: @rule_criteria['description'].present?}
+                  %label
+                    %strong
+                      Matches Description
+              %div.field{class: "description-inputs #{@rule_criteria['description'].present? ? '' : 'transition hidden'}"}
+                = form.text_field :description, placeholder: 'Enter description', value: @rule_criteria['description']&.value_comparator
+              %div.field
+                %div.ui.toggle.checkbox
+                  %input{type: "checkbox", name: "matches-amount", checked: @rule_criteria['amount'].present?}
+                  %label
+                    %strong
+                      Matches Amount
+              %div.field{class: "amount-inputs #{@rule_criteria['amount'].present? ? '' : 'transition hidden'}"}
+                %div.ui.right.labeled.input
+                  = form.text_field :amount, placeholder: 'Enter amount', value: @rule_criteria['amount']&.value_comparator
+                  %div.ui.dropdown.label
+                    %div.text
+                      USD
+        %div.one.wide.column
+          = image_tag '/right-arrow.png', size: '32x32'
+        %div.column
+          %div.ui.fluid.card
+            %div.content
+              %h3.ui.header
+                Then apply the following updates
+              %div.ui.divider
+              %div.ui.form
+                %div.field
+                  %div.ui.toggle.checkbox
+                    %input{type: "checkbox", name: "rename-merchant", checked: @transaction_rule.field_replacement_mappings['merchant'].present?}
+                    %label
+                      %strong
+                        Rename Merchant
+                %div.field{class: "merchant-rename-inputs #{@transaction_rule.field_replacement_mappings['merchant'].present? ? '' : 'transition hidden'}"}
+                  = form.text_field :updated_merchant, placeholder: 'Enter new merchant name', value: @transaction_rule.field_replacement_mappings['merchant']
+                %div.field
+                  %div.ui.toggle.checkbox
+                    %input{type: "checkbox", name: "set-description", checked: @transaction_rule.field_replacement_mappings['description'].present?}
+                    %label
+                      %strong
+                        Set Description
+                %div.field{class: "description-set-inputs #{@transaction_rule.field_replacement_mappings['description'].present? ? '' : 'transition hidden'}"}
+                  = form.text_field :updated_description, placeholder: 'Enter new description', value: @transaction_rule.field_replacement_mappings['description']
+                %div.field
+                  %div.ui.toggle.checkbox
+                    %input{type: "checkbox", name: "set-category", checked: @transaction_rule.field_replacement_mappings['plaid_category_id'].present?}
+                    %label
+                      %strong
+                        Set Category
+                %div.field{class: "category-set-inputs #{@transaction_rule.field_replacement_mappings['plaid_category_id'].present? ? '' : 'transition hidden'}"}
+                  = form.select :updated_category_id, @plaid_categories.map{ |p| [humanized_category(p), p.id] }, {include_blank: true, selected: @transaction_rule.field_replacement_mappings['plaid_category_id']}, {class: 'ui search dropdown'}
+                %div.field
+                  %div.ui.toggle.checkbox
+                    %input{type: "checkbox", name: "set-label", checked: @transaction_rule.field_replacement_mappings['label_id'].present?}
+                    %label
+                      %strong
+                        Set Label
+                %div.field{class: "label-set-inputs #{@transaction_rule.field_replacement_mappings['label_id'].present? ? '' : 'transition hidden'}"}
+                  = form.select :updated_label_id, @labels.map{ |l| [l.name, l.id] }, {include_blank: true, selected: @transaction_rule.field_replacement_mappings['label_id']}, {class: 'ui dropdown'}
+                %div.field
+                  = form.submit "Update Rule", class: "ui fluid primary button"
+
+= javascript_include_tag "plaid"
+= javascript_include_tag "rules"

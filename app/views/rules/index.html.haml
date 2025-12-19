@@ -21,6 +21,8 @@
                 %td.right-cell
                   - rule.field_replacement_mappings.each do |k, v|
                     != "Set #{k.humanize} to <div class='ui basic label criteria-label'>#{make_value_readable(v, k)}</div><br>"
+                %td
+                  = link_to 'Edit', edit_rule_path(rule)
         %div.five.wide.column
 
 = javascript_include_tag "plaid"

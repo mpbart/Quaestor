@@ -76,10 +76,31 @@ $(function() {
       });
   });
 
+  $('#backup-database-button').click(function() {
+    dimPage();
+    $.ajax({
+      url: '/accounts/backup',
+      type: 'POST',
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));
+      },
+      success: function(data) {
+        unDimPage();
+        if (data.success) {
+          $('#database-backup-notification').removeClass('hidden');
+        }
+      }
+    });
+  });
+
  /**
   * Add behavior to dismiss warning banner if the x is clicked
   */
   $('#account_refresh_failure_banner').on('click', function() {
+    $(this).closest('.message').transition('fade');
+  });
+
+  $('#database-backup-notification').on('click', function() {
     $(this).closest('.message').transition('fade');
   });
 

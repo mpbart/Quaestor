@@ -29,4 +29,9 @@ class AccountsController < ApplicationController
   def subtypes
     render json: { subtypes: Account::ACCOUNT_TYPES[params[:subtype]] }
   end
+
+  def backup
+    DatabaseBackupWorker.perform_async(current_user.id)
+    render json: { success: true }
+  end
 end
