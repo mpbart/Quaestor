@@ -33,3 +33,5 @@ config.json
 db_backups/*
 
 .tool-versions
+
+.env
