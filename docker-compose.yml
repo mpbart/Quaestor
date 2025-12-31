@@ -20,14 +20,14 @@ services:
         protocol: tcp
         mode: host
     environment: &web_environment
-      - DEVISE_SECRET_KEY=
-      - DB_HOST=db
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=password
-      - ENCRYPTION_KEY=
-      - PLAID_SECRET_ID=
-      - PLAID_CLIENT_ID=
-      - REDIS_URL=redis://redis:6379
+      - DEVISE_SECRET_KEY=${DEVISE_SECRET_KEY}
+      - DB_HOST=${DB_HOST}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - PLAID_SECRET_ID=${PLAID_SECRET_ID}
+      - PLAID_CLIENT_ID=${PLAID_CLIENT_ID}
+      - REDIS_URL=${REDIS_URL}
     volumes:
       - .:/code:cached
 

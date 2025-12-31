@@ -19,6 +19,8 @@ module FinanceManager
         spending_on_label_over_timeframe(**params)
       when 'spending_over_timeframe'
         spending_over_timeframe(**params)
+      when 'spending_by_category_over_timeframe'
+        spending_by_category_over_timeframe(**params)
       when 'income_over_timeframe'
         income_over_timeframe(**params)
       when 'account_balance_history'
@@ -171,6 +173,41 @@ module FinanceManager
           balance: row['amount'].round(2) }
       end
                .sort_by { |h| Date.strptime(h[:month], '%B %Y') }
+    end
+
+    def self.spending_by_category_over_timeframe(user_id:, start_date:, end_date:)
+      records = filter_for_timeframe(
+        start_date,
+        end_date,
+        ::Transaction.spending_by_category_over_time(user_id)
+      )
+
+      grouped_by_month = records.group_by { |rec| rec['month'].to_date }
+      grouped_by_month.flat_map do |month, month_records|
+        sorted_categories = month_records.sort_by { |rec| -rec['total'].to_f }
+        top_ten = sorted_categories.first(10)
+        other_total = sorted_categories.drop(10).sum { |rec| rec['total'].to_f }
+
+        month_str = month.strftime('%B %Y')
+
+        month_data = top_ten.map do |rec|
+          {
+            month:    month_str,
+            category: rec['category'].split('_').map(&:downcase).join(' '),
+            total:    rec['total'].to_f.abs.round(2)
+          }
+        end
+
+        if other_total.positive?
+          month_data << {
+            month:    month_str,
+            category: 'Other',
+            total:    other_total.abs.round(2)
+          }
+        end
+
+        month_data
+      end
     end
 
     def self.present_as_hash(records)
