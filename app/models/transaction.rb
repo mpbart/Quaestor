@@ -98,6 +98,21 @@ optional: true
     ORDER BY month ASC
   SQL
 
+  SPENDING_BY_CATEGORY_PER_MONTH_SQL = <<-SQL.freeze
+    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month, pc.primary_category as category
+    FROM transactions t
+    JOIN accounts a
+    ON t.account_id = a.id
+    JOIN plaid_categories pc
+    ON t.plaid_category_id = pc.id
+    WHERE a.user_id = ?
+    AND pc.primary_category <> 'INCOME'
+    AND pc.detailed_category NOT IN (#{::PlaidCategory::EXCLUDED_CATEGORIES.map { |i| "'#{i}'" }.join(', ')})
+    AND t.deleted_at IS NULL
+    GROUP BY DATE_TRUNC('MONTH', t.date), pc.primary_category
+    ORDER BY month ASC
+  SQL
+
   def grouped_transactions
     transaction_group&.transactions&.where&.not(id: id) || []
   end
@@ -154,6 +169,11 @@ optional: true
                                             [LABEL_PER_MONTH_SQL,
                                              user_id,
                                              label_id])
+    ActiveRecord::Base.connection.execute(sanitized_sql)
+  end
+
+  def self.spending_by_category_over_time(user_id)
+    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [SPENDING_BY_CATEGORY_PER_MONTH_SQL, user_id])
     ActiveRecord::Base.connection.execute(sanitized_sql)
   end
 end

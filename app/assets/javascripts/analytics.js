@@ -1,4 +1,10 @@
 var analyticsChart = null;
+var chartColors = [
+  '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+  '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+  '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5',
+  '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5'
+];
 
 renderTable = function(tableData, sumValues, averageValues) {
   const table = document.getElementById('graph_data_table');
@@ -100,7 +106,9 @@ renderChart = function(form, chartCreator) {
     } else {
       sumValues = true;
     }
-    renderTable(data, sumValues, averageValues);
+    if (chartType != 'spending_by_category_over_timeframe') {
+      renderTable(data, sumValues, averageValues);
+    }
   });
 }
 
@@ -158,11 +166,8 @@ initTimeframeField = function(selectedOption) {
 }
 
 $(function() {
-  // TODO:
-  // 1. Figure out how to fix the errors that occur when reloading the page
   // IDEAS:
-  // 1. Add chart for showing spending on top 3 categories per month
-  // 2. Add a sankey diagram for showing flows of money?
+  // 1. Add a sankey diagram for showing flows of money?
 
   const createChart = (data) => ({
     'net_worth_over_timeframe': {
@@ -306,6 +311,48 @@ $(function() {
           },
         ]
       }
+    },
+    'spending_by_category_over_timeframe': {
+      type: 'bar',
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Spending by Category over Time',
+            font: {
+              size: 16
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+          },
+          y: {
+            stacked: true
+          }
+        }
+      },
+      data: (function() {
+        if (!data || data.length === 0) {
+          return { labels: [], datasets: [] };
+        }
+        const labels = [...new Set(data.map(item => item.month))].sort((a, b) => new Date(Date.parse(a)) - new Date(Date.parse(b)));
+        const categories = [...new Set(data.map(item => item.category))];
+
+        const datasets = categories.map((category, index) => {
+          return {
+            label: category,
+            data: labels.map(label => {
+              const found = data.find(item => item.month === label && item.category === category);
+              return found ? found.total : 0;
+            }),
+            backgroundColor: chartColors[index % chartColors.length]
+          };
+        });
+
+        return { labels, datasets };
+      })()
     },
     'income_over_timeframe': {
       type: 'bar',

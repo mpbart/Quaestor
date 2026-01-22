@@ -28,7 +28,7 @@ jobs:
         run: docker compose build
 
       - name: Setup Database
-        run: RAILS_ENV=test docker compose run web bundle exec rake db:create db:schema:load
+        run: RAILS_ENV=test docker compose --env-file .env.test run web bundle exec rake db:create db:schema:load
 
       - name: Run RSpec Tests
-        run: RAILS_ENV=test docker compose run web bundle exec rspec
+        run: RAILS_ENV=test docker compose --env-file .env.test run web bundle exec rspec
