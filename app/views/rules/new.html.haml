@@ -78,6 +78,32 @@
                 %div.field.transition.hidden.label-set-inputs
                   = form.select :updated_label_id, Label.all.map{ |l| [l.name, l.id] }, {include_blank: true}, {class: 'ui dropdown'}
                 %div.field
+                  %div.ui.toggle.checkbox
+                    %input{type: "checkbox", name: "split-transaction"}
+                    %label
+                      %strong
+                        Split Transaction
+                %div.field.transition.hidden.split-transaction-inputs
+                  %div.field
+                    %label Split Amount
+                    %div.ui.right.labeled.input
+                      = form.text_field :split_amount, placeholder: 'Enter split amount'
+                      %div.ui.dropdown.label
+                        %div.text
+                          USD
+                  %div.field
+                    %label Split Category
+                    = form.select :split_category_id, PlaidCategory.all.map{ |p| [humanized_category(p), p.id] }, {include_blank: true}, {class: 'ui search dropdown'}
+                  %div.field
+                    %label Split Description
+                    = form.text_field :split_description, placeholder: 'Enter split description'
+                  %div.field
+                    %label Split Merchant Name
+                    = form.text_field :split_merchant_name, placeholder: 'Enter split merchant name'
+                  %div.field
+                    %label Split Labels
+                    = form.select :split_labels, Label.all.map{ |l| [l.name, l.id] }, {include_blank: true}, {class: 'ui search dropdown', multiple: true}
+                %div.field
                   = form.submit "Create Rule", class: "ui fluid primary button"
 
 = javascript_include_tag "plaid"
