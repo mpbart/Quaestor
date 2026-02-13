@@ -78,6 +78,32 @@
                 %div.field{class: "label-set-inputs #{@transaction_rule.field_replacement_mappings['label_id'].present? ? '' : 'transition hidden'}"}
                   = form.select :updated_label_id, @labels.map{ |l| [l.name, l.id] }, {include_blank: true, selected: @transaction_rule.field_replacement_mappings['label_id']}, {class: 'ui dropdown'}
                 %div.field
+                  %div.ui.toggle.checkbox
+                    %input{type: "checkbox", name: "split-transaction", checked: @transaction_rule.split_category_id.present?}
+                    %label
+                      %strong
+                        Split Transaction
+                %div.field{class: "split-transaction-inputs #{@transaction_rule.split_category_id.present? ? '' : 'transition hidden'}"}
+                  %div.field
+                    %label Split Amount
+                    %div.ui.right.labeled.input
+                      = form.text_field :split_amount, placeholder: 'Enter split amount', value: @transaction_rule.split_amount
+                      %div.ui.dropdown.label
+                        %div.text
+                          USD
+                  %div.field
+                    %label Split Category
+                    = form.select :split_category_id, @plaid_categories.map{ |p| [humanized_category(p), p.id] }, {include_blank: true, selected: @transaction_rule.split_category_id}, {class: 'ui search dropdown'}
+                  %div.field
+                    %label Split Description
+                    = form.text_field :split_description, placeholder: 'Enter split description', value: @transaction_rule.split_description
+                  %div.field
+                    %label Split Merchant Name
+                    = form.text_field :split_merchant_name, placeholder: 'Enter split merchant name', value: @transaction_rule.split_merchant_name
+                  %div.field
+                    %label Split Labels
+                    = form.select :split_labels, @labels.map{ |l| [l.name, l.id] }, {include_blank: true, selected: @transaction_rule.split_labels}, {class: 'ui search dropdown', multiple: true}
+                %div.field
                   = form.submit "Update Rule", class: "ui fluid primary button"
 
 = javascript_include_tag "plaid"

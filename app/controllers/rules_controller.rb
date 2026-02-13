@@ -10,7 +10,9 @@ class RulesController < ApplicationController
   def create
     filtered_params = params.require(:rule).permit(
       :account_id, :description, :amount, :updated_merchant, :updated_description,
-      :updated_category_id, :updated_label_id
+      :updated_category_id, :updated_label_id,
+      :split_category_id, :split_amount, :split_description, :split_merchant_name,
+      split_labels: [] # For array of label IDs
     )
 
     transaction_rule = TransactionRule.create!(
@@ -19,7 +21,12 @@ class RulesController < ApplicationController
         merchant:          filtered_params[:updated_merchant],
         plaid_category_id: filtered_params[:updated_category_id],
         label_id:          filtered_params[:updated_label_id]
-      }.compact_blank
+      }.compact_blank,
+      split_category_id:          filtered_params[:split_category_id],
+      split_amount:               filtered_params[:split_amount],
+      split_description:          filtered_params[:split_description],
+      split_merchant_name:        filtered_params[:split_merchant_name],
+      split_labels:               filtered_params[:split_labels]
     )
 
     [:account_id, :description, :amount].each do |key|
@@ -59,7 +66,9 @@ class RulesController < ApplicationController
     transaction_rule = TransactionRule.find(params[:id])
     filtered_params = params.require(:rule).permit(
       :account_id, :description, :amount, :updated_merchant, :updated_description,
-      :updated_category_id, :updated_label_id
+      :updated_category_id, :updated_label_id,
+      :split_category_id, :split_amount, :split_description, :split_merchant_name,
+      split_labels: [] # For array of label IDs
     )
 
     transaction_rule.update!(
@@ -68,7 +77,12 @@ class RulesController < ApplicationController
         merchant:          filtered_params[:updated_merchant],
         plaid_category_id: filtered_params[:updated_category_id],
         label_id:          filtered_params[:updated_label_id]
-      }.compact_blank
+      }.compact_blank,
+      split_category_id:          filtered_params[:split_category_id],
+      split_amount:               filtered_params[:split_amount],
+      split_description:          filtered_params[:split_description],
+      split_merchant_name:        filtered_params[:split_merchant_name],
+      split_labels:               filtered_params[:split_labels]
     )
 
     transaction_rule.rule_criteria.destroy_all
