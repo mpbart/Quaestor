@@ -2,10 +2,10 @@
 
 = turbo_frame_tag 'home' do
   %body
-    %div.ui.padded.grid
+    %div.ui.padded.stackable.grid
       = render "shared/dimmer"
-      %div.one.wide.column
-      %div.three.wide.column
+      %div.one.wide.column.mobile-hidden
+      %div.sixteen.wide.mobile.three.wide.computer.column
         = render partial: "shared/account_refresh_error"
         = render partial: "shared/database_backup_notification"
         %div.ui.fluid.card
@@ -138,7 +138,7 @@
                         = "0%"
                       - else
                         = "#{((net_income / @total_income) * 100.0).round(2)}%"
-      %div.eight.wide.column
+      %div.sixteen.wide.mobile.eight.wide.computer.column
         %div.ui.fluid.card
           %div.content
             %h3.ui.center.aligned.header
@@ -228,7 +228,7 @@
                                 %strong
                                   = "#{(BigDecimal(sub_transactions.sum(&:first), 8) / BigDecimal(@total_expenses, 8)).round(2) * 100.0} %"
               
-      %div.four.wide.column
+      %div.sixteen.wide.mobile.four.wide.computer.column
         %div.ui.grid
           %div.ui.row
             %div.left.floated.column

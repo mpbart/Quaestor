@@ -2,10 +2,10 @@
 
 = turbo_frame_tag 'transactions' do
   %body
-    %div.ui.padded.grid
+    %div.ui.padded.stackable.grid
       = render "shared/dimmer"
-      %div.one.wide.column
-      %div.fourteen.wide.column
+      %div.one.wide.column.mobile-hidden
+      %div.sixteen.wide.mobile.fourteen.wide.computer.column
         %h2.ui.center.aligned.header
           Transactions
         %div.ten.wide.row
@@ -43,7 +43,7 @@
                       %div.six.wide.column.right.floated
                         = form.submit "Filter", class: 'ui fluid primary bottom button'
         = render partial: "shared/account_refresh_error"
-        %div#recent_transactions
+        %div#recent_transactions.table-responsive
           %table.ui.selectable.padded.basic.table
             %thead
               %th
@@ -86,7 +86,7 @@
             %i.left.chevron.icon
           %button#next-page-button.ui.right.floated.icon.button
             %i.right.chevron.icon
-    %div.one.wide.column
+    %div.one.wide.column.mobile-hidden
 
 = javascript_include_tag "plaid"
 = javascript_include_tag "transactions"

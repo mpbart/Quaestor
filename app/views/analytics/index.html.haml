@@ -1,9 +1,9 @@
 = stylesheet_link_tag "application", media: "all"
 
 %body
-  %div.ui.divided.padded.grid
+  %div.ui.divided.padded.stackable.grid
     = render "shared/dimmer"
-    %div.four.wide.column
+    %div.sixteen.wide.mobile.four.wide.computer.column
       %form.ui.form#chartForm
         %div.field
           %label Select a View
@@ -47,7 +47,7 @@
           %label Select an End Date
           %input#endDateInput{ type: 'date', name: 'end_date' }
         %button.ui.primary.button{ type: "submit" } Submit
-    %div.nine.wide.column
+    %div.sixteen.wide.mobile.nine.wide.computer.column
       %div
         %canvas#analytics
       %div

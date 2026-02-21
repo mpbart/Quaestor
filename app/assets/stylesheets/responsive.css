@@ -1,0 +1,79 @@
+/* Mobile-first responsive overrides for Fomantic UI */
+
+/* Make tables horizontally scrollable on small screens */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media only screen and (max-width: 767px) {
+  /* Header nav: stack tabs vertically */
+  .ui.tabular.menu {
+    flex-direction: column;
+  }
+  .ui.tabular.menu .item {
+    border-bottom: 1px solid rgba(34,36,38,.15);
+    border-right: none;
+  }
+  .ui.tabular.menu .right.item {
+    align-self: stretch;
+  }
+
+  /* Remove side gutter columns on mobile */
+  .mobile-hidden {
+    display: none !important;
+  }
+
+  /* Full-width columns on mobile */
+  .ui.grid > .column:not(.row),
+  .ui.grid > .row > .column {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  /* Modal: full-width on mobile */
+  .ui.modal {
+    width: 95% !important;
+    margin: 1rem auto !important;
+  }
+
+  /* Form fields: stack on mobile */
+  .ui.form .fields {
+    flex-wrap: wrap;
+  }
+  .ui.form .fields > .field {
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Progress bar labels */
+  .two.column.row.consistent .cozy.column {
+    font-size: 0.85rem;
+  }
+
+  /* Spending breakdown grid columns */
+  .ui.grid > .four.wide.column,
+  .ui.grid > .eight.wide.column,
+  .ui.grid > .nine.wide.column {
+    width: 100% !important;
+  }
+
+  /* Account cards */
+  .ui.fluid.card {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Rules page arrow image */
+  .one.wide.column img {
+    display: none;
+  }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .ui.modal {
+    width: 85% !important;
+  }
+}

@@ -1,7 +1,7 @@
 = turbo_frame_tag 'rules' do
   %div.ui.container
     = form_for :rule, url: rule_path(@transaction_rule), method: :patch, class: 'ui form' do |form|
-      %div.ui.three.column.grid
+      %div.ui.three.column.stackable.grid
         %div.column
           %div.ui.fluid.card
             %div.content
