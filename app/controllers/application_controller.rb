@@ -33,6 +33,8 @@ class ApplicationController < ActionController::Base
   end
 
   def humanized_category(plaid_category)
+    return 'N/A' if plaid_category.nil?
+
     plaid_category.detailed_category[plaid_category.primary_category.length + 1..].humanize
   end
 

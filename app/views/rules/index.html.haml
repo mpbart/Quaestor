@@ -21,6 +21,16 @@
                 %td.right-cell
                   - rule.field_replacement_mappings.each do |k, v|
                     != "Set #{k.humanize} to <div class='ui basic label criteria-label'>#{make_value_readable(v, k)}</div><br>"
+                  - if rule.split_category_id.present?
+                    %div
+                      != "Split Amount: <div class='ui basic label criteria-label'>#{rule.split_amount}</div><br>"
+                      != "Split Category: <div class='ui basic label criteria-label'>#{humanized_category(rule.split_category)}</div><br>"
+                      - if rule.split_description.present?
+                        != "Split Description: <div class='ui basic label criteria-label'>#{rule.split_description}</div><br>"
+                      - if rule.split_merchant_name.present?
+                        != "Split Merchant: <div class='ui basic label criteria-label'>#{rule.split_merchant_name}</div><br>"
+                      - if rule.split_labels.present?
+                        != "Split Labels: <div class='ui basic label criteria-label'>#{rule.split_labels.map { |label_id| Label.find_by(id: label_id)&.name }.compact.join(', ')}</div><br>"
                 %td
                   = link_to 'Edit', edit_rule_path(rule)
         %div.five.wide.column

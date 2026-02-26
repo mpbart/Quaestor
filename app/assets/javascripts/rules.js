@@ -26,6 +26,10 @@ initializeCheckboxes = function() {
   $('input[name="set-label"]').on('change', function() {
     $('.label-set-inputs').toggleClass('hidden', !$(this).is(':checked'));
   });
+
+  $('input[name="split-transaction"]').on('change', function() {
+    $('.split-transaction-inputs').toggleClass('hidden', !$(this).is(':checked'));
+  });
 }
 
 $(function() {
