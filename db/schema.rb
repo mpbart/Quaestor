@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_27_155049) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_03_165540) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -28,6 +28,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_27_155049) do
     t.datetime "updated_at", null: false
     t.string "institution_name"
     t.string "institution_id"
+    t.boolean "inactive", default: false
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
