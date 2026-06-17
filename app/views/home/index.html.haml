@@ -51,7 +51,7 @@
                               = account.name
                             %div.right.floated.vertical-aligned
                               %b{ style: "color: #767676" }
-                                = number_to_currency(account.balances.last&.amount.round(2))
+                                = number_to_currency(account.balances.order(created_at: :desc).first&.amount.round(2))
               %div.ui.divider
               %div.ui.grid
                 %div.ui.two.column.row
