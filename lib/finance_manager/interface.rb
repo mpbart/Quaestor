@@ -51,7 +51,15 @@ module FinanceManager
                 .map { |transaction| FinanceManager::Transaction.create(transaction) }
                 .map { |transaction| FinanceManager::Rules::Runner.run_all_rules(transaction) }
                 .compact
-                .each(&:save!)
+                .each do |transaction|
+                  transaction.save!
+                  Turbo::StreamsChannel.broadcast_prepend_to(
+                    [user, "transactions"],
+                    target: "transactions-table-body",
+                    partial: "transactions/transaction_row",
+                    locals: { transaction: transaction }
+                  )
+                end
 
           result.modified
                 .map { |transaction| FinanceManager::Transaction.update(transaction) }

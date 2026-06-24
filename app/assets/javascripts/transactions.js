@@ -25,7 +25,7 @@ showTransactionSplitIcon = function(event) {
 }
 
 makeTableRowsClickable = function() {
-  $('tr').click(function(obj) {
+  $('#transactions-table-body').on('click', 'tr', function(obj) {
       Turbo.visit($(this).data('url'), {action: 'advance'});
   })
 }
@@ -124,4 +124,47 @@ $('turbo-frame#transactions').on('turbo:frame-load', function(event) {
   $('turbo-frame#search').on('turbo:submit-end', function(event) {
     Turbo.visit(event.detail.fetchResponse.response.url, {action: 'advance'})
   });
+});
+
+// Filter incoming Turbo Stream transactions based on active filters
+document.addEventListener('turbo:before-stream-render', function(event) {
+  var streamElement = event.target;
+  if (streamElement.getAttribute('target') !== 'transactions-table-body') return;
+
+  var container = document.getElementById('recent_transactions');
+  if (!container) return;
+
+  var template = streamElement.querySelector('template');
+  if (!template) return;
+
+  var row = template.content.querySelector('tr');
+  if (!row) return;
+
+  var filters = container.dataset;
+  var matches = true;
+
+  if (filters.filterAccountId) {
+    matches = matches && row.dataset.accountId === filters.filterAccountId;
+  }
+  if (filters.filterCategoryId) {
+    matches = matches && row.dataset.plaidCategoryId === filters.filterCategoryId;
+  }
+  if (filters.filterLabelId) {
+    var labelIds = (row.dataset.labelIds || '').split(',');
+    matches = matches && labelIds.indexOf(filters.filterLabelId) !== -1;
+  }
+  if (filters.filterQ) {
+    var desc = (row.dataset.description || '').toLowerCase();
+    matches = matches && desc.indexOf(filters.filterQ.toLowerCase()) !== -1;
+  }
+  if (filters.filterStartDate) {
+    matches = matches && row.dataset.date >= filters.filterStartDate;
+  }
+  if (filters.filterEndDate) {
+    matches = matches && row.dataset.date <= filters.filterEndDate;
+  }
+
+  if (!matches) {
+    event.preventDefault();
+  }
 });

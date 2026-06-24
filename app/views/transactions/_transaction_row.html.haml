@@ -1,0 +1,18 @@
+- amount_klass = transaction.amount < 0 ? 'green-text' : 'black-text'
+- row_klass = transaction.pending ? 'pending-transaction-background': ''
+%tr{ class: row_klass, data: {url: transaction_path(transaction), account_id: transaction.account_id, plaid_category_id: transaction.plaid_category_id, label_ids: transaction.labels.pluck(:id).join(','), date: transaction.date.to_s, description: transaction.description} }
+  %td
+    = short_format_date(transaction.date)
+  %td
+    = transaction.description[..40]
+  %td
+    = transaction.account&.name
+  %td
+    = humanized_category(transaction.plaid_category)
+  %td
+    - transaction.labels.pluck(:id, :name).sort.each do |id, name|
+      - color = label_id_to_color(id)
+      %a{ href: "/transactions?label_id=#{id}", class: "ui #{color} label"}
+        = name
+  %td{ class: amount_klass }
+    = number_to_currency(transaction.amount * -1.0)

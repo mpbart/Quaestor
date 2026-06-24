@@ -1,6 +1,7 @@
 = stylesheet_link_tag "application", media: "all"
 
 = turbo_frame_tag 'transactions' do
+  = turbo_stream_from current_user, "transactions"
   %body
     %div.ui.padded.grid
       = render "shared/dimmer"
@@ -43,7 +44,7 @@
                       %div.six.wide.column.right.floated
                         = form.submit "Filter", class: 'ui fluid primary bottom button'
         = render partial: "shared/account_refresh_error"
-        %div#recent_transactions
+        %div#recent_transactions{ data: { filter_account_id: params[:account_id], filter_category_id: params[:plaid_category_id], filter_label_id: params[:label_id], filter_q: params[:q], filter_start_date: params[:start_date], filter_end_date: params[:end_date] } }
           %table.ui.selectable.padded.basic.table
             %thead
               %th
@@ -58,30 +59,8 @@
                 Labels
               %th
                 Amount
-            %tbody
-              - @transactions.each do |transaction|
-                - amount_klass = transaction.amount < 0 ? 'green-text' : 'black-text'
-                - row_klass = transaction.pending ? 'pending-transaction-background': ''
-                %tr{ class: row_klass, data: {url: transaction_path(transaction)} }
-                  %td
-                    = short_format_date(transaction.date)
-                  %td
-                    = transaction.description[..40]
-                  %td
-                    = transaction.account&.name
-                  %td
-                    = humanized_category(transaction.plaid_category)
-                  %td
-                    - # TODO: if a label filter is applied this will only show that single
-                    - # label and no others because the associations are eager-loaded into
-                    - # memory in the query_builder to avoid N+1 query problems. Think about
-                    - # how to fix this
-                    - transaction.labels.pluck(:id, :name).sort.each do |id, name|
-                      - color = label_id_to_color(id)
-                      %a{ href: "/transactions?label_id=#{id}", class: "ui #{color} label"}
-                        = name
-                  %td{ class: amount_klass }
-                    = number_to_currency(transaction.amount * -1.0)
+            %tbody#transactions-table-body
+              = render partial: "transactions/transaction_row", collection: @transactions, as: :transaction
           %button#previous-page-button.ui.right.icon.button
             %i.left.chevron.icon
           %button#next-page-button.ui.right.floated.icon.button
