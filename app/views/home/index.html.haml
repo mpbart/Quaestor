@@ -51,7 +51,7 @@
                               = account.name
                             %div.right.floated.vertical-aligned
                               %b{ style: "color: #767676" }
-                                = number_to_currency(account.balances.last&.amount.round(2))
+                                = number_to_currency(account.balances.order(created_at: :desc).first&.amount.round(2))
               %div.ui.divider
               %div.ui.grid
                 %div.ui.two.column.row
@@ -162,7 +162,11 @@
                   = number_to_currency(@total_expenses)
 
             - amounts = @calcs.expenses_by_source(@start_date, @end_date).map{ |k, v| [k, v.sum(&:first)] }.to_h
-            - percentages = amounts.map{ |k, v| [k, ((v / @total_income) * 100).to_i] }.to_h
+            - if @total_income < @total_expenses
+              - benchmark = @total_expenses
+            - else
+              - benchmark = @total_income
+            - percentages = amounts.map{ |k, v| [k, ((v / benchmark) * 100).to_i] }.to_h
             %div#expense-progress.ui.multiple.progress{ data: { percent: percentages.values.map(&:to_i).sort.reverse.join(",") } }
               - percentages.sort_by{ |k, v| v }.reverse.each_with_index do |(name, percent), idx|
                 - color = progress_bar_colors[idx % progress_bar_colors.length + 1]
