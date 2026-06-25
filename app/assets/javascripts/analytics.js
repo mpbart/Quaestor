@@ -53,7 +53,8 @@ renderTable = function(tableData, sumValues, averageValues) {
     });
 
     tableBody.appendChild(row);
-  } else if (averageValues) {
+  }
+  if (averageValues) {
     const row = document.createElement('tr');
     const td = document.createElement('td');
     td.innerHTML = "<b>Average</b>";
@@ -99,13 +100,8 @@ renderChart = function(form, chartCreator) {
     const chart = chartCreator(data)[chartType];
     analyticsChart = new Chart($('#analytics'), chart);
 
-    let averageValues = false;
-    let sumValues = false;
-    if (chartType === 'net_worth_over_timeframe') {
-      averageValues = true;
-    } else {
-      sumValues = true;
-    }
+    let averageValues = true;
+    let sumValues = true;
     if (chartType != 'spending_by_category_over_timeframe') {
       renderTable(data, sumValues, averageValues);
     }
@@ -215,8 +211,6 @@ $(function() {
         };
       })()
     },
-<<<<<<< Updated upstream
-=======
     'net_worth_by_account_over_timeframe': {
       type: 'bar',
       options: {
@@ -262,7 +256,6 @@ $(function() {
         return { labels: data.months, datasets: datasets };
       })()
     },
->>>>>>> Stashed changes
     'spending_on_merchant_over_timeframe': {
       type: 'bar',
       options: {
