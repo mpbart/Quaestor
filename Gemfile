@@ -37,6 +37,7 @@ gem 'acts_as_paranoid', '~> 0.9'
 
 gem 'redis', '~> 5'
 
+gem 'connection_pool', '~> 2.4'
 gem 'sidekiq', '~> 7.2'
 
 gem 'haml', '~> 6.3'
@@ -47,7 +48,7 @@ gem 'googleauth', '~> 1.14.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'database_cleaner-active_record'
+  gem 'database_cleaner-active_record', '~> 2.2'
   gem 'factory_bot_rails', '~> 6.4'
   gem 'rails-controller-testing'
   gem 'rspec', '~> 3'
