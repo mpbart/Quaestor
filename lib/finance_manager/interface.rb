@@ -54,10 +54,10 @@ module FinanceManager
                 .each do |transaction|
                   transaction.save!
                   Turbo::StreamsChannel.broadcast_prepend_to(
-                    [user, "transactions"],
-                    target: "transactions-table-body",
-                    partial: "transactions/transaction_row",
-                    locals: { transaction: transaction }
+                    [user, 'transactions'],
+                    target:  'transactions-table-body',
+                    partial: 'transactions/transaction_row',
+                    locals:  { transaction: transaction }
                   )
                 end
 
