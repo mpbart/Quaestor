@@ -16,3 +16,9 @@ COPY Gemfile Gemfile.lock ./
 RUN bundle install --jobs 20 --retry 3
 
 COPY . ./
+
+# tmp/ and log/ are gitignored (nothing tracked under them), so a fresh
+# checkout - which is what the GHA build uses - has neither. Create them so
+# puma can write tmp/pids/server.pid, Rails can write log/*.log, and sprockets
+# can use tmp/cache. Without this the container fails to boot.
+RUN mkdir -p tmp/pids tmp/cache log

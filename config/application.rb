@@ -23,6 +23,13 @@ module Quaestor
     config.load_defaults 7.1
     config.time_zone = 'America/Detroit'
     config.action_view.form_with_generates_remote_forms = false
+    config.hosts << ENV['ALLOWED_HOST'] if ENV['ALLOWED_HOST'].present?
+
+    # Allow requests through a reverse proxy (e.g. Nginx Proxy Manager) on a
+    # homelab deployment. Set ALLOWED_HOST in .env to the proxied hostname -
+    # the DNS name NPM answers for, e.g. quaestor.home.example.com. Unset ->
+    # Rails keeps its environment defaults (localhost in dev; allow-all in prod).
+    config.hosts << ENV['ALLOWED_HOST'] if ENV['ALLOWED_HOST'].present?
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
