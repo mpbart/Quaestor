@@ -23,6 +23,7 @@ module Quaestor
     config.load_defaults 7.1
     config.time_zone = 'America/Detroit'
     config.action_view.form_with_generates_remote_forms = false
+    config.hosts << ENV['ALLOWED_HOST'] if ENV['ALLOWED_HOST'].present?
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
