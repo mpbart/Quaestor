@@ -15,7 +15,7 @@ getUrl = function() {
 }
 
 getHeaderTabs = function() {
-  return $('.tabular.menu .item').not('#link-button').not('#refresh-button').not('#account-options').not('#nav-toggle');
+  return $('#main-menu > .item').not('.account-options-item').not('#nav-toggle');
 }
 
 formatDate = function(date) {

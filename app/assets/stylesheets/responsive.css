@@ -18,17 +18,32 @@
     align-items: center;
   }
 
-  /* Collapse the tabs + Account Options until the hamburger is tapped */
-  #main-menu > .item:not(.nav-toggle),
-  #main-menu > .right.item {
+  /* Keep account actions separate; collapse only the page-navigation tabs. */
+  #main-menu > .item:not(.nav-toggle):not(.account-options-item) {
     display: none;
     width: 100%;
     margin-left: 0 !important;
+    order: 3;
   }
 
-  #main-menu.mobile-open > .item:not(.nav-toggle),
-  #main-menu.mobile-open > .right.item {
+  #main-menu.mobile-open > .item:not(.nav-toggle):not(.account-options-item) {
     display: block;
+  }
+
+  #main-menu > .nav-toggle {
+    order: 1;
+  }
+
+  #main-menu > .account-options-item {
+    display: flex;
+    width: auto;
+    margin-left: auto !important;
+    order: 2;
+  }
+
+  #main-menu > .account-options-item .menu {
+    right: 0 !important;
+    left: auto !important;
   }
 }
 
@@ -49,6 +64,46 @@
 
 @media only screen and (max-width: 767px) {
   .mobile-hidden { display: none !important; }
+
+  /*
+   * The spending chart's progress bars are secondary on narrow screens.
+   * Removing that column leaves readable, single-line amount headings.
+   */
+  .spending-breakdown-row > .spending-breakdown-name {
+    width: 37.5% !important;
+    min-width: 0;
+    padding-right: 0.5rem !important;
+    padding-left: 0.5rem !important;
+  }
+
+  .spending-breakdown-row > .spending-breakdown-progress {
+    display: none !important;
+  }
+
+  .spending-breakdown-row > .spending-breakdown-values {
+    width: 62.5% !important;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .spending-breakdown-values > .ui.grid {
+    width: 100%;
+    margin: 0;
+  }
+
+  .spending-breakdown-values .two.column.row {
+    padding: 0;
+  }
+
+  .spending-breakdown-values .cozy.column {
+    padding-right: 0.35rem !important;
+    padding-left: 0.35rem !important;
+    white-space: nowrap;
+  }
+
+  .spending-breakdown-header .cozy.column {
+    font-size: 0.8rem;
+  }
 }
 
 /* ---------- Analytics chart stays within its column ---------- */

@@ -17,7 +17,7 @@ showSplitTransactionUpdateIcon = function(event) {
 }
 
 showTransactionSplitIcon = function(event) {
-  if (data.detail[0]['success']) {
+  if (event.detail.success) {
     $('#successIconSplit').show();
   } else {
     $('#failureIconSplit').show();

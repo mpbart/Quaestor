@@ -172,12 +172,12 @@
                 - color = progress_bar_colors[idx % progress_bar_colors.length + 1]
                 %div.bar{ style: "background-color: #{color} !important", data: { content: name, position: "top center" } }
             %div.ui.grid
-              %div.ui.row
-                %div.ui.four.wide.column
+              %div.ui.row.spending-breakdown-row.spending-breakdown-header
+                %div.ui.four.wide.column.spending-breakdown-name
                   %strong{ style: "color: #767676" }
                     EXPENSES
-                %div.ui.eight.wide.column
-                %div.ui.four.wide.column
+                %div.ui.eight.wide.column.spending-breakdown-progress
+                %div.ui.four.wide.column.spending-breakdown-values
                   %div.ui.grid
                     %div.two.column.row.consistent
                       %div.cozy.column
@@ -191,15 +191,15 @@
               %div.ui.divider
               %div.ui.fluid.accordion
                 %div.ui.grid.title
-                  %div.ui.row
-                    %div.ui.four.wide.column
+                  %div.ui.row.spending-breakdown-row
+                    %div.ui.four.wide.column.spending-breakdown-name
                       %i.dropdown.icon
                       %strong
                         = name.humanize
-                    %div.ui.eight.wide.column
+                    %div.ui.eight.wide.column.spending-breakdown-progress
                       %div.ui.middle.aligned.small.progress{ data: { percent: ((transactions.sum(&:first) / @total_expenses).round(2) * 100.0).to_s } }
                         %div.bar{ style: "background-color: #{color}" }
-                    %div.ui.four.wide.column
+                    %div.ui.four.wide.column.spending-breakdown-values
                       %div.ui.grid
                         %div.two.column.row.consistent
                           %div.cozy.column
@@ -212,17 +212,17 @@
                   - transactions.group_by{ |t| t.third }.sort_by{ |k, v| v.sum(&:first) }.reverse.each do |sub_name, sub_transactions|
                     %div.ui.divider
                     %div.ui.grid
-                      %div.ui.row
-                        %div.ui.four.wide.column
+                      %div.ui.row.spending-breakdown-row
+                        %div.ui.four.wide.column.spending-breakdown-name
                           %div.vertical-aligned
                             = inline_svg('angle_icon.svg')
                             = inline_svg('dash-icon.svg')
                             %strong
                               = sub_name[sub_transactions[0][1].length + 1..].humanize
-                        %div.ui.eight.wide.column
+                        %div.ui.eight.wide.column.spending-breakdown-progress
                           %div.ui.middle.aligned.small.progress{ data: { percent: ((sub_transactions.sum(&:first) / @total_expenses).round(2) * 100.0).to_s } }
                             %div.bar{ style: "background-color: #{color}" }
-                        %div.ui.four.wide.column
+                        %div.ui.four.wide.column.spending-breakdown-values
                           %div.ui.grid
                             %div.two.column.row.consistent
                               %div.cozy.column
