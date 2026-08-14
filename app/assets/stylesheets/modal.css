@@ -3,7 +3,8 @@
   left: auto;
   position: fixed;
   margin: auto;
-  width: 700px;
+  width: 95vw;
+  max-width: 700px;
 }
 
 .ui.modal > .header {

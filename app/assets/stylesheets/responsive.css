@@ -1,0 +1,60 @@
+/*
+ * Responsive / mobile layout rules.
+ *
+ * Loaded after the Fomantic UI CDN stylesheet (see the layout <head>) via the
+ * application.css manifest's require_tree, so equal-specificity rules here win.
+ * The 767px breakpoint matches Fomantic's mobile/tablet boundary and the
+ * `.stackable` grid behavior used on the dashboard/transactions/analytics pages.
+ */
+
+/* ---------- Collapsible top nav (hamburger below tablet) ---------- */
+#main-menu .nav-toggle { display: none; } /* hidden on desktop */
+
+@media only screen and (max-width: 767px) {
+  #main-menu { flex-wrap: wrap; }
+
+  #main-menu .nav-toggle {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Collapse the tabs + Account Options until the hamburger is tapped */
+  #main-menu > .item:not(.nav-toggle),
+  #main-menu > .right.item {
+    display: none;
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  #main-menu.mobile-open > .item:not(.nav-toggle),
+  #main-menu.mobile-open > .right.item {
+    display: block;
+  }
+}
+
+/* ---------- Stack multi-field form rows on phones ---------- */
+@media only screen and (max-width: 767px) {
+  .ui.form .fields { flex-wrap: wrap; }
+  .ui.form .fields > .field {
+    width: 100% !important;
+    margin-bottom: 1em;
+  }
+}
+
+/* ---------- Horizontally scrollable tables + low-priority columns ---------- */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media only screen and (max-width: 767px) {
+  .mobile-hidden { display: none !important; }
+}
+
+/* ---------- Analytics chart stays within its column ---------- */
+.chart-container {
+  position: relative;
+  width: 100%;
+}
+
+#analytics { max-width: 100%; }

@@ -15,7 +15,7 @@ getUrl = function() {
 }
 
 getHeaderTabs = function() {
-  return $('.tabular.menu .item').not('#link-button').not('#refresh-button').not('#account-options');
+  return $('.tabular.menu .item').not('#link-button').not('#refresh-button').not('#account-options').not('#nav-toggle');
 }
 
 formatDate = function(date) {
@@ -59,6 +59,12 @@ $(function() {
   getHeaderTabs().tab();  
   $('.ui.dropdown:not(#primary-category-dropdown)').dropdown();
   $('.ui.accordion').accordion();
+
+  // Mobile hamburger toggle for the top nav
+  $('#nav-toggle').on('click', function(e) {
+    e.preventDefault();
+    $('#main-menu').toggleClass('mobile-open');
+  });
 
  /*
   * Refresh Accounts Button with behavior to show warning banner

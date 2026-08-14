@@ -1,7 +1,7 @@
 = stylesheet_link_tag "application", media: "all"
 
 %body
-  %div.ui.divided.padded.grid
+  %div.ui.divided.padded.stackable.grid
     = render "shared/dimmer"
     %div.four.wide.column
       %form.ui.form#chartForm
@@ -48,9 +48,9 @@
           %input#endDateInput{ type: 'date', name: 'end_date' }
         %button.ui.primary.button{ type: "submit" } Submit
     %div.nine.wide.column
-      %div
+      %div.chart-container
         %canvas#analytics
-      %div
+      %div.table-scroll
         %div.ui.celled.striped.table#graph_data_table
 
 = javascript_include_tag "plaid"

@@ -1,4 +1,6 @@
-%div.ui.tabular.menu
+%div#main-menu.ui.tabular.menu
+  %a#nav-toggle.item.nav-toggle{ href: "#" }
+    %i.bars.icon
   %a#home-tab.active.item{ href: "/" }
     Home
   = link_to "Transactions", transactions_path, data: {turbo_frame: "transactions", turbo_action: "advance"}, class: "item", id: "transactions-tab"
