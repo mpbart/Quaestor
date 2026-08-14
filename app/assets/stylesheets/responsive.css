@@ -61,48 +61,59 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+.spending-breakdown-row {
+  display: grid;
+  grid-template-columns: 4fr 8fr 2fr 2fr;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 0;
+}
+
+.spending-breakdown-name,
+.spending-breakdown-progress {
+  min-width: 0;
+  padding-right: 1rem;
+  padding-left: 1rem;
+}
+
+.spending-breakdown-total,
+.spending-breakdown-percentage {
+  padding-right: 0.5rem !important;
+  padding-left: 0.5rem !important;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.spending-breakdown-header .spending-breakdown-total,
+.spending-breakdown-header .spending-breakdown-percentage {
+  font-size: 0.8rem;
+}
 
 @media only screen and (max-width: 767px) {
   .mobile-hidden { display: none !important; }
 
   /*
    * The spending chart's progress bars are secondary on narrow screens.
-   * Removing that column leaves readable, single-line amount headings.
+   * Replace the Fomantic column widths with a three-column layout so category
+   * names retain the flexible space and both numeric columns stay aligned.
    */
-  .spending-breakdown-row > .spending-breakdown-name {
-    width: 37.5% !important;
-    min-width: 0;
+  .spending-breakdown-row {
+    grid-template-columns: minmax(0, 1fr) 5.25rem 4.25rem;
+    column-gap: 0.25rem;
+  }
+
+  .spending-breakdown-name {
     padding-right: 0.5rem !important;
     padding-left: 0.5rem !important;
   }
-
-  .spending-breakdown-row > .spending-breakdown-progress {
+  .spending-breakdown-progress {
     display: none !important;
   }
 
-  .spending-breakdown-row > .spending-breakdown-values {
-    width: 62.5% !important;
+  .spending-breakdown-total,
+  .spending-breakdown-percentage {
     padding-right: 0 !important;
     padding-left: 0 !important;
-  }
-
-  .spending-breakdown-values > .ui.grid {
-    width: 100%;
-    margin: 0;
-  }
-
-  .spending-breakdown-values .two.column.row {
-    padding: 0;
-  }
-
-  .spending-breakdown-values .cozy.column {
-    padding-right: 0.35rem !important;
-    padding-left: 0.35rem !important;
-    white-space: nowrap;
-  }
-
-  .spending-breakdown-header .cozy.column {
-    font-size: 0.8rem;
   }
 }
 

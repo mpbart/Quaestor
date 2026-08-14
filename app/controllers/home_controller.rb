@@ -7,8 +7,8 @@ class HomeController < ApplicationController
 
   def index
     filtered_params = params.permit(:start_date, :end_date)
-    @start_date = filtered_params[:start_date] || 30.days.ago.to_date
-    @end_date = filtered_params[:end_date] || Date.current
+    @start_date = filtered_params[:start_date] || Date.new(2026, 6, 1)
+    @end_date = filtered_params[:end_date] || Date.new(2026, 7, 1)
     @accounts = current_user.accounts.where(inactive: false)
     @net_worth = Account.net_worth(current_user.id)
     @calcs = FinanceManager::Transaction::Calculations.new(current_user)
