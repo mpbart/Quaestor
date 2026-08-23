@@ -99,10 +99,15 @@ module FinanceManager
       end
 
       ActiveRecord::Base.transaction do
+        new_attrs = new_transaction_details
+                    .reject { |_k, v| v.blank? }
+                    .transform_keys(&:to_s)
+                    .merge(
+                      'id'    => generate_transaction_id,
+                      'split' => true
+                    )
         new_transaction_record = ::Transaction.create!(
-          original_transaction.attributes.except('id')
-          .merge(new_transaction_details.reject { |_k, v| v.blank? })
-          .merge({ id: generate_transaction_id, split: true })
+          original_transaction.attributes.except('id').merge(new_attrs)
         )
         new_transaction_record.split = true
         new_transaction_record.save!
