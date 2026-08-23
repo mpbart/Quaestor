@@ -129,16 +129,19 @@ RSpec.describe FinanceManager::Rules::Runner do
     let(:rule_criteria2) { nil } # No need for a second criteria for this test
 
     it 'creates a new split transaction and updates the original' do
-      transaction # Force creation of the transaction defined in the let block
+      transaction
       expect { run_rules }.to change(Transaction, :count).by(1)
 
-      transaction.reload # Reload the original transaction to get updated attributes
-      split_transaction = Transaction.last
+      transaction.reload
+      split_transaction = Transaction.where(transaction_group: transaction.transaction_group)
+                                     .where.not(id: transaction.id)
+                                     .first
 
-      expect(transaction.amount).to eq(60.0) # 90 - 30
+      expect(transaction.amount).to eq(60.0)
       expect(transaction.split).to be(true)
       expect(transaction.transaction_group).to be_present
 
+      expect(split_transaction).not_to be_nil
       expect(split_transaction.amount).to eq(30.0)
       expect(split_transaction.plaid_category).to eq(split_category)
       expect(split_transaction.description).to eq('Split Part')

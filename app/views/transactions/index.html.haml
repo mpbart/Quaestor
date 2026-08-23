@@ -3,7 +3,7 @@
 = turbo_frame_tag 'transactions' do
   = turbo_stream_from current_user, "transactions"
   %body
-    %div.ui.padded.grid
+    %div.ui.padded.stackable.grid
       = render "shared/dimmer"
       %div.one.wide.column
       %div.fourteen.wide.column
@@ -45,22 +45,23 @@
                         = form.submit "Filter", class: 'ui fluid primary bottom button'
         = render partial: "shared/account_refresh_error"
         %div#recent_transactions{ data: { filter_account_id: params[:account_id], filter_category_id: params[:plaid_category_id], filter_label_id: params[:label_id], filter_q: params[:q], filter_start_date: params[:start_date], filter_end_date: params[:end_date] } }
-          %table.ui.selectable.padded.basic.table
-            %thead
-              %th
-                Date
-              %th
-                Description
-              %th
-                Account
-              %th
-                Category
-              %th
-                Labels
-              %th
-                Amount
-            %tbody#transactions-table-body
-              = render partial: "transactions/transaction_row", collection: @transactions, as: :transaction
+          %div.table-scroll
+            %table.ui.selectable.padded.basic.table
+              %thead
+                %th
+                  Date
+                %th
+                  Description
+                %th.mobile-hidden
+                  Account
+                %th.mobile-hidden
+                  Category
+                %th
+                  Labels
+                %th
+                  Amount
+              %tbody#transactions-table-body
+                = render partial: "transactions/transaction_row", collection: @transactions, as: :transaction
           %button#previous-page-button.ui.right.icon.button
             %i.left.chevron.icon
           %button#next-page-button.ui.right.floated.icon.button
