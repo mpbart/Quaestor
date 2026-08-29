@@ -53,7 +53,8 @@ renderTable = function(tableData, sumValues, averageValues) {
     });
 
     tableBody.appendChild(row);
-  } else if (averageValues) {
+  }
+  if (averageValues) {
     const row = document.createElement('tr');
     const td = document.createElement('td');
     td.innerHTML = "<b>Average</b>";
@@ -99,13 +100,8 @@ renderChart = function(form, chartCreator) {
     const chart = chartCreator(data)[chartType];
     analyticsChart = new Chart($('#analytics'), chart);
 
-    let averageValues = false;
-    let sumValues = false;
-    if (chartType === 'net_worth_over_timeframe') {
-      averageValues = true;
-    } else {
-      sumValues = true;
-    }
+    let averageValues = true;
+    let sumValues = true;
     if (chartType != 'spending_by_category_over_timeframe') {
       renderTable(data, sumValues, averageValues);
     }
@@ -169,7 +165,9 @@ $(function() {
   // IDEAS:
   // 1. Add a sankey diagram for showing flows of money?
 
-  const createChart = (data) => ({
+  const createChart = (data) => {
+    var arrData = Array.isArray(data) ? data : [];
+    return {
     'net_worth_over_timeframe': {
       type: 'bar',
       options: {
@@ -181,36 +179,82 @@ $(function() {
               size: 16
             }
           }
-        }
-      },
-      data: {
-        labels: data.map(row => row.month),
-        datasets: [
-          {
-            type: 'line',
-            label: 'Net Worth',
-            data: data.map(row => row.assets - row.debts),
-            backgroundColor: '#000000',
-            borderColor: 'rgba(0, 0, 0, 0.7)',
-            tension: 0.1
-          },
-          {
-            type: 'bar',
-            label: 'Debts',
-            data: data.map(row => row.debts),
-            backgroundColor: '#9d172b'
-          },
-          {
-            type: 'bar',
-            label: 'Assets',
-            data: data.map(row => row.assets),
-            backgroundColor: '#179d89'
-          }
-        ]
-      },
-      options: {
+        },
         scales: { x: { stacked: true }, y: { stacked: true } }
-      }
+      },
+      data: (function() {
+        if (!Array.isArray(data)) { return { labels: [], datasets: [] }; }
+        return {
+          labels: arrData.map(row => row.month),
+          datasets: [
+            {
+              type: 'line',
+              label: 'Net Worth',
+              data: arrData.map(row => row.assets - row.debts),
+              backgroundColor: '#000000',
+              borderColor: 'rgba(0, 0, 0, 0.7)',
+              tension: 0.1
+            },
+            {
+              type: 'bar',
+              label: 'Debts',
+              data: arrData.map(row => row.debts),
+              backgroundColor: '#9d172b'
+            },
+            {
+              type: 'bar',
+              label: 'Assets',
+              data: arrData.map(row => row.assets),
+              backgroundColor: '#179d89'
+            }
+          ]
+        };
+      })()
+    },
+    'net_worth_by_account_over_timeframe': {
+      type: 'bar',
+      options: {
+        plugins: {
+          title: { display: true, text: 'Net Worth by Account', font: { size: 16 } }
+        },
+        scales: { x: { stacked: true }, y: { stacked: true } }
+      },
+      data: (function() {
+        if (!data || !data.months) { return { labels: [], datasets: [] }; }
+        var debtColors = ['#9d172b', '#d62728', '#ff7f0e', '#e377c2', '#c49c94'];
+        var assetColors = ['#179d89', '#2ca02c', '#1f77b4', '#17becf', '#bcbd22'];
+        var debtIdx = 0;
+        var assetIdx = 0;
+        var datasets = data.accounts.map(function(account) {
+          var isDebt = account.type === 'debt';
+          var color = isDebt ? debtColors[debtIdx++ % debtColors.length] : assetColors[assetIdx++ % assetColors.length];
+          return {
+            type: 'bar',
+            label: account.name,
+            data: account.data,
+            backgroundColor: color,
+            stack: 'combined'
+          };
+        });
+        // Net worth line: assets - debts per month
+        var netWorth = data.months.map(function(_, i) {
+          var total = 0;
+          data.accounts.forEach(function(a) {
+            total += a.type === 'asset' ? a.data[i] : -a.data[i];
+          });
+          return total;
+        });
+        datasets.push({
+          type: 'line',
+          label: 'Net Worth',
+          data: netWorth,
+          backgroundColor: '#000000',
+          borderColor: 'rgba(0, 0, 0, 0.7)',
+          tension: 0.1,
+          stack: 'line'
+        });
+        return { labels: data.months, datasets: datasets };
+      })()
     },
     'spending_on_merchant_over_timeframe': {
       type: 'bar',
@@ -226,12 +270,12 @@ $(function() {
         }
       },
       data: {
-        labels: data.map(row => row.month),
+        labels: arrData.map(row => row.month),
         datasets: [
           {
             type: 'bar',
             label: 'Spending',
-            data: data.map(row => row.amount),
+            data: arrData.map(row => row.amount),
             backgroundColor: '#0982aa'
           },
         ]
@@ -251,12 +295,12 @@ $(function() {
         }
       },
       data: {
-        labels: data.map(row => row.month),
+        labels: arrData.map(row => row.month),
         datasets: [
           {
             type: 'bar',
             label: 'Spending',
-            data: data.map(row => row.amount),
+            data: arrData.map(row => row.amount),
             backgroundColor: '#0982aa'
           },
         ]
@@ -276,12 +320,12 @@ $(function() {
         }
       },
       data: {
-        labels: data.map(row => row.month),
+        labels: arrData.map(row => row.month),
         datasets: [
           {
             type: 'bar',
             label: 'Spending',
-            data: data.map(row => row.amount),
+            data: arrData.map(row => row.amount),
             backgroundColor: '#0982aa'
           },
         ]
@@ -301,12 +345,12 @@ $(function() {
         }
       },
       data: {
-        labels: data.map(row => row.month),
+        labels: arrData.map(row => row.month),
         datasets: [
           {
             type: 'bar',
             label: 'Spending',
-            data: data.map(row => row.amount),
+            data: arrData.map(row => row.amount),
             backgroundColor: '#0982aa'
           },
         ]
@@ -334,7 +378,7 @@ $(function() {
         }
       },
       data: (function() {
-        if (!data || data.length === 0) {
+        if (!data || !Array.isArray(data) || data.length === 0) {
           return { labels: [], datasets: [] };
         }
         const labels = [...new Set(data.map(item => item.month))].sort((a, b) => new Date(Date.parse(a)) - new Date(Date.parse(b)));
@@ -368,18 +412,18 @@ $(function() {
         }
       },
       data: {
-        labels: data.map(row => row.month),
+        labels: arrData.map(row => row.month),
         datasets: [
           {
             type: 'bar',
             label: 'Income',
-            data: data.map(row => row.amount),
+            data: arrData.map(row => row.amount),
             backgroundColor: '#179d89'
           },
         ]
       }
     }
-  });
+  };};
 
   $('#chartType').change(function() {
     var selectedOption = $(this).val();
