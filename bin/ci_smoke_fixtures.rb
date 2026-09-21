@@ -56,6 +56,6 @@ transaction.assign_attributes(
 transaction.save!
 
 puts "SMOKE_USER_EMAIL=#{user.email}"
-puts "SMOKE_USER_PASSWORD=#{password}"
+puts 'SMOKE_USER_PASSWORD=[redacted]'
 puts "SMOKE_ACCOUNT_ID=#{account.id}"
 puts "SMOKE_TRANSACTION_ID=#{transaction.id}"
