@@ -1,14 +1,12 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.2.2'
+ruby '3.4.10'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 7'
+gem 'rails', '~> 8.1.3'
 # Use Puma as the app server
 gem 'puma', '~> 6'
-# Use SCSS for stylesheets
-gem 'sass-rails', '~> 6'
 
 # Javascript import maps for rails
 gem 'importmap-rails', '~> 2'
@@ -32,27 +30,29 @@ gem 'will_paginate', '~> 3.3'
 gem 'cocoon'
 
 gem 'sprockets', '~> 4'
+gem 'sprockets-rails', '~> 3.5'
 
-gem 'acts_as_paranoid', '~> 0.9'
+gem 'acts_as_paranoid', '~> 0.11'
 
 gem 'redis', '~> 5'
 
 gem 'connection_pool', '~> 2.4'
-gem 'sidekiq', '~> 7.2'
+gem 'sidekiq', '~> 7.3'
 
 gem 'haml', '~> 6.3'
 
 gem 'google-api-client', '~> 0.53.0'
 
 gem 'googleauth', '~> 1.14.0'
+gem 'csv'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'database_cleaner-active_record', '~> 2.2'
-  gem 'factory_bot_rails', '~> 6.4'
+  gem 'factory_bot_rails', '~> 6.5'
   gem 'rails-controller-testing'
   gem 'rspec', '~> 3'
-  gem 'rspec-rails', '~> 6.1'
+  gem 'rspec-rails', '~> 8.0'
 end
 
 group :development do

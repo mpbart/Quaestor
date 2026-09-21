@@ -3,6 +3,7 @@ set -e
 
 case "$1" in
   run_app)
+    mkdir -p tmp/pids tmp/cache log
     exec bundle exec puma -C config/puma.rb
   ;;
 
