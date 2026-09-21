@@ -1,10 +1,12 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-begin
-  load File.expand_path('spring', __dir__)
-rescue LoadError => e
-  raise unless e.message.include?('spring')
+if [nil, 'development', 'test'].include?(ENV['RAILS_ENV'])
+  begin
+    load File.expand_path('spring', __dir__)
+  rescue LoadError => e
+    raise unless e.message.include?('spring')
+  end
 end
 require_relative '../config/boot'
 require 'rake'

@@ -1,0 +1,28 @@
+# CI-only overrides used by bin/ci_smoke_test.sh to boot the stack in
+# production mode against a throwaway database and placeholder credentials.
+#
+# This file is NOT loaded automatically: docker compose only reads
+# docker-compose.yml and docker-compose.override.yml. It must be selected
+# explicitly with `-f docker-compose.ci.yml`, so development and deployment are
+# unaffected.
+#
+# None of the values below are secrets. They exist purely so the production
+# code paths (which fetch these variables with ENV.fetch) can boot in CI.
+services:
+  web:
+    environment: &ci_environment
+      - RAILS_ENV=production
+      - DATABASE_URL=postgresql://postgres:password@db/crm_ci
+      - SECRET_KEY_BASE=0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f
+      - DEVISE_SECRET_KEY=ci-smoke-devise-secret-key
+      - ENCRYPTION_KEY=0123456789abcdef0123456789abcdef
+      - PLAID_CLIENT_ID=ci-smoke-plaid-client-id
+      - PLAID_SECRET_ID=ci-smoke-plaid-secret
+      # Serve precompiled assets through Puma, and log to the container output
+      # so CI failures are diagnosable.
+      - RAILS_SERVE_STATIC_FILES=true
+      - RAILS_LOG_TO_STDOUT=true
+      - ALLOWED_HOST=localhost
+
+  sidekiq:
+    environment: *ci_environment

@@ -49,4 +49,7 @@ jobs:
         run: docker compose --env-file .env.test run web bundle exec rubocop
 
       - name: Precompile Production Assets
-        run: SECRET_KEY_BASE=ci-placeholder DATABASE_URL=postgresql://postgres:password@db/crm_dev DISABLE_SPRING=1 RAILS_ENV=production docker compose --env-file .env.test run web bundle exec rails assets:precompile
+        run: docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.ci.yml run --rm web bundle exec rails assets:precompile
+
+      - name: Run Production Smoke Test
+        run: bin/ci_smoke_test.sh
