@@ -34,17 +34,59 @@ PAGE="${WORK_DIR}/page.html"
 BODY="${WORK_DIR}/body.txt"
 ASSET_LIST="${WORK_DIR}/assets.txt"
 ASSET_BODY="${WORK_DIR}/asset-body.txt"
+HEADERS="${WORK_DIR}/headers.txt"
+
+# Set once the app container is serving, so diagnostics can query it.
+DIAG_READY=false
 
 step() { printf '\n== %s\n' "$1"; }
 pass() { printf '   ok: %s\n' "$1"; }
-fail() {
-  printf '   FAIL: %s\n' "$1" >&2
-  exit 1
-}
 
 dump_logs() {
   printf '\n--- container logs ---\n' >&2
   "${COMPOSE[@]}" logs --tail=80 web sidekiq >&2 2>&1 || true
+}
+
+# A failing assertion here is usually caused by state the driver cannot see
+# (which database the app is on, whether the seed landed, whether Devise
+# rejects the credentials). Print that state so a CI failure is actionable
+# without having to reproduce it locally.
+diagnose() {
+  printf '\n--- diagnostics ---\n' >&2
+  if [ -s "$HEADERS" ]; then
+    printf '\nlast response headers:\n' >&2
+    sed -n '1,30p' "$HEADERS" >&2 2>/dev/null || true
+  fi
+  if [ -s "$BODY" ]; then
+    printf '\nlast response body:\n' >&2
+    sed -n '1,40p' "$BODY" >&2 2>/dev/null || true
+  fi
+  if [ -s "$COOKIE_JAR" ]; then
+    printf '\ncookies:\n' >&2
+    cat "$COOKIE_JAR" >&2 2>/dev/null || true
+  fi
+  if [ "$DIAG_READY" = 'true' ]; then
+    printf '\napp-side database and credential check:\n' >&2
+    "${COMPOSE[@]}" exec -T \
+      -e "SMOKE_USER_EMAIL=${SMOKE_USER_EMAIL:-}" \
+      -e "SMOKE_USER_PASSWORD=${SMOKE_USER_PASSWORD:-}" \
+      web bundle exec rails runner '
+        email = ENV.fetch("SMOKE_USER_EMAIL")
+        password = ENV.fetch("SMOKE_USER_PASSWORD")
+        user = User.find_by(email: email)
+        puts "SMOKE_DB=#{ActiveRecord::Base.connection.current_database}"
+        puts "SMOKE_USER_COUNT=#{User.count}"
+        puts "SMOKE_USER_FOUND=#{!user.nil?}"
+        puts "SMOKE_PASSWORD_VALID=#{!user.nil? && user.valid_password?(password)}"
+      ' >&2 2>&1 || true
+  fi
+  dump_logs
+}
+
+fail() {
+  printf '   FAIL: %s\n' "$1" >&2
+  diagnose || true
+  exit 1
 }
 
 cleanup() { rm -rf "$WORK_DIR"; }
@@ -76,17 +118,49 @@ for _ in $(seq 1 60); do
   sleep 2
 done
 [ "$ready" = 'true' ] || fail "web server never served /users/sign_in (waited 120s)"
+DIAG_READY=true
 pass 'puma booted and served the sign-in page'
 
+# The credentials are defined here and pushed into the container, rather than
+# read back out of it: only the generated ids need to round-trip, and both are
+# asserted below. That keeps the password out of the captured stdout, where
+# stray whitespace or interleaved output would silently corrupt it into a
+# failed sign-in.
+SMOKE_USER_EMAIL="${SMOKE_USER_EMAIL:-smoke@example.com}"
+SMOKE_USER_PASSWORD="${SMOKE_USER_PASSWORD:-ci-smoke-password}"
+
 step 'Seeding fixtures'
-FIXTURES="$("${COMPOSE[@]}" exec -T web bundle exec rails runner bin/ci_smoke_fixtures.rb | grep '^SMOKE_' || true)"
+FIXTURES="$("${COMPOSE[@]}" exec -T \
+  -e "SMOKE_USER_EMAIL=${SMOKE_USER_EMAIL}" \
+  -e "SMOKE_USER_PASSWORD=${SMOKE_USER_PASSWORD}" \
+  web bundle exec rails runner bin/ci_smoke_fixtures.rb | tr -d '\r' | grep '^SMOKE_' || true)"
 [ -n "$FIXTURES" ] || fail 'fixture script produced no SMOKE_ output'
-SMOKE_USER_EMAIL="$(sed -n 's/^SMOKE_USER_EMAIL=//p' <<<"$FIXTURES")"
-SMOKE_USER_PASSWORD="$(sed -n 's/^SMOKE_USER_PASSWORD=//p' <<<"$FIXTURES")"
 SMOKE_TRANSACTION_ID="$(sed -n 's/^SMOKE_TRANSACTION_ID=//p' <<<"$FIXTURES")"
-[ -n "$SMOKE_USER_EMAIL" ] || fail 'fixture script did not report a user email'
 [ -n "$SMOKE_TRANSACTION_ID" ] || fail 'fixture script did not report a transaction id'
 pass "fixtures ready for ${SMOKE_USER_EMAIL}"
+
+step 'Verifying the seeded credentials inside the app container'
+# Confirms the fixture row landed in the database the app is actually on, and
+# that Devise accepts the password, before any HTTP is involved. Without this,
+# a mismatch between the seed and the app only surfaces as an opaque 200 from
+# the sign-in POST.
+CHECK="$("${COMPOSE[@]}" exec -T \
+  -e "SMOKE_USER_EMAIL=${SMOKE_USER_EMAIL}" \
+  -e "SMOKE_USER_PASSWORD=${SMOKE_USER_PASSWORD}" \
+  web bundle exec rails runner '
+    email = ENV.fetch("SMOKE_USER_EMAIL")
+    password = ENV.fetch("SMOKE_USER_PASSWORD")
+    user = User.find_by(email: email)
+    valid = !user.nil? && user.valid_password?(password)
+    puts "SMOKE_DB=#{ActiveRecord::Base.connection.current_database}"
+    puts "SMOKE_USER_COUNT=#{User.count}"
+    puts "SMOKE_USER_FOUND=#{!user.nil?}"
+    puts "SMOKE_PASSWORD_VALID=#{valid}"
+  ' | tr -d '\r' || true)"
+printf '%s\n' "$CHECK" | sed 's/^/   /'
+grep -q '^SMOKE_PASSWORD_VALID=true$' <<<"$CHECK" ||
+  fail 'the app container cannot authenticate the seeded user'
+pass "app container authenticates ${SMOKE_USER_EMAIL} against $(sed -n 's/^SMOKE_DB=//p' <<<"$CHECK")"
 
 # ---------------------------------------------------------------------------
 # HTTP: authentication
@@ -105,7 +179,7 @@ curl -s --max-time 10 -o "$PAGE" -c "$COOKIE_JAR" "${BASE_URL}/users/sign_in"
 TOKEN="$(sed -n 's/.*name="authenticity_token" value="\([^"]*\)".*/\1/p' "$PAGE" | head -n 1)"
 [ -n "$TOKEN" ] || fail 'sign-in page has no authenticity token, so CSRF protection looks disabled'
 
-STATUS="$(curl -s --max-time 10 -o "$BODY" -b "$COOKIE_JAR" -c "$COOKIE_JAR" -w '%{http_code}' \
+STATUS="$(curl -s --max-time 10 -o "$BODY" -D "$HEADERS" -b "$COOKIE_JAR" -c "$COOKIE_JAR" -w '%{http_code}' \
   -X POST "${BASE_URL}/users/sign_in" \
   -H "Origin: ${BASE_URL}" \
   --data-urlencode "authenticity_token=${TOKEN}" \
