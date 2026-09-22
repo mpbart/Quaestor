@@ -20,7 +20,7 @@ require 'haml'
 module Quaestor
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    config.load_defaults 8.1
     config.time_zone = 'America/Detroit'
     config.action_view.form_with_generates_remote_forms = false
     config.hosts << ENV['ALLOWED_HOST'] if ENV['ALLOWED_HOST'].present?

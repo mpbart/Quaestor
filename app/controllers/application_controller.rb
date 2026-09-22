@@ -35,7 +35,7 @@ class ApplicationController < ActionController::Base
   def humanized_category(plaid_category)
     return 'N/A' if plaid_category.nil?
 
-    plaid_category.detailed_category[plaid_category.primary_category.length + 1..].humanize
+    plaid_category.detailed_category[(plaid_category.primary_category.length + 1)..].humanize
   end
 
   def label_id_to_color(idx)

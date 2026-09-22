@@ -88,6 +88,9 @@ module FinanceManager
       transaction.destroy
     end
 
+    # This API returns false for invalid split details, so the bang suffix is
+    # retained for callers even though RuboCop classifies it as a predicate.
+    # rubocop:disable-next Naming/PredicateMethod
     def self.split!(original_transaction, new_transaction_details)
       if new_transaction_details[:amount].nil?
         raise BadParametersError, 'Amount must be filled when splitting a transaction'

@@ -4,6 +4,7 @@ require 'finance_manager/google_api_client'
 
 class DatabaseBackupWorker
   include Sidekiq::Worker
+
   DB_BACKUP_DIR = "#{Rails.root}/db_backups".freeze
 
   def perform(user_id)
