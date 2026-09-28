@@ -6,7 +6,7 @@ ruby '3.4.10'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 8.1.3'
 # Use Puma as the app server
-gem 'puma', '~> 6'
+gem 'puma', '~> 7'
 
 # Javascript import maps for rails
 gem 'importmap-rails', '~> 2'
