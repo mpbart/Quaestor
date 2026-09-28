@@ -7,7 +7,14 @@ on:
 
   push:
     paths:
-      '**/*.rb'
+      - '**/*.rb'
+      - 'Gemfile'
+      - 'Gemfile.lock'
+      - 'Dockerfile'
+      - 'docker-compose*.yml'
+      - 'config/**'
+      - 'db/**'
+      - 'spec/**'
 
 jobs:
   test:
@@ -28,7 +35,21 @@ jobs:
         run: docker compose build
 
       - name: Setup Database
-        run: RAILS_ENV=test docker compose --env-file .env.test run web bundle exec rake db:create db:schema:load
+        run: RAILS_ENV=test docker compose --env-file .env.test run web bundle exec rake db:create db:migrate
+      - name: Verify Schema Load
+        run: RAILS_ENV=test docker compose --env-file .env.test run web bundle exec rake db:drop db:create db:schema:load
 
       - name: Run RSpec Tests
         run: RAILS_ENV=test docker compose --env-file .env.test run web bundle exec rspec
+
+      - name: Check Zeitwerk Autoloading
+        run: RAILS_ENV=test docker compose --env-file .env.test run web bundle exec rails zeitwerk:check
+
+      - name: Run RuboCop
+        run: docker compose --env-file .env.test run web bundle exec rubocop
+
+      - name: Precompile Production Assets
+        run: docker compose --env-file .env.test -f docker-compose.yml -f docker-compose.ci.yml run --rm web bundle exec rails assets:precompile
+
+      - name: Run Production Smoke Test
+        run: bin/ci_smoke_test.sh

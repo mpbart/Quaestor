@@ -114,7 +114,9 @@ optional: true
   SQL
 
   def grouped_transactions
-    transaction_group&.transactions&.where&.not(id: id) || []
+    return [] unless transaction_group
+
+    transaction_group.transactions.where.not(id: id)
   end
 
   def self.search_by_label_name(user, label_name, page_num)
@@ -129,30 +131,30 @@ optional: true
   def self.total_spending_over_time(user_id)
     sql_statement = format(TOTAL_PER_MONTH_SQL, '<>')
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [sql_statement, user_id])
-    ActiveRecord::Base.connection.execute(sanitized_sql)
+    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
   end
 
   def self.total_income_over_time(user_id)
     sql_statement = format(TOTAL_PER_MONTH_SQL, '=')
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [sql_statement, user_id])
-    ActiveRecord::Base.connection.execute(sanitized_sql)
+    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
   end
 
   def self.category_totals(user_id)
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [CUMULATIVE_TOTALS_SQL, user_id])
-    ActiveRecord::Base.connection.execute(sanitized_sql)
+    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
   end
 
   def self.primary_category_spending_over_time(category_id, user_id)
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
                                             [PRIMARY_CATEGORY_PER_MONTH_SQL, user_id, category_id])
-    ActiveRecord::Base.connection.execute(sanitized_sql)
+    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
   end
 
   def self.detailed_category_spending_over_time(category_id, user_id)
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
                                             [DETAILED_CATEGORY_PER_MONTH_SQL, user_id, category_id])
-    ActiveRecord::Base.connection.execute(sanitized_sql)
+    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
   end
 
   def self.merchant_spending_over_time(merchant_name, user_id)
@@ -161,7 +163,7 @@ optional: true
                                              user_id,
                                              '%' + merchant_name + '%',
                                              '%' + merchant_name + '%'])
-    ActiveRecord::Base.connection.execute(sanitized_sql)
+    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
   end
 
   def self.label_spending_over_time(label_id, user_id)
@@ -169,11 +171,11 @@ optional: true
                                             [LABEL_PER_MONTH_SQL,
                                              user_id,
                                              label_id])
-    ActiveRecord::Base.connection.execute(sanitized_sql)
+    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
   end
 
   def self.spending_by_category_over_time(user_id)
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [SPENDING_BY_CATEGORY_PER_MONTH_SQL, user_id])
-    ActiveRecord::Base.connection.execute(sanitized_sql)
+    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
   end
 end

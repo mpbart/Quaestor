@@ -6,6 +6,6 @@ class SplitTransactionsController < ApplicationController
   before_action :authenticate_user!
 
   def show
-    @split_transaction = SplitTransaction.find(id)
+    @split_transaction = Transaction.find(params[:id])
   end
 end

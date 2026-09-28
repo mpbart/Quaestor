@@ -1,4 +1,4 @@
-FROM ruby:3.2.2-bookworm
+FROM ruby:3.4.10-bookworm
 
 CMD ["run_app"]
 

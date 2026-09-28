@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Layout/LineLength
-
 module FinanceManager
   module Transaction
     class Calculations
@@ -51,4 +49,3 @@ module FinanceManager
     end
   end
 end
-# rubocop:enable Layout/LineLength

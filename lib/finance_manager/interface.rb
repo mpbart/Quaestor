@@ -23,13 +23,10 @@ module FinanceManager
 
           if result.failed_institution_name.present?
             failed_accounts << result.failed_institution_name
-            next
-          end
-
-          next unless result.accounts&.any?
-
-          result.accounts.each do |account|
-            FinanceManager::Account.handle(account, credential)
+          elsif result.accounts&.any?
+            result.accounts.each do |account|
+              FinanceManager::Account.handle(account, credential)
+            end
           end
         end
       end
@@ -44,32 +41,31 @@ module FinanceManager
 
           if result.failed_institution_name.present?
             failed_accounts << result.failed_institution_name
-            next
+          else
+            result.added
+                  .map { |transaction| FinanceManager::Transaction.create(transaction) }
+                  .map { |transaction| FinanceManager::Rules::Runner.run_all_rules(transaction) }
+                  .compact
+                  .each do |transaction|
+                    transaction.save!
+                    Turbo::StreamsChannel.broadcast_prepend_to(
+                      [user, 'transactions'],
+                      target:  'transactions-table-body',
+                      partial: 'transactions/transaction_row',
+                      locals:  { transaction: transaction }
+                    )
+                  end
+
+            result.modified
+                  .map { |transaction| FinanceManager::Transaction.update(transaction) }
+                  .map { |transaction| FinanceManager::Rules::Runner.run_all_rules(transaction) }
+                  .compact
+                  .each(&:save!)
+
+            result.removed.each { |transaction| FinanceManager::Transaction.remove(transaction) }
+
+            credential.update_columns(cursor: result.cursor)
           end
-
-          result.added
-                .map { |transaction| FinanceManager::Transaction.create(transaction) }
-                .map { |transaction| FinanceManager::Rules::Runner.run_all_rules(transaction) }
-                .compact
-                .each do |transaction|
-                  transaction.save!
-                  Turbo::StreamsChannel.broadcast_prepend_to(
-                    [user, 'transactions'],
-                    target:  'transactions-table-body',
-                    partial: 'transactions/transaction_row',
-                    locals:  { transaction: transaction }
-                  )
-                end
-
-          result.modified
-                .map { |transaction| FinanceManager::Transaction.update(transaction) }
-                .map { |transaction| FinanceManager::Rules::Runner.run_all_rules(transaction) }
-                .compact
-                .each(&:save!)
-
-          result.removed.each { |transaction| FinanceManager::Transaction.remove(transaction) }
-
-          credential.update_columns(cursor: result.cursor)
         end
       end
       failed_accounts

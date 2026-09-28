@@ -49,9 +49,9 @@ module FinanceManager
           )
         )
       end
-        # Remove months where both debts and assets are 0 which is an artifact of loading
-        # some months from a file
-        .reject { |row| row['assets'] == 0.0 && row['debts'] == 0.0 }
+               # Remove months where both debts and assets are 0 which is an artifact of loading
+               # some months from a file
+               .reject { |row| row['assets'] == 0.0 && row['debts'] == 0.0 }
                .concat(mint_data('mint_data/net_worth.json'))
                .group_by { |h| h['month'] }
                .map do |_month, values|

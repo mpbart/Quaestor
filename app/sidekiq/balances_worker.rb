@@ -2,11 +2,12 @@
 
 class BalancesWorker
   include Sidekiq::Worker
+
   # All balances before this date will come from static mint data read via
   # JSON file so only fill in months with missing balances after this date
   BALANCE_START_DATE = Date.new(2024, 2, 1)
 
-  # rubocop:disable Layout/LineLength
+  # rubocop:disable-next Layout/LineLength
   def perform
     ::Account.all.each do |account|
       newest_existing_balance = account.balances.order(created_at: :desc).first
@@ -26,5 +27,4 @@ class BalancesWorker
       end
     end
   end
-  # rubocop:enable Layout/LineLength
 end

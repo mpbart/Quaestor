@@ -72,13 +72,17 @@ class Account < ActiveRecord::Base
 
   def self.net_worth(user_id)
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [NET_WORTH_SQL, user_id, user_id])
-    ActiveRecord::Base.connection.execute(sanitized_sql, user_id).first['net_worth']
+    connection_pool.with_connection do |connection|
+      connection.execute(sanitized_sql, user_id).first['net_worth']
+    end
   end
 
   def self.current_balance(user_id, account_ids)
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
                                             [BALANCE_SQL, user_id, account_ids])
-    ActiveRecord::Base.connection.execute(sanitized_sql).first['balance']
+    connection_pool.with_connection do |connection|
+      connection.execute(sanitized_sql).first['balance']
+    end
   end
 
   # TODO: Make configurable over a given time period instead of hardcoding to 12 months?
@@ -93,6 +97,6 @@ class Account < ActiveRecord::Base
 
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
                                             [BALANCES_BY_MONTH_SQL % where_clause, *bindings])
-    ActiveRecord::Base.connection.execute(sanitized_sql)
+    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
   end
 end
