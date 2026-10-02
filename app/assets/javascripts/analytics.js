@@ -5,6 +5,12 @@ var chartColors = [
   '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5',
   '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5'
 ];
+formatAnalyticsNumber = function(value) {
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(value);
+}
 
 renderTable = function(tableData, sumValues, averageValues) {
   const table = document.getElementById('graph_data_table');
@@ -16,6 +22,7 @@ renderTable = function(tableData, sumValues, averageValues) {
 
   const tableHead = document.createElement('thead');
   const tableBody = document.createElement('tbody');
+  const summationKeys = ['assets', 'debts', 'amount'];
 
 
   const columns = Object.keys(tableData[0]).filter((k) => k != 'sort_date').sort().reverse();
@@ -31,14 +38,11 @@ renderTable = function(tableData, sumValues, averageValues) {
     const row = document.createElement('tr');
     columns.forEach(column => {
       const td = document.createElement('td');
-      td.textContent = item[column];
+      td.textContent = summationKeys.includes(column) ? formatAnalyticsNumber(item[column]) : item[column];
       row.appendChild(td);
     });
     tableBody.appendChild(row);
   });
-
-
-  const summationKeys = ['assets', 'debts', 'amount'];
   if (sumValues) {
     const row = document.createElement('tr');
     const td = document.createElement('td');
@@ -47,13 +51,15 @@ renderTable = function(tableData, sumValues, averageValues) {
 
     columns.filter((k) => summationKeys.includes(k)).forEach(column => {
       const td = document.createElement('td');
-      sum = tableData.reduce((acc, obj) => acc += obj[column], 0).toFixed(2);
-      td.innerHTML = `<b>${sum}</b>`;
+      const sum = tableData.reduce((acc, obj) => acc + obj[column], 0);
+      td.innerHTML = `<b>${formatAnalyticsNumber(sum)}</b>`;
       row.appendChild(td);
     });
 
     tableBody.appendChild(row);
-  } else if (averageValues) {
+  }
+
+  if (averageValues) {
     const row = document.createElement('tr');
     const td = document.createElement('td');
     td.innerHTML = "<b>Average</b>";
@@ -61,10 +67,9 @@ renderTable = function(tableData, sumValues, averageValues) {
 
     columns.filter((k) => summationKeys.includes(k)).forEach(column => {
       const td = document.createElement('td');
-      const sum = tableData.reduce((acc, obj) => acc += obj[column], 0).toFixed(2);
-      const average = (sum / tableData.length).toFixed(2);
-      
-      td.innerHTML = `<b>${average}</b>`;
+      const sum = tableData.reduce((acc, obj) => acc + obj[column], 0);
+      const average = sum / tableData.length;
+      td.innerHTML = `<b>${formatAnalyticsNumber(average)}</b>`;
       row.appendChild(td);
     });
 
@@ -99,13 +104,8 @@ renderChart = function(form, chartCreator) {
     const chart = chartCreator(data)[chartType];
     analyticsChart = new Chart($('#analytics'), chart);
 
-    let averageValues = false;
-    let sumValues = false;
-    if (chartType === 'net_worth_over_timeframe') {
-      averageValues = true;
-    } else {
-      sumValues = true;
-    }
+    const averageValues = true;
+    const sumValues = true;
     if (chartType != 'spending_by_category_over_timeframe') {
       renderTable(data, sumValues, averageValues);
     }
