@@ -31,7 +31,20 @@ module QueryBuilder
 
   def self.build_where(params)
     params.compact_blank.slice(*FILTER_PARAMS).to_h.map do |key, value|
-      send(key, value)
+      case key
+      when 'q'
+        q(value)
+      when 'account_id'
+        account_id(value)
+      when 'plaid_category_id'
+        plaid_category_id(value)
+      when 'label_id'
+        label_id(value)
+      when 'start_date'
+        start_date(value)
+      when 'end_date'
+        end_date(value)
+      end
     end.compact.reduce(:and)
   end
 
