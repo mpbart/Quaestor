@@ -44,6 +44,18 @@ RSpec.describe 'Sidekiq workers' do
 
       expect(account.balances.where(interpolated: true).pluck(:amount).uniq).to eq([100.0])
     end
+    it 'timestamps historical balances at month end and the current month at the current time' do
+      current_time = Time.zone.local(2026, 10, 2, 14, 30)
+      account = create(:account, user: user)
+      create(:balance, account: account, amount: 100, created_at: current_time.advance(months: -2))
+      allow(Time).to receive(:current).and_return(current_time)
+
+      described_class.new.perform
+
+      timestamps = account.balances.where(interpolated: true).order(:created_at).pluck(:created_at)
+      expect(timestamps.first).to be_within(0.000001).of(current_time.prev_month.end_of_month.end_of_day)
+      expect(timestamps.last).to eq(current_time)
+    end
 
     it 'does nothing when the newest balance is from the current month' do
       account = create(:account, user: user)

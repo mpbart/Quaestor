@@ -18,7 +18,7 @@ showSplitTransactionUpdateIcon = function(event) {
 
 showTransactionSplitIcon = function(event) {
   if (event.detail.success) {
-    $('#successIconSplit').show();
+    Turbo.visit(window.location.href, {action: 'replace'});
   } else {
     $('#failureIconSplit').show();
   }
@@ -85,7 +85,6 @@ $(function() {
   $('#transaction-labels > option').filter($("option[data-selected='true']")).each(function(_idx, el) {
       $('#transaction-labels').dropdown('set selected', el.text)
   });
-  $('#split-transactions-form').on('turbo:submit-end', showTransactionSplitIcon);
 
   // Set the values for dropdowns on the transactions SHOW page
   $('#plaid-category-id').dropdown('set selected',

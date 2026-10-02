@@ -24,6 +24,16 @@ RSpec.describe TransactionsController, type: :controller do
 
         expect(response).to render_template(:show)
       end
+
+      context 'when rendering views' do
+        render_views
+
+        it 'includes the split transaction form' do
+          get :show, params: { id: transaction.id }
+
+          expect(response.body).to include('id="split-transactions-form"')
+        end
+      end
     end
 
     context 'which does not exist' do
