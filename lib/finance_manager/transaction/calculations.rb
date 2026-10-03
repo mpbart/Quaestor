@@ -21,7 +21,6 @@ module FinanceManager
           .group_by { |t| t[1] }
       end
 
-      # rubocop:disable Layout/LineLength
       def income_transactions(start_date, end_date)
         user.transactions.joins(:plaid_category)
             .within_days(start_date, end_date)
@@ -33,7 +32,6 @@ module FinanceManager
             .within_days(start_date, end_date)
             .where("plaid_categories.primary_category != 'INCOME' AND plaid_categories.detailed_category NOT IN (?)", PlaidCategory::EXCLUDED_CATEGORIES)
       end
-      # rubocop:enable Layout/LineLength
 
       def total_amount(grouped_transactions)
         grouped_transactions.sum { |_k, v| v.sum(&:first) }.abs.round(2)
