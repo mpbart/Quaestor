@@ -47,7 +47,7 @@
                             %option{ value: category.id, selected: "true" }
                               = humanized_category(category)
                           - else
-                            %option{ value: category.id } 
+                            %option{ value: category.id }
                               = humanized_category(category)
                     %div.field.six.wide
                       = f.submit :id => 'edit-transaction-button', :class => 'ui fluid basic primary bottom button'
@@ -102,13 +102,13 @@
                             %option{ value: category.id, selected: "true" }
                               = humanized_category(category)
                           - else
-                            %option{ value: category.id } 
+                            %option{ value: category.id }
                               = humanized_category(category)
                     %div.field.six.wide
                       = f.submit :id => 'grouped-transaction-button', :class => 'ui fluid basic primary bottom button'
                     %div.field
                       %i.green.check.icon{ id: "successIconTransaction#{idx}" }
-                      %i.red.times.icon{ id: "failureIconTransaction#{idx}" }
+                    %i.red.times.icon{ id: "failureIconTransaction#{idx}" }
 
         %h3.ui.center.aligned.header
           Create New Split Transaction

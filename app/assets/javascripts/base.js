@@ -50,15 +50,22 @@ addAccountsToWarningBanner = function(accounts) {
 showWarningBanner = function() {
   $('#account_refresh_failure_banner').removeClass('hidden');
 }
+initializeFomanticUi = function() {
+  if (document.documentElement.classList.contains('fomantic-ready')) {
+    return;
+  }
+
+  getHeaderTabs().tab();
+  $('.ui.dropdown:not(#primary-category-dropdown)').dropdown();
+  $('.ui.accordion').accordion();
+  $('.progress').popup();
+  $('.progress .bar').popup();
+  document.documentElement.classList.add('fomantic-ready');
+}
 
 
 $(function() {
- /**
-  * Semantic init
-  */
-  getHeaderTabs().tab();  
-  $('.ui.dropdown:not(#primary-category-dropdown)').dropdown();
-  $('.ui.accordion').accordion();
+  initializeFomanticUi();
 
   // Mobile hamburger toggle for the top nav
   $('#nav-toggle').on('click', function(e) {
@@ -126,6 +133,10 @@ $(function() {
   if (HEADER_TABS.includes(`${getUrl()}-tab`)) {
     activateTab($(`#${getUrl()}-tab`), $('.active'));
   }
-  $('.progress').popup();
-  $('.progress .bar').popup();
 });
+
+document.addEventListener('turbo:before-render', function() {
+  document.documentElement.classList.remove('fomantic-ready');
+});
+
+document.addEventListener('turbo:load', initializeFomanticUi);
