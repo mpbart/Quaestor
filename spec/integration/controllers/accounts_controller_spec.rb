@@ -40,7 +40,7 @@ RSpec.describe AccountsController, type: :controller do
       other_account = create(:account)
 
       expect { post :mark_inactive, params: { id: other_account.id } }
-        .not_to change { other_account.reload.inactive }
+        .not_to(change { other_account.reload.inactive })
 
       expect(response).to have_http_status(:not_found)
     end
