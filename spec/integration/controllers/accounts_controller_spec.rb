@@ -45,4 +45,22 @@ RSpec.describe AccountsController, type: :controller do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  describe 'PATCH rename' do
+    it 'renames the account' do
+      patch :rename, params: { id: account.id, name: 'New Name' }
+
+      expect(account.reload.name).to eq('New Name')
+      expect(JSON.parse(response.body)).to eq({ 'success' => true })
+    end
+
+    it 'does not rename another user account' do
+      other_account = create(:account)
+
+      patch :rename, params: { id: other_account.id, name: 'New Name' }
+
+      expect(response).to have_http_status(:not_found)
+      expect(other_account.reload.name).not_to eq('New Name')
+    end
+  end
 end

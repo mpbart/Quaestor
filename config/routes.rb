@@ -25,6 +25,7 @@ Rails.application.routes.draw do
     member do
       get 'balance_history'
       post 'mark_inactive'
+      patch 'rename'
     end
     collection do
       post 'backup'

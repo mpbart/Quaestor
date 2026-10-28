@@ -134,6 +134,24 @@ $(function() {
     });
   });
 
+  $('#rename-account-button').click(function() {
+    const accountId = $('#account-id-data').data('account-id');
+    const name = $('#rename-account-input input').val();
+    $.ajax({
+      url: '/accounts/' + accountId + '/rename',
+      type: 'PATCH',
+      data: { name: name },
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));
+      },
+      success: function(data) {
+        if (data.success) {
+          $('#account-name').text(name);
+        }
+      }
+    });
+  });
+
  /**
   * Add behavior to dismiss warning banner if the x is clicked
   */
