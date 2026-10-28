@@ -9,6 +9,8 @@ RSpec.describe AccountsController, type: :controller do
   before { sign_in user }
 
   describe 'GET show' do
+    render_views
+
     it 'renders the account status as Active' do
       get :show, params: { id: account.id }
 
