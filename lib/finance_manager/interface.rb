@@ -22,7 +22,10 @@ module FinanceManager
           result = plaid_client.sync_accounts(credential)
 
           if result.failed_institution_name.present?
-            failed_accounts << result.failed_institution_name
+            failed_accounts << {
+              institution_name: result.failed_institution_name,
+              error_code:       result.error_code
+            }
           elsif result.accounts&.any?
             result.accounts.each do |account|
               FinanceManager::Account.handle(account, credential)
@@ -40,7 +43,10 @@ module FinanceManager
           result = plaid_client.sync_transactions(credential)
 
           if result.failed_institution_name.present?
-            failed_accounts << result.failed_institution_name
+            failed_accounts << {
+              institution_name: result.failed_institution_name,
+              error_code:       result.error_code
+            }
           else
             result.added
                   .map { |transaction| FinanceManager::Transaction.create(transaction) }
