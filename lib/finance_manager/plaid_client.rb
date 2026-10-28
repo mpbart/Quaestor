@@ -5,10 +5,14 @@ require 'plaid'
 module FinanceManager
   class PlaidClient
     ITEM_LOGIN_REQUIRED = 'ITEM_LOGIN_REQUIRED'
+    NO_ACCOUNTS = 'NO_ACCOUNTS'
+    # Item errors that make the credential unusable; report them as failed
+    # institutions instead of raising so the rest of the refresh can proceed
+    FAILED_ITEM_ERROR_CODES = [ITEM_LOGIN_REQUIRED, NO_ACCOUNTS].freeze
 
-    AccountsResponse = Struct.new(:accounts, :failed_institution_name)
+    AccountsResponse = Struct.new(:accounts, :failed_institution_name, :error_code)
     TransactionsResponse = Struct.new(:added, :modified, :removed, :cursor,
-                                      :failed_institution_name)
+                                      :failed_institution_name, :error_code)
 
     attr_reader :client
 
@@ -32,10 +36,11 @@ module FinanceManager
       return_value
     rescue Plaid::ApiError => e
       body = JSON.parse(e.response_body)
-      raise e unless body['error_code'] == ITEM_LOGIN_REQUIRED
+      raise e unless FAILED_ITEM_ERROR_CODES.include?(body['error_code'])
 
       institution_name = plaid_credential.institution_name || 'Unknown Institution'
       return_value.failed_institution_name = institution_name
+      return_value.error_code = body['error_code']
       Rails.logger.error("Failed to sync accounts #{institution_name} - #{e}")
       return_value
     end
@@ -71,10 +76,11 @@ module FinanceManager
       return_value
     rescue Plaid::ApiError => e
       body = JSON.parse(e.response_body)
-      raise e unless body['error_code'] == ITEM_LOGIN_REQUIRED
+      raise e unless FAILED_ITEM_ERROR_CODES.include?(body['error_code'])
 
       institution_name = plaid_credential.institution_name || 'Unknown Institution'
       return_value.failed_institution_name = institution_name
+      return_value.error_code = body['error_code']
       Rails.logger.error(
         "Failed to sync transactions for #{institution_name} - #{e}"
       )

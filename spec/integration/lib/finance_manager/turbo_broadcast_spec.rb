@@ -99,7 +99,9 @@ RSpec.describe 'Turbo streams' do
       allow(plaid_client).to receive(:sync_transactions).and_return(failed_response)
       allow(Turbo::StreamsChannel).to receive(:broadcast_prepend_to)
 
-      expect(instance.refresh_transactions).to eq(['Some Institution'])
+      expect(instance.refresh_transactions).to eq(
+        [{ institution_name: 'Some Institution', error_code: nil }]
+      )
       expect(Turbo::StreamsChannel).not_to have_received(:broadcast_prepend_to)
     end
   end

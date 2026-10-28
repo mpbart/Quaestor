@@ -43,7 +43,18 @@ unDimPage = function() {
 addAccountsToWarningBanner = function(accounts) {
   elt = $('#account_refresh_failure_banner > ul')
   for (const account of accounts) {
-    elt.append("<li>" + account + "</li>");
+    elt.append("<li>" + account.institution_name + failureMessage(account.error_code) + "</li>");
+  }
+}
+
+failureMessage = function(errorCode) {
+  switch (errorCode) {
+    case 'ITEM_LOGIN_REQUIRED':
+      return " — login required, please reconnect this institution";
+    case 'NO_ACCOUNTS':
+      return " — no valid accounts found, relink a new item or remove this institution";
+    default:
+      return " — failed to refresh";
   }
 }
 

@@ -75,6 +75,7 @@ RSpec.describe FinanceManager::PlaidClient do
       it 'returns error information' do
         result = sync_accounts
         expect(result.failed_institution_name).to eq(institution_name)
+        expect(result.error_code).to eq(FinanceManager::PlaidClient::ITEM_LOGIN_REQUIRED)
       end
     end
 
@@ -89,6 +90,24 @@ RSpec.describe FinanceManager::PlaidClient do
 
       it 'raises the error' do
         expect { sync_accounts }.to raise_error(Plaid::ApiError)
+      end
+    end
+
+    context 'when the item has no accounts' do
+      let(:exc) do
+        Plaid::ApiError.new(
+          response_body: JSON.dump(
+            { error_code: FinanceManager::PlaidClient::NO_ACCOUNTS }
+          )
+        )
+      end
+
+      before { allow(client).to receive(:accounts_get).with(anything).and_raise(exc) }
+
+      it 'returns error information' do
+        result = sync_accounts
+        expect(result.failed_institution_name).to eq(institution_name)
+        expect(result.error_code).to eq(FinanceManager::PlaidClient::NO_ACCOUNTS)
       end
     end
   end
@@ -168,6 +187,7 @@ RSpec.describe FinanceManager::PlaidClient do
       it 'returns error information if errors do occur' do
         result = sync_transactions
         expect(result.failed_institution_name).to eq(institution_name)
+        expect(result.error_code).to eq(FinanceManager::PlaidClient::ITEM_LOGIN_REQUIRED)
       end
     end
 
@@ -204,6 +224,25 @@ RSpec.describe FinanceManager::PlaidClient do
       it 'returns a fallback institution name so the failure is reported' do
         result = sync_transactions
         expect(result.failed_institution_name).to eq('Unknown Institution')
+        expect(result.error_code).to eq(FinanceManager::PlaidClient::ITEM_LOGIN_REQUIRED)
+      end
+    end
+
+    context 'when the item has no accounts' do
+      let(:exc) do
+        Plaid::ApiError.new(
+          response_body: JSON.dump(
+            { error_code: FinanceManager::PlaidClient::NO_ACCOUNTS }
+          )
+        )
+      end
+
+      before { allow(client).to receive(:transactions_sync).with(anything).and_raise(exc) }
+
+      it 'returns error information' do
+        result = sync_transactions
+        expect(result.failed_institution_name).to eq(institution_name)
+        expect(result.error_code).to eq(FinanceManager::PlaidClient::NO_ACCOUNTS)
       end
     end
   end
