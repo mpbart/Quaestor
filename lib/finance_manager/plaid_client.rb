@@ -29,14 +29,15 @@ module FinanceManager
       PlaidResponse.record_accounts_response!(plaid_response.to_hash, plaid_credential)
 
       return_value.accounts = plaid_response.accounts
+      return_value
     rescue Plaid::ApiError => e
       body = JSON.parse(e.response_body)
       raise e unless body['error_code'] == ITEM_LOGIN_REQUIRED
 
-      return_value.failed_institution_name = plaid_credential.institution_name
-      Rails.logger.error("Failed to sync accounts #{plaid_credential.institution_name} - #{e}")
-    ensure
-      return return_value
+      institution_name = plaid_credential.institution_name || 'Unknown Institution'
+      return_value.failed_institution_name = institution_name
+      Rails.logger.error("Failed to sync accounts #{institution_name} - #{e}")
+      return_value
     end
 
     def sync_transactions(plaid_credential)
@@ -67,16 +68,17 @@ module FinanceManager
       return_value.removed = removed
       return_value.modified = modified
       return_value.cursor = cursor
+      return_value
     rescue Plaid::ApiError => e
       body = JSON.parse(e.response_body)
       raise e unless body['error_code'] == ITEM_LOGIN_REQUIRED
 
-      return_value.failed_institution_name = plaid_credential.institution_name
+      institution_name = plaid_credential.institution_name || 'Unknown Institution'
+      return_value.failed_institution_name = institution_name
       Rails.logger.error(
-        "Failed to sync transactions for #{plaid_credential.institution_name} - #{e}"
+        "Failed to sync transactions for #{institution_name} - #{e}"
       )
-    ensure
-      return return_value
+      return_value
     end
 
     def get_institution_information!(plaid_credential)
