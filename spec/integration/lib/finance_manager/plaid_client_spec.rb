@@ -77,6 +77,20 @@ RSpec.describe FinanceManager::PlaidClient do
         expect(result.failed_institution_name).to eq(institution_name)
       end
     end
+
+    context 'when the api error is not a login required error' do
+      let(:exc) do
+        Plaid::ApiError.new(
+          response_body: JSON.dump({ error_code: 'INTERNAL_SERVER_ERROR' })
+        )
+      end
+
+      before { allow(client).to receive(:accounts_get).with(anything).and_raise(exc) }
+
+      it 'raises the error' do
+        expect { sync_accounts }.to raise_error(Plaid::ApiError)
+      end
+    end
   end
 
   describe '#sync_transactions' do
@@ -154,6 +168,42 @@ RSpec.describe FinanceManager::PlaidClient do
       it 'returns error information if errors do occur' do
         result = sync_transactions
         expect(result.failed_institution_name).to eq(institution_name)
+      end
+    end
+
+    context 'when the api error is not a login required error' do
+      let(:exc) do
+        Plaid::ApiError.new(
+          response_body: JSON.dump({ error_code: 'INTERNAL_SERVER_ERROR' })
+        )
+      end
+
+      before { allow(client).to receive(:transactions_sync).with(anything).and_raise(exc) }
+
+      it 'raises the error' do
+        expect { sync_transactions }.to raise_error(Plaid::ApiError)
+      end
+    end
+
+    context 'when the account needs to be refreshed but the institution name is missing' do
+      let(:plaid_credential) do
+        create(:plaid_credential, user: user, institution_name: nil)
+      end
+      let(:exc) do
+        Plaid::ApiError.new(
+          response_body: JSON.dump(
+            { error_code: FinanceManager::PlaidClient::ITEM_LOGIN_REQUIRED }
+          )
+        )
+      end
+
+      before do
+        allow(client).to receive(:transactions_sync).with(anything).and_raise(exc)
+      end
+
+      it 'returns a fallback institution name so the failure is reported' do
+        result = sync_transactions
+        expect(result.failed_institution_name).to eq('Unknown Institution')
       end
     end
   end

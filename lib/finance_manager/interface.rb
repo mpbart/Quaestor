@@ -88,7 +88,7 @@ module FinanceManager
     end
 
     def add_institution_information(plaid_credential)
-      plaid_client.add_institution_information(plaid_credential)
+      plaid_client.get_institution_information!(plaid_credential)
     end
   end
 end
