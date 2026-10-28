@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   resources :accounts, only: [:create, :show] do
     member do
       get 'balance_history'
+      post 'mark_inactive'
     end
     collection do
       post 'backup'

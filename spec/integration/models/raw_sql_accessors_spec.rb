@@ -143,6 +143,15 @@ RSpec.describe 'Raw SQL accessors', type: :model do
       expect(Account.net_worth(user.id).to_f).to eq(500.0)
     end
 
+    it 'excludes inactive accounts from net worth' do
+      savings = create(:account, user: user, account_type: 'depository')
+      create(:balance, account: savings, amount: 300.0, created_at: '2023-02-15')
+
+      depository.update!(inactive: true)
+
+      expect(Account.net_worth(user.id).to_f).to eq(-400.0)
+    end
+
     it 'computes the current balance for the given accounts' do
       expect(Account.current_balance(user.id, [depository.id]).to_f).to eq(1200.0)
     end

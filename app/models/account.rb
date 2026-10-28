@@ -27,6 +27,7 @@ class Account < ActiveRecord::Base
       JOIN (SELECT *, ROW_NUMBER() OVER (PARTITION BY account_id ORDER BY created_at DESC) FROM balances)
       AS balances ON balances.account_id = accounts.id
       WHERE row_number = 1 AND accounts.account_type IN ('loan', 'credit')
+      AND accounts.inactive = false
       AND accounts.user_id = ?
       ),
     assets AS (
@@ -34,6 +35,7 @@ class Account < ActiveRecord::Base
       JOIN (SELECT *, ROW_NUMBER() OVER (PARTITION BY account_id ORDER BY created_at DESC) FROM balances)
       AS balances ON balances.account_id = accounts.id
       WHERE row_number = 1 AND accounts.account_type IN ('depository', 'investment')
+      AND accounts.inactive = false
       AND accounts.user_id = ?
     )
     SELECT assets.sum - debts.sum AS net_worth FROM assets, debts
