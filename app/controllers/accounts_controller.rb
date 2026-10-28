@@ -3,6 +3,8 @@
 require 'finance_manager/analytics'
 
 class AccountsController < ApplicationController
+  before_action :authenticate_user!
+
   def create
     FinanceManager::Account.create_manually(params[:account], current_user)
     render json: { success: true }
@@ -28,6 +30,14 @@ class AccountsController < ApplicationController
 
   def subtypes
     render json: { subtypes: Account::ACCOUNT_TYPES[params[:subtype]] }
+  end
+
+  def mark_inactive
+    account = current_user.accounts.find(params[:id])
+    account.update!(inactive: true)
+    render json: { success: true }
+  rescue ActiveRecord::RecordNotFound
+    render json: { success: false }, status: :not_found
   end
 
   def backup

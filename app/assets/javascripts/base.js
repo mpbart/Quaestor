@@ -117,6 +117,23 @@ $(function() {
     });
   });
 
+  $('#mark-inactive-button').click(function() {
+    dimPage();
+    $.ajax({
+      url: '/accounts/' + $('#account-id-data').data('account-id') + '/mark_inactive',
+      type: 'POST',
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'));
+      },
+      success: function(data) {
+        unDimPage();
+        if (data.success) {
+          Turbo.visit('/', { action: 'replace' });
+        }
+      }
+    });
+  });
+
  /**
   * Add behavior to dismiss warning banner if the x is clicked
   */

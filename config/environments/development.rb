@@ -35,6 +35,11 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
+  # Timestamp all log lines. The default development formatter (SimpleFormatter)
+  # prints the message only; this matches the production formatter and also
+  # applies to the STDOUT copy `rails server` broadcasts in development.
+  config.log_formatter = ::Logger::Formatter.new
+
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
 

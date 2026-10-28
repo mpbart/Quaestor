@@ -20,7 +20,7 @@ class PlaidController < ActionController::Base
     request = Plaid::ItemPublicTokenExchangeRequest.new
     request.public_token = public_token
 
-    response = finance_manager.plaid_client.item_public_token_exchange(request)
+    response = finance_manager.plaid_client.client.item_public_token_exchange(request)
     credential = PlaidCredential.create!(plaid_item_id: response.item_id,
                                          access_token:  response.access_token,
                                          user:          current_user)
