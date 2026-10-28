@@ -40,6 +40,14 @@ class AccountsController < ApplicationController
     render json: { success: false }, status: :not_found
   end
 
+  def rename
+    account = current_user.accounts.find(params[:id])
+    account.update!(name: params.require(:name))
+    render json: { success: true }
+  rescue ActiveRecord::RecordNotFound
+    render json: { success: false }, status: :not_found
+  end
+
   def backup
     DatabaseBackupWorker.perform_async(current_user.id)
     render json: { success: true }

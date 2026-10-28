@@ -40,9 +40,27 @@ RSpec.describe AccountsController, type: :controller do
       other_account = create(:account)
 
       expect { post :mark_inactive, params: { id: other_account.id } }
-        .not_to(change { other_account.reload.inactive })
+        .not_to change { other_account.reload.inactive }
 
       expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'PATCH rename' do
+    it 'renames the account' do
+      patch :rename, params: { id: account.id, name: 'New Name' }
+
+      expect(account.reload.name).to eq('New Name')
+      expect(JSON.parse(response.body)).to eq({ 'success' => true })
+    end
+
+    it 'does not rename another user account' do
+      other_account = create(:account)
+
+      patch :rename, params: { id: other_account.id, name: 'New Name' }
+
+      expect(response).to have_http_status(:not_found)
+      expect(other_account.reload.name).not_to eq('New Name')
     end
   end
 end

@@ -4,7 +4,7 @@
   %body
     %div.ui.card
       %div.content
-        %div.header
+        %div.header#account-name
           = @account.name
       %div.content
         %div.ui.list
@@ -30,6 +30,11 @@
     - unless @account.inactive
       %div#mark-inactive-button.ui.button
         Mark Account Inactive
+
+    %div.ui.action.input#rename-account-input
+      %input{ type: 'text', value: @account.name, placeholder: 'Account name' }
+      %div#rename-account-button.ui.button
+        Rename
 
     %div{id: "account-id-data", data: { 'account-id': @account.id }, style: "display:none;"}
 
