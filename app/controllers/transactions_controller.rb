@@ -7,10 +7,11 @@ class TransactionsController < ApplicationController
   include ActionView::Helpers::NumberHelper
 
   before_action :authenticate_user!
+  before_action :require_owner!, only: [:hard_delete]
 
   def index
     permitted = params.permit(*QueryBuilder::FILTER_PARAMS + [:page])
-    @transactions = QueryBuilder.filter(current_user, permitted)
+    @transactions = QueryBuilder.filter(data_user, permitted)
   end
 
   def show
@@ -58,8 +59,8 @@ class TransactionsController < ApplicationController
 
   # Upload a CSV of transactions
   def upload_csv
-    current_user.transaction_csvs.attach(params[:user][:transaction_csv])
-    finance_manager.import_transactions_csv(current_user.transaction_csvs.last)
+    data_user.transaction_csvs.attach(params[:user][:transaction_csv])
+    finance_manager.import_transactions_csv(data_user.transaction_csvs.last)
   end
 
   def hard_delete
@@ -71,6 +72,6 @@ class TransactionsController < ApplicationController
   private
 
   def finance_manager
-    @finance_manager ||= FinanceManager::Interface.new(current_user)
+    @finance_manager ||= FinanceManager::Interface.new(data_user)
   end
 end

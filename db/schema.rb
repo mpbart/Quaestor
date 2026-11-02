@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_28_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_02_181740) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
@@ -189,16 +189,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_000000) do
     t.string "encrypted_password", default: "", null: false
     t.datetime "last_sign_in_at", precision: nil
     t.inet "last_sign_in_ip"
+    t.bigint "owner_id"
     t.datetime "remember_created_at", precision: nil
     t.datetime "reset_password_sent_at", precision: nil
     t.string "reset_password_token"
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["owner_id"], name: "index_users_on_owner_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "plaid_responses", "plaid_credentials"
+  add_foreign_key "users", "users", column: "owner_id"
 end

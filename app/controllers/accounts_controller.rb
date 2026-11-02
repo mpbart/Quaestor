@@ -4,9 +4,10 @@ require 'finance_manager/analytics'
 
 class AccountsController < ApplicationController
   before_action :authenticate_user!
+  before_action :require_owner!, only: [:create, :mark_inactive, :backup]
 
   def create
-    FinanceManager::Account.create_manually(params[:account], current_user)
+    FinanceManager::Account.create_manually(params[:account], data_user)
     render json: { success: true }
   rescue StandardError => e
     render json: { success: false, error: e }
@@ -20,7 +21,7 @@ class AccountsController < ApplicationController
     end_date = Date.current
     start_date = end_date - 11.months
     balance_data = FinanceManager::Analytics.account_balance_history(
-      user_id:    current_user.id,
+      user_id:    data_user.id,
       account_id: params[:id],
       start_date: start_date.to_s,
       end_date:   end_date.to_s
@@ -33,7 +34,7 @@ class AccountsController < ApplicationController
   end
 
   def mark_inactive
-    account = current_user.accounts.find(params[:id])
+    account = data_user.accounts.find(params[:id])
     account.update!(inactive: true)
     render json: { success: true }
   rescue ActiveRecord::RecordNotFound
@@ -41,7 +42,7 @@ class AccountsController < ApplicationController
   end
 
   def rename
-    account = current_user.accounts.find(params[:id])
+    account = data_user.accounts.find(params[:id])
     account.update!(name: params.require(:name))
     render json: { success: true }
   rescue ActiveRecord::RecordNotFound
@@ -49,7 +50,7 @@ class AccountsController < ApplicationController
   end
 
   def backup
-    DatabaseBackupWorker.perform_async(current_user.id)
+    DatabaseBackupWorker.perform_async(data_user.id)
     render json: { success: true }
   end
 end

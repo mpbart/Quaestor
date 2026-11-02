@@ -39,7 +39,7 @@
                     %span
                       - balance_klass = Account::DEBT_ACCOUNT_TYPES.include?(type) ? 'black-text' : 'green-text'
                       %strong{ class: balance_klass }
-                        = number_to_currency(Account.current_balance(current_user.id, accounts.pluck(:id)).round(2))
+                        = number_to_currency(Account.current_balance(data_user.id, accounts.pluck(:id)).round(2))
                   %div.content
                     %div.ui.list.padded
                       - accounts.each do |account|
@@ -223,38 +223,39 @@
               
       %div.four.wide.column
         %div.ui.grid
-          %div.ui.row
-            %div.left.floated.column
-              %div#add-account-button.ui.accordion.button
-                %div.active.title
-                  %strong
-                    Add New Account
-                %div.content
-                  %div#create-account-form.ui.form
-                    = form_for :account, url: accounts_path do |form|
-                      %div.field
-                        = form.label :name
-                        = form.text_field :name
-                      %div.field
-                        = form.label :institution_name
-                        = form.text_field :institution_name
-                      %div.field
-                        = form.label :account_number_last_4
-                        = form.text_field :mask
-                      %div.field
-                        = form.label :account_type
-                        = form.select :type, Account::ACCOUNT_TYPES.keys, {include_blank: true}, {class: 'ui dropdown'}
-                      %div.field
-                        = form.label :account_sub_type
-                        = form.select :sub_type, [], {}, {class: 'ui dropdown'}
-                      %div.field
-                        = form.label :current_balance
-                        = form.text_field :balance
-                      %span
-                        %button.ui.button{ type: "submit" }
-                          Save Account
-                        %i#successIconAccount.green.check.icon
-                        %i#failureIconAccount.red.times.icon
+          - unless current_user.member?
+            %div.ui.row
+              %div.left.floated.column
+                %div#add-account-button.ui.accordion.button
+                  %div.active.title
+                    %strong
+                      Add New Account
+                  %div.content
+                    %div#create-account-form.ui.form
+                      = form_for :account, url: accounts_path do |form|
+                        %div.field
+                          = form.label :name
+                          = form.text_field :name
+                        %div.field
+                          = form.label :institution_name
+                          = form.text_field :institution_name
+                        %div.field
+                          = form.label :account_number_last_4
+                          = form.text_field :mask
+                        %div.field
+                          = form.label :account_type
+                          = form.select :type, Account::ACCOUNT_TYPES.keys, {include_blank: true}, {class: 'ui dropdown'}
+                        %div.field
+                          = form.label :account_sub_type
+                          = form.select :sub_type, [], {}, {class: 'ui dropdown'}
+                        %div.field
+                          = form.label :current_balance
+                          = form.text_field :balance
+                        %span
+                          %button.ui.button{ type: "submit" }
+                            Save Account
+                          %i#successIconAccount.green.check.icon
+                          %i#failureIconAccount.red.times.icon
           %div.ui.row
             %div.left.floated.column
               %div#add-balance-button.ui.accordion.button
