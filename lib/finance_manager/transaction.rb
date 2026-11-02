@@ -78,6 +78,13 @@ module FinanceManager
     end
 
     def self.remove(transaction)
+      if transaction.nil?
+        Rails.logger.warn(
+          'Transaction removal triggered with null - check the db for more details'
+        )
+        return
+      end
+
       transaction = ::Transaction.find_by(id: transaction.transaction_id)
       unless transaction
         Rails.logger.warn(
