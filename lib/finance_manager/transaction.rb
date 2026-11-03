@@ -85,14 +85,15 @@ module FinanceManager
         return
       end
 
-      transaction = ::Transaction.find_by(id: transaction.transaction_id)
-      unless transaction
+      found_transaction = ::Transaction.find_by(id: transaction.transaction_id)
+      unless found_transaction
         Rails.logger.warn(
           "Could not find transaction to remove with id #{transaction.transaction_id}"
         )
+        return
       end
 
-      transaction.destroy
+      found_transaction.destroy
     end
 
     # This API returns false for invalid split details, so the bang suffix is
