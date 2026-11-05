@@ -7,6 +7,16 @@
  * `.stackable` grid behavior used on the dashboard/transactions/analytics pages.
  */
 
+/* ---------- Account options stay vertically stacked ---------- */
+#account-options > .menu {
+  flex-direction: column;
+}
+
+#account-options > .menu > .item {
+  display: block;
+  width: 100%;
+}
+
 /* ---------- Collapsible top nav (hamburger below tablet) ---------- */
 #main-menu .nav-toggle { display: none; } /* hidden on desktop */
 
