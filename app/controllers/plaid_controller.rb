@@ -5,7 +5,10 @@ require 'finance_manager/interface'
 require 'finance_manager/plaid_client'
 
 class PlaidController < ActionController::Base
+  include HouseholdAccess
+
   before_action :authenticate_user!
+  before_action :require_owner!, only: [:get_access_token, :create_link_token, :fix_account_connection]
   skip_before_action :verify_authenticity_token
   TOKEN_REGEX = /\w+-\w+-\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/
 
@@ -23,7 +26,7 @@ class PlaidController < ActionController::Base
     response = finance_manager.plaid_client.client.item_public_token_exchange(request)
     credential = PlaidCredential.create!(plaid_item_id: response.item_id,
                                          access_token:  response.access_token,
-                                         user:          current_user)
+                                         user:          data_user)
     finance_manager.add_institution_information(credential)
 
     render json: { success: true }
@@ -33,13 +36,13 @@ class PlaidController < ActionController::Base
   def refresh_accounts
     failed_accounts = finance_manager.refresh_accounts
     failed_accounts += finance_manager.refresh_transactions
-    DatabaseBackupWorker.perform_async(current_user.id)
+    DatabaseBackupWorker.perform_async(data_user.id)
 
     render json: { status: 'complete', failed_accounts: failed_accounts.uniq }
   end
 
   def create_link_token
-    link_token = CacheManager.get(:plaid_link_token, current_user.id)
+    link_token = CacheManager.get(:plaid_link_token, data_user.id)
 
     render json: { link_token: link_token }
   end
@@ -52,7 +55,7 @@ class PlaidController < ActionController::Base
 
     link_token_create_request = Plaid::LinkTokenCreateRequest.new(
       {
-        user:          { client_user_id: current_user.id.to_s },
+        user:          { client_user_id: data_user.id.to_s },
         client_name:   'personal-dash',
         access_token:  access_token,
         country_codes: ['US'],
@@ -70,7 +73,7 @@ class PlaidController < ActionController::Base
   private
 
   def finance_manager
-    @finance_manager ||= FinanceManager::Interface.new(current_user)
+    @finance_manager ||= FinanceManager::Interface.new(data_user)
   end
 
   # TODO: Eventually refactor this out but leave for now to keep the number of

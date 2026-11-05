@@ -1,7 +1,7 @@
 = stylesheet_link_tag "application", media: "all"
 
 = turbo_frame_tag 'transactions' do
-  = turbo_stream_from current_user, "transactions"
+  = turbo_stream_from data_user, "transactions"
   %body
     %div.ui.padded.stackable.grid
       = render "shared/dimmer"

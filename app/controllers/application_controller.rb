@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  include HouseholdAccess
+
   helper_method :short_format_date, :amount_class
   helper_method :humanized_category, :label_id_to_color
   helper_method :progress_bar_colors, :make_value_readable

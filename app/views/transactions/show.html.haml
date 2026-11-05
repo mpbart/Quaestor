@@ -138,6 +138,7 @@
                   %div.field
                     %i#failureIconSplit.red.times.icon
       %div.one.wide.column
-        = button_to "Hard Delete", transaction_hard_delete_path(@transaction)
+        - unless current_user.member?
+          = button_to "Hard Delete", transaction_hard_delete_path(@transaction)
 
 = javascript_include_tag "transactions"

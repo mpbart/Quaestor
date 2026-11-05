@@ -1,0 +1,34 @@
+%div.ui.padded.stackable.grid
+  %div.two.wide.column
+  %div.twelve.wide.column
+    %h2.ui.header Manage Household
+    %p Members share your financial data, but cannot link or add accounts, fix connections, create manual backups, deactivate accounts, or permanently delete transactions.
+    - if notice.present?
+      %div.ui.positive.message= notice
+    - if @member.errors.any?
+      %div.ui.negative.message
+        %ul
+          - @member.errors.full_messages.each do |message|
+            %li= message
+    %div.ui.segment
+      %h3.ui.header Household Members
+      - if @members.empty?
+        %p No household members yet.
+      - else
+        %div.ui.divided.list
+          - @members.each do |member|
+            %div.item
+              %div.content
+                %p= member.email
+                = button_to "Remove login", member_path(member), method: :delete, class: "ui small negative button", data: { turbo_confirm: "Remove this login? Your financial data will be kept." }
+    %div.ui.segment
+      %h3.ui.header Add Member
+      = form_with model: @member, url: members_path, class: "ui form" do |form|
+        %div.field
+          = form.label :email
+          = form.email_field :email, required: true, autocomplete: "off"
+        %div.field
+          = form.label :password, "Initial password"
+          = form.password_field :password, required: true, minlength: User.password_length.min, autocomplete: "new-password"
+        %p Share the initial password directly. Members can change it using Account Options → Change Password.
+        = form.submit "Add Member", class: "ui primary button"

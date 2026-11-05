@@ -2,6 +2,7 @@
 
 module Users
   class RegistrationsController < Devise::RegistrationsController
+    before_action :require_first_user!, only: [:new, :create]
     # before_action :configure_sign_up_params, only: [:create]
     # before_action :configure_account_update_params, only: [:update]
 
@@ -55,6 +56,12 @@ module Users
     # def after_sign_up_path_for(resource)
     #   super(resource)
     # end
+
+    private
+
+    def require_first_user!
+      redirect_to new_user_session_path, alert: 'Public sign-up is disabled.' unless User.none?
+    end
 
     # The path used after sign up for inactive accounts.
     # def after_inactive_sign_up_path_for(resource)

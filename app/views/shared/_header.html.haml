@@ -7,17 +7,22 @@
   = link_to "Analytics", analytics_path, data: {turbo_prefetch: false}, class: "item", id: "analytics-tab"
   %a#rules-tab.item{ href: "/rules" }
     Rules
-  %div.right.item.account-options-item
-    %div#account-options.ui.dropdown.link
-      %span.text
-        Account Options
-      %i.dropdown.icon
-      %div.menu
-        %div#link-button.item
-          Link New Account
-        %div#refresh-button.item
-          Refresh Accounts
-        %div#backup-database-button.item
-          Backup Database
+  - if user_signed_in?
+    %div.right.item.account-options-item
+      %div#account-options.ui.dropdown.link
+        %span.text
+          Account Options
+        %i.dropdown.icon
+        %div.menu
+          - unless current_user.member?
+            %div#link-button.item
+              Link New Account
+          %div#refresh-button.item
+            Refresh Accounts
+          - unless current_user.member?
+            %div#backup-database-button.item
+              Backup Database
+            = link_to "Manage Household", members_path, class: "item", data: { turbo_frame: "_top" }
+          = link_to "Change Password", edit_user_registration_path, class: "item", data: { turbo_frame: "_top" }
 
 = javascript_include_tag "base"

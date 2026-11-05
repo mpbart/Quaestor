@@ -18,4 +18,6 @@
 
   %body
     = render "shared/header"
+    - if alert.present?
+      %div.ui.negative.message= alert
     = yield

@@ -32,6 +32,7 @@ Rails.application.routes.draw do
     end
   end
   resources :balances, only: [:create]
+  resources :members, only: [:index, :create, :destroy]
   resources :labels, only: [:create]
   resources :categories, only: [:create]
   resources :analytics, only: [:index]
