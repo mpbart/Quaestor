@@ -15,21 +15,6 @@ optional: true
                         where('transactions.date BETWEEN ? AND ?', start_date, end_date)
                       }
 
-  TOTAL_PER_MONTH_SQL = <<-SQL.freeze
-    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
-    FROM transactions t
-    JOIN accounts a
-    ON t.account_id = a.id
-    JOIN plaid_categories pc
-    ON t.plaid_category_id = pc.id
-    AND a.user_id = ?
-    AND pc.primary_category %s 'INCOME'
-    AND pc.detailed_category NOT IN (#{::PlaidCategory::EXCLUDED_CATEGORIES.map { |i| "'#{i}'" }.join(', ')})
-    AND t.deleted_at IS NULL
-    GROUP BY DATE_TRUNC('MONTH', t.date)
-    ORDER BY month ASC
-  SQL
-
   CUMULATIVE_TOTALS_SQL = <<-SQL
     SELECT SUM(amount) as total, primary_category
     FROM transactions t
@@ -42,76 +27,7 @@ optional: true
     GROUP BY primary_category
   SQL
 
-  PRIMARY_CATEGORY_PER_MONTH_SQL = <<-SQL
-    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
-    FROM transactions t
-    JOIN accounts a
-    ON t.account_id = a.id
-    JOIN plaid_categories pc
-    ON t.plaid_category_id = pc.id
-    AND a.user_id = ?
-    AND pc.primary_category = ?
-    AND t.deleted_at IS NULL
-    GROUP BY DATE_TRUNC('MONTH', t.date)
-    ORDER BY month ASC
-  SQL
-
-  DETAILED_CATEGORY_PER_MONTH_SQL = <<-SQL
-    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
-    FROM transactions t
-    JOIN accounts a
-    ON t.account_id = a.id
-    JOIN plaid_categories pc
-    ON t.plaid_category_id = pc.id
-    AND a.user_id = ?
-    AND pc.detailed_category = ?
-    AND t.deleted_at IS NULL
-    GROUP BY DATE_TRUNC('MONTH', t.date)
-    ORDER BY month ASC
-  SQL
-
-  MERCHANT_PER_MONTH_SQL = <<-SQL
-    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
-    FROM transactions t
-    JOIN accounts a
-    ON t.account_id = a.id
-    AND a.user_id = ?
-    AND (t.merchant_name ILIKE ? OR t.description ILIKE ?)
-    AND t.deleted_at IS NULL
-    GROUP BY DATE_TRUNC('MONTH', t.date)
-    ORDER BY month ASC
-  SQL
-
-  LABEL_PER_MONTH_SQL = <<-SQL.freeze
-    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month
-    FROM transactions t
-    JOIN accounts a
-    ON t.account_id = a.id
-    JOIN labels_transactions lt
-    ON lt.transaction_id = t.id#{' '}
-    JOIN labels l
-    ON lt.label_id = l.id
-    WHERE a.user_id = ?
-    AND l.id = ?
-    AND t.deleted_at IS NULL
-    GROUP BY DATE_TRUNC('MONTH', t.date)
-    ORDER BY month ASC
-  SQL
-
-  SPENDING_BY_CATEGORY_PER_MONTH_SQL = <<-SQL.freeze
-    SELECT SUM(amount) as total, DATE_TRUNC('MONTH', t.date) AS month, pc.primary_category as category
-    FROM transactions t
-    JOIN accounts a
-    ON t.account_id = a.id
-    JOIN plaid_categories pc
-    ON t.plaid_category_id = pc.id
-    WHERE a.user_id = ?
-    AND pc.primary_category <> 'INCOME'
-    AND pc.detailed_category NOT IN (#{::PlaidCategory::EXCLUDED_CATEGORIES.map { |i| "'#{i}'" }.join(', ')})
-    AND t.deleted_at IS NULL
-    GROUP BY DATE_TRUNC('MONTH', t.date), pc.primary_category
-    ORDER BY month ASC
-  SQL
+  MONTH_SQL = "DATE_TRUNC('MONTH', transactions.date)"
 
   def grouped_transactions
     return [] unless transaction_group
@@ -128,16 +44,73 @@ optional: true
                   .includes(:account, :plaid_category)
   end
 
-  def self.total_spending_over_time(user_id)
-    sql_statement = format(TOTAL_PER_MONTH_SQL, '<>')
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [sql_statement, user_id])
-    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
+  # Removes transactions matching any of the given exclusions. Supported keys:
+  # :account_ids, :label_ids, :categories (detailed categories), :merchants
+  # (substring match against merchant name or description).
+  def self.apply_exclusions(exclusions = {})
+    exclusions ||= {}
+    relation = all
+
+    account_ids = Array(exclusions[:account_ids]).map(&:to_i)
+    relation = relation.where.not(account_id: account_ids) if account_ids.any?
+
+    label_ids = Array(exclusions[:label_ids]).map(&:to_i)
+    if label_ids.any?
+      relation = relation.where(
+        'transactions.id NOT IN (SELECT transaction_id FROM labels_transactions WHERE label_id IN (?))',
+        label_ids
+      )
+    end
+
+    categories = Array(exclusions[:categories])
+    if categories.any?
+      relation = relation.where(
+        'transactions.plaid_category_id IS NULL OR transactions.plaid_category_id NOT IN ' \
+        '(SELECT id FROM plaid_categories WHERE detailed_category IN (?))',
+        categories
+      )
+    end
+
+    Array(exclusions[:merchants]).each do |merchant|
+      pattern = "%#{sanitize_sql_like(merchant)}%"
+      relation = relation.where(
+        "NOT (COALESCE(transactions.merchant_name, '') ILIKE :p OR " \
+        "COALESCE(transactions.description, '') ILIKE :p)",
+        p: pattern
+      )
+    end
+
+    relation
   end
 
-  def self.total_income_over_time(user_id)
-    sql_statement = format(TOTAL_PER_MONTH_SQL, '=')
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [sql_statement, user_id])
-    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
+  # Transactions belonging to the user's accounts, with exclusions applied.
+  def self.for_analytics(user_id, exclusions = {})
+    joins(:account).where(accounts: { user_id: user_id }).apply_exclusions(exclusions)
+  end
+
+  def self.monthly_totals(relation)
+    relation.group(Arel.sql(MONTH_SQL))
+            .order(Arel.sql(MONTH_SQL))
+            .pluck(Arel.sql('SUM(transactions.amount)'), Arel.sql(MONTH_SQL))
+            .map { |total, month| { 'total' => total, 'month' => month } }
+  end
+
+  def self.total_spending_over_time(user_id, exclusions = {})
+    monthly_totals(
+      for_analytics(user_id, exclusions)
+        .joins(:plaid_category)
+        .where.not(plaid_categories: { primary_category: 'INCOME' })
+        .where.not(plaid_categories: { detailed_category: ::PlaidCategory::EXCLUDED_CATEGORIES })
+    )
+  end
+
+  def self.total_income_over_time(user_id, exclusions = {})
+    monthly_totals(
+      for_analytics(user_id, exclusions)
+        .joins(:plaid_category)
+        .where(plaid_categories: { primary_category: 'INCOME' })
+        .where.not(plaid_categories: { detailed_category: ::PlaidCategory::EXCLUDED_CATEGORIES })
+    )
   end
 
   def self.category_totals(user_id)
@@ -145,37 +118,48 @@ optional: true
     connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
   end
 
-  def self.primary_category_spending_over_time(category_id, user_id)
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
-                                            [PRIMARY_CATEGORY_PER_MONTH_SQL, user_id, category_id])
-    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
+  def self.primary_category_spending_over_time(category_id, user_id, exclusions = {})
+    monthly_totals(
+      for_analytics(user_id, exclusions)
+        .joins(:plaid_category)
+        .where(plaid_categories: { primary_category: category_id })
+    )
   end
 
-  def self.detailed_category_spending_over_time(category_id, user_id)
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
-                                            [DETAILED_CATEGORY_PER_MONTH_SQL, user_id, category_id])
-    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
+  def self.detailed_category_spending_over_time(category_id, user_id, exclusions = {})
+    monthly_totals(
+      for_analytics(user_id, exclusions)
+        .joins(:plaid_category)
+        .where(plaid_categories: { detailed_category: category_id })
+    )
   end
 
-  def self.merchant_spending_over_time(merchant_name, user_id)
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
-                                            [MERCHANT_PER_MONTH_SQL,
-                                             user_id,
-                                             '%' + merchant_name + '%',
-                                             '%' + merchant_name + '%'])
-    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
+  def self.merchant_spending_over_time(merchant_name, user_id, exclusions = {})
+    pattern = "%#{merchant_name}%"
+    monthly_totals(
+      for_analytics(user_id, exclusions)
+        .where('transactions.merchant_name ILIKE :p OR transactions.description ILIKE :p', p: pattern)
+    )
   end
 
-  def self.label_spending_over_time(label_id, user_id)
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,
-                                            [LABEL_PER_MONTH_SQL,
-                                             user_id,
-                                             label_id])
-    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
+  def self.label_spending_over_time(label_id, user_id, exclusions = {})
+    monthly_totals(
+      for_analytics(user_id, exclusions)
+        .joins(:labels)
+        .where(labels: { id: label_id })
+    )
   end
 
-  def self.spending_by_category_over_time(user_id)
-    sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array, [SPENDING_BY_CATEGORY_PER_MONTH_SQL, user_id])
-    connection_pool.with_connection { |connection| connection.execute(sanitized_sql) }
+  def self.spending_by_category_over_time(user_id, exclusions = {})
+    relation = for_analytics(user_id, exclusions)
+               .joins(:plaid_category)
+               .where.not(plaid_categories: { primary_category: 'INCOME' })
+               .where.not(plaid_categories: { detailed_category: ::PlaidCategory::EXCLUDED_CATEGORIES })
+
+    relation.group(Arel.sql(MONTH_SQL), 'plaid_categories.primary_category')
+            .order(Arel.sql(MONTH_SQL))
+            .pluck(Arel.sql('SUM(transactions.amount)'), Arel.sql(MONTH_SQL),
+                   'plaid_categories.primary_category')
+            .map { |total, month, category| { 'total' => total, 'month' => month, 'category' => category } }
   end
 end

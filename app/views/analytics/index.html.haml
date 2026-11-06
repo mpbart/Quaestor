@@ -4,7 +4,7 @@
   %div.ui.divided.padded.stackable.grid
     = render "shared/dimmer"
     %div.four.wide.column
-      %form.ui.form#chartForm
+      %form.ui.form#chartForm{ autocomplete: "off" }
         %div.field
           %label Select a View
           %select#chartType.ui.dropdown{ name: "chart_type" }
@@ -46,6 +46,32 @@
         %div.field#endDateField{ style: "display: none;" }
           %label Select an End Date
           %input#endDateInput{ type: 'date', name: 'end_date' }
+        %h4.ui.dividing.header Exclude from Charts
+        %div.field
+          %label Accounts
+          %select#excludeAccounts.ui.fluid.search.multiple.dropdown{ name: "exclude_account_ids[]", multiple: true }
+            %option{ value: "" } Select Accounts
+            - data_user.accounts.order(:name).each do |account|
+              %option{ value: account.id }
+                = account.name
+        %div.field
+          %label Labels
+          %select#excludeLabels.ui.fluid.search.multiple.dropdown{ name: "exclude_label_ids[]", multiple: true }
+            %option{ value: "" } Select Labels
+            - Label.all.each do |label|
+              %option{ value: label.id }
+                = label.name
+        %div.field
+          %label Categories
+          %select#excludeCategories.ui.fluid.search.multiple.dropdown{ name: "exclude_categories[]", multiple: true }
+            %option{ value: "" } Select Categories
+            - PlaidCategory.all.each do |category|
+              %option{ value: category.detailed_category }
+                = humanized_category(category)
+        %div.field
+          %label Merchants
+          %select#excludeMerchants.ui.fluid.search.multiple.dropdown{ name: "exclude_merchants[]", multiple: true }
+            %option{ value: "" } Type a merchant name and press enter
         %button.ui.primary.button{ type: "submit" } Submit
     %div.nine.wide.column
       %div.chart-container
