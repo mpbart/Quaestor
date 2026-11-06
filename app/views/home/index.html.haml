@@ -17,10 +17,10 @@
               %div.two.fields
                 %div.field
                   = form.label :start_date
-                  = form.date_field :start_date, value: Date.new(2026, 6, 1)
+                  = form.date_field :start_date, value: @start_date
                 %div.field
                   = form.label :end_date
-                  = form.date_field :end_date, value: Date.new(2026, 7, 1)
+                  = form.date_field :end_date, value: @end_date
               %div.field
                 = form.submit "Submit", class: 'ui fluid primary button'
         %div.ui.fluid.card
