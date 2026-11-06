@@ -47,7 +47,7 @@ optional: true
   # Removes transactions matching any of the given exclusions. Supported keys:
   # :account_ids, :label_ids, :categories (detailed categories), :merchants
   # (substring match against merchant name or description).
-  def self.excluding(exclusions = {})
+  def self.apply_exclusions(exclusions = {})
     exclusions ||= {}
     relation = all
 
@@ -85,7 +85,7 @@ optional: true
 
   # Transactions belonging to the user's accounts, with exclusions applied.
   def self.for_analytics(user_id, exclusions = {})
-    joins(:account).where(accounts: { user_id: user_id }).excluding(exclusions)
+    joins(:account).where(accounts: { user_id: user_id }).apply_exclusions(exclusions)
   end
 
   def self.monthly_totals(relation)
