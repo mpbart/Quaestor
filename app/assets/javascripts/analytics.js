@@ -407,6 +407,8 @@ $(function() {
     }
   });
 
+  $('#excludeMerchants').dropdown({ allowAdditions: true, forceSelection: false });
+
   $('#timeframeField').change(function() {
     initTimeframeField($(this).val());
   });

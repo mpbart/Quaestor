@@ -122,6 +122,59 @@ RSpec.describe 'Raw SQL accessors', type: :model do
       expect(rows.map { |row| row['total'].to_f }).to eq([-100.0])
     end
 
+    describe 'exclusions' do
+      let(:other_account) { create(:account, user: user, account_type: 'depository') }
+
+      before do
+        create(
+          :transaction,
+          user:           user,
+          account:        other_account,
+          plaid_category: expense_category,
+          amount:         -10.0,
+          date:           '2023-01-12',
+          merchant_name:  'Corner Cafe'
+        )
+      end
+
+      it 'excludes accounts' do
+        rows = Transaction.total_spending_over_time(user.id, { account_ids: [other_account.id] })
+
+        expect(rows.map { |row| row['total'].to_f }).to eq([-100.0, -50.0])
+      end
+
+      it 'excludes detailed categories' do
+        rows = Transaction.total_spending_over_time(
+          user.id, { categories: ['FOOD_AND_DRINK_GROCERIES'] }
+        )
+
+        expect(rows).to be_empty
+      end
+
+      it 'excludes merchants by substring' do
+        rows = Transaction.total_spending_over_time(user.id, { merchants: ['shop'] })
+
+        expect(rows.map { |row| row['total'].to_f }).to eq([-10.0])
+      end
+
+      it 'excludes labels without dropping unlabeled or multi-labeled transactions' do
+        labels = [create(:label, name: 'A'), create(:label, name: 'B')]
+        january_expense.labels << labels
+
+        rows = Transaction.total_spending_over_time(user.id, { label_ids: labels.map(&:id) })
+
+        expect(rows.map { |row| row['total'].to_f }).to eq([-10.0, -50.0])
+      end
+
+      it 'applies exclusions to a filtered chart query' do
+        rows = Transaction.merchant_spending_over_time(
+          'Shop', user.id, { account_ids: [depository.id] }
+        )
+
+        expect(rows).to be_empty
+      end
+    end
+
     it 'totals spending by category per month' do
       rows = Transaction.spending_by_category_over_time(user.id)
 
@@ -164,6 +217,12 @@ RSpec.describe 'Raw SQL accessors', type: :model do
       rows = Account.balances_by_month(user.id, depository.id)
 
       expect(rows.map { |row| row['amount'].to_f }).to eq([1000.0, 1200.0])
+    end
+
+    it 'excludes accounts when grouping balances by month' do
+      rows = Account.balances_by_month(user.id, exclude_account_ids: [credit.id]).to_a
+
+      expect(rows.map { |row| row['account_id'].to_i }.uniq).to eq([depository.id])
     end
 
     it 'groups balances by month across all of the user accounts' do

@@ -32,9 +32,9 @@ module FinanceManager
 
     # Return JSON array of both debts and assets over the
     # given timeframe in months.
-    def self.net_worth_over_timeframe(user_id:, start_date:, end_date:)
+    def self.net_worth_over_timeframe(user_id:, start_date:, end_date:, exclusions: {})
       time_range = range_from_timeframe(start_date, end_date)
-      ::Account.balances_by_month(user_id)
+      ::Account.balances_by_month(user_id, exclude_account_ids: exclusions[:account_ids])
                .group_by { |row| row['month'] }
                .map do |k, v|
         {
@@ -101,12 +101,13 @@ module FinanceManager
     def self.spending_on_primary_category_over_timeframe(category_name:,
                                                          user_id:,
                                                          start_date:,
-                                                         end_date:)
+                                                         end_date:,
+                                                         exclusions: {})
       present_as_hash(
         filter_for_timeframe(
           start_date,
           end_date,
-          ::Transaction.primary_category_spending_over_time(category_name, user_id)
+          ::Transaction.primary_category_spending_over_time(category_name, user_id, exclusions)
         )
       )
     end
@@ -114,59 +115,62 @@ module FinanceManager
     def self.spending_on_detailed_category_over_timeframe(category_name:,
                                                           user_id:,
                                                           start_date:,
-                                                          end_date:)
+                                                          end_date:,
+                                                          exclusions: {})
       present_as_hash(
         filter_for_timeframe(
           start_date,
           end_date,
-          ::Transaction.detailed_category_spending_over_time(category_name, user_id)
+          ::Transaction.detailed_category_spending_over_time(category_name, user_id, exclusions)
         )
       )
     end
 
-    def self.spending_on_merchant_over_timeframe(merchant_name:, user_id:, start_date:, end_date:)
+    def self.spending_on_merchant_over_timeframe(merchant_name:, user_id:, start_date:, end_date:,
+                                                 exclusions: {})
       present_as_hash(
         filter_for_timeframe(
           start_date,
           end_date,
-          ::Transaction.merchant_spending_over_time(merchant_name, user_id)
+          ::Transaction.merchant_spending_over_time(merchant_name, user_id, exclusions)
         )
       )
     end
 
-    def self.spending_over_timeframe(user_id:, start_date:, end_date:)
+    def self.spending_over_timeframe(user_id:, start_date:, end_date:, exclusions: {})
       present_as_hash(
         filter_for_timeframe(
           start_date,
           end_date,
-          ::Transaction.total_spending_over_time(user_id)
+          ::Transaction.total_spending_over_time(user_id, exclusions)
         )
       )
     end
 
-    def self.income_over_timeframe(user_id:, start_date:, end_date:)
+    def self.income_over_timeframe(user_id:, start_date:, end_date:, exclusions: {})
       present_as_hash(
         filter_for_timeframe(
           start_date,
           end_date,
-          ::Transaction.total_income_over_time(user_id)
+          ::Transaction.total_income_over_time(user_id, exclusions)
         )
       )
     end
 
-    def self.spending_on_label_over_timeframe(user_id:, label_id:, start_date:, end_date:)
+    def self.spending_on_label_over_timeframe(user_id:, label_id:, start_date:, end_date:,
+                                              exclusions: {})
       present_as_hash(
         filter_for_timeframe(
           start_date,
           end_date,
-          ::Transaction.label_spending_over_time(label_id, user_id)
+          ::Transaction.label_spending_over_time(label_id, user_id, exclusions)
         )
       )
     end
 
-    def self.account_balance_history(user_id:, account_id:, start_date:, end_date:)
+    def self.account_balance_history(user_id:, account_id:, start_date:, end_date:, exclusions: {})
       time_range = range_from_timeframe(start_date, end_date)
-      ::Account.balances_by_month(user_id, account_id)
+      ::Account.balances_by_month(user_id, account_id, exclude_account_ids: exclusions[:account_ids])
                .filter { |row| time_range.cover?(row['month']) }
                .map do |row|
         { month:   row['month'].strftime('%B %Y'),
@@ -175,11 +179,11 @@ module FinanceManager
                .sort_by { |h| Date.strptime(h[:month], '%B %Y') }
     end
 
-    def self.spending_by_category_over_timeframe(user_id:, start_date:, end_date:)
+    def self.spending_by_category_over_timeframe(user_id:, start_date:, end_date:, exclusions: {})
       records = filter_for_timeframe(
         start_date,
         end_date,
-        ::Transaction.spending_by_category_over_time(user_id)
+        ::Transaction.spending_by_category_over_time(user_id, exclusions)
       )
 
       grouped_by_month = records.group_by { |rec| rec['month'].to_date }
