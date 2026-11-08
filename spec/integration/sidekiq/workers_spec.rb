@@ -65,6 +65,63 @@ RSpec.describe 'Sidekiq workers' do
     end
   end
 
+  describe TransactionRefreshWorker do
+    it 'can be enqueued' do
+      expect { described_class.perform_async }.to change { described_class.jobs.size }.by(1)
+    end
+
+    it 'enqueues onto the default queue' do
+      described_class.perform_async
+
+      expect(described_class.jobs.last['queue']).to eq('default')
+      expect(described_class.jobs.last['class']).to eq('TransactionRefreshWorker')
+    end
+
+    it 'refreshes transactions for all users with credentials when no responses are recorded' do
+      create(:plaid_credential)
+      interface = double('interface', refresh_transactions: [])
+      allow(FinanceManager::Interface).to receive(:new).and_return(interface)
+
+      described_class.new.perform
+
+      expect(interface).to have_received(:refresh_transactions).once
+    end
+
+    it 'does nothing when the newest plaid response is from today' do
+      credential = create(:plaid_credential)
+      PlaidResponse.create!(
+        endpoint:         '/transactions/get',
+        response:         {},
+        plaid_credential: credential
+      )
+      interface = double('interface', refresh_transactions: [])
+      allow(FinanceManager::Interface).to receive(:new).and_return(interface)
+
+      described_class.new.perform
+
+      expect(FinanceManager::Interface).not_to have_received(:new)
+    end
+
+    it 'refreshes transactions for all users with credentials when the newest response is stale' do
+      stale_credential = create(:plaid_credential)
+      PlaidResponse.create!(
+        endpoint:         '/transactions/get',
+        response:         {},
+        plaid_credential: stale_credential,
+        created_at:       2.days.ago
+      )
+      fresh_credential = create(:plaid_credential)
+      interface = double('interface', refresh_transactions: [])
+      allow(FinanceManager::Interface).to receive(:new).and_return(interface)
+
+      described_class.new.perform
+
+      expect(FinanceManager::Interface).to have_received(:new).with(stale_credential.user)
+      expect(FinanceManager::Interface).to have_received(:new).with(fresh_credential.user)
+      expect(interface).to have_received(:refresh_transactions).twice
+    end
+  end
+
   describe DatabaseBackupWorker do
     it 'can be enqueued with a user id' do
       expect { described_class.perform_async(user.id) }.to change { described_class.jobs.size }.by(1)

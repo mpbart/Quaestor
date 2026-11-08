@@ -25,7 +25,9 @@ gem 'pg'
 
 gem 'attr_encrypted'
 
-gem 'will_paginate', '~> 3.3'
+gem "will_paginate", "~> 3.3"
+
+gem "sidekiq-cron", "~> 2.3"
 
 gem 'cocoon'
 
