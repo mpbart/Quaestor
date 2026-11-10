@@ -88,13 +88,19 @@ class Account < ActiveRecord::Base
   end
 
   # TODO: Make configurable over a given time period instead of hardcoding to 12 months?
-  def self.balances_by_month(user_id, account_id = nil)
+  def self.balances_by_month(user_id, account_id = nil, exclude_account_ids: [])
     bindings = [user_id]
     where_clause = 'AND u.id = ?'
 
     if account_id.present?
       where_clause += ' AND a.id = ?'
       bindings << account_id
+    end
+
+    exclude_account_ids = Array(exclude_account_ids).map(&:to_i)
+    if exclude_account_ids.any?
+      where_clause += ' AND a.id NOT IN (?)'
+      bindings << exclude_account_ids
     end
 
     sanitized_sql = ActiveRecord::Base.send(:sanitize_sql_array,

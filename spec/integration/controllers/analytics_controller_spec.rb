@@ -46,6 +46,28 @@ RSpec.describe AnalyticsController, type: :controller do
       )
     end
 
+    it 'passes non-blank exclusions to the analytics engine' do
+      allow(FinanceManager::Analytics).to receive(:compute_analytics).and_return([])
+
+      get :chart_data, params: {
+        dataset:             'spending_over_timeframe',
+        start_date:          '2023-01-01',
+        end_date:            '2023-03-31',
+        exclude_account_ids: ['1', ''],
+        exclude_merchants:   ['Shop']
+      }
+
+      expect(FinanceManager::Analytics).to have_received(:compute_analytics).with(
+        'spending_over_timeframe',
+        {
+          user_id:    user.id,
+          start_date: '2023-01-01',
+          end_date:   '2023-03-31',
+          exclusions: { account_ids: ['1'], merchants: ['Shop'] }
+        }
+      )
+    end
+
     it 'renders an empty object when the analytics engine returns nothing' do
       allow(FinanceManager::Analytics).to receive(:compute_analytics).and_return(nil)
 

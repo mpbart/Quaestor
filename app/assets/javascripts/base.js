@@ -67,7 +67,7 @@ initializeFomanticUi = function() {
   }
 
   getHeaderTabs().tab();
-  $('.ui.dropdown:not(#primary-category-dropdown)').dropdown();
+  $('.ui.dropdown:not(#primary-category-dropdown):not(#excludeMerchants)').dropdown();
   $('.ui.accordion').accordion();
   $('.progress').popup();
   $('.progress .bar').popup();
